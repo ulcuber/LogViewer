@@ -105,7 +105,13 @@ class LogViewerController extends Controller
         $log     = $this->getLogOrFail($date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
-        $entries = $log->entries($level)->paginate($this->perPage);
+        $entries = $log->entries($level)
+            ->when($request->get('uuid'), function (LogEntryCollection $entries, string $uuid) {
+                return $entries->filter(function (LogEntry $entry) use ($uuid) {
+                    return $entry->uuid === $uuid;
+                });
+            })
+            ->paginate($this->perPage);
 
         return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries'));
     }

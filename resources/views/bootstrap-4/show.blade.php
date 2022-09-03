@@ -122,7 +122,9 @@
                                 <?php /** @var  Arcanedev\LogViewer\Entities\LogEntry  $entry */ ?>
                                 <tr>
                                     <td>
-                                        <span class="badge badge-env">{{ $entry->uuid }}</span>
+                                        <a class="badge badge-env" href="{{ route('log-viewer::logs.show', array_merge(request()->input(), ['date' => $log->date, 'uuid' => $entry->uuid])) }}">
+                                            {{ $entry->uuid }}
+                                        </a>
                                         <span class="badge badge-env">{{ $entry->env }}</span>
                                         <span class="badge badge-level-{{ $entry->level }}">
                                             {!! $entry->level() !!}
