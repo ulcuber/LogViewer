@@ -17,7 +17,7 @@
         <div class="col-lg-2">
             {{-- Log Menu --}}
             <div class="card mb-4">
-                <div class="card-header"><i class="fa fa-fw fa-flag"></i> Levels</div>
+                <div class="card-header"><i class="fa fa-fw fa-flag"></i> {{ trans('log-viewer::general.levels') }}</div>
                 <div class="list-group list-group-flush log-menu">
                     @foreach($log->menu() as $levelKey => $item)
                         @if ($item['count'] === 0)
@@ -42,10 +42,10 @@
                     Log info :
                     <div class="group-btns pull-right">
                         <a href="{{ route('log-viewer::logs.download', [$log->date]) }}" class="btn btn-sm btn-success">
-                            <i class="fa fa-download"></i> DOWNLOAD
+                            <i class="fa fa-download"></i> {{ trans('log-viewer::general.download') }}
                         </a>
                         <a href="#delete-log-modal" class="btn btn-sm btn-danger" data-toggle="modal">
-                            <i class="fa fa-trash-o"></i> DELETE
+                            <i class="fa fa-trash-o"></i> {{ trans('log-viewer::general.delete') }}
                         </a>
                     </div>
                 </div>
@@ -113,8 +113,8 @@
                     <table id="entries" class="table mb-0">
                         <thead>
                             <tr>
-                                <th>Info/Actions</th>
-                                <th>Header</th>
+                                <th>{{ trans('log-viewer::general.info-actions') }}</th>
+                                <th>{{ trans('log-viewer::general.header') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -130,6 +130,11 @@
                                         <span class="badge badge-secondary">
                                             {{ $entry->getDatetime()->format('H:i:s') }}
                                         </span>
+
+                                        <br/>
+
+                                        <a class="btn btn-sm btn-light" href="{{ route('log-viewer::logs.similar', [$log->date, $entry->level, 'text' => $entry->header]) }}">{{ trans('log-viewer::general.similar') }}</a>
+
                                         @if ($entry->hasStack())
                                         <a class="btn btn-sm btn-light" role="button" data-toggle="collapse"
                                            href="#log-stack-{{ $key }}" aria-expanded="false" aria-controls="log-stack-{{ $key }}">

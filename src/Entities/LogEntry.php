@@ -36,7 +36,7 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     /** @var string */
     public $level;
 
-    /** @var \Carbon\Carbon */
+    /** @var \Carbon\Carbon|callable */
     protected $datetime;
 
     /** @var string */
@@ -342,6 +342,23 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     public function isSameLevel($level)
     {
         return $this->level === $level;
+    }
+
+    /**
+     * Check if similar to.
+     *
+     * @param  string  $text
+     * @param  float  $similarity
+     *
+     * @return bool
+     */
+    public function isSimilar(string $text, float $similarity)
+    {
+        $percent = 0;
+
+        similar_text($text, $this->header, $percent);
+
+        return $percent >= $similarity;
     }
 
     /* -----------------------------------------------------------------

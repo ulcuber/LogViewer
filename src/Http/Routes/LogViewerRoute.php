@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Http\Routes;
+<?php
+
+namespace Arcanedev\LogViewer\Http\Routes;
 
 use Arcanedev\Support\Routing\RouteRegistrar;
 
@@ -35,14 +37,14 @@ class LogViewerRoute extends RouteRegistrar
      */
     private function mapLogsRoutes()
     {
-        $this->prefix('logs')->name('logs.')->group(function() {
+        $this->prefix('logs')->name('logs.')->group(function () {
             $this->get('/', 'LogViewerController@listLogs')
                  ->name('list'); // log-viewer::logs.list
 
             $this->delete('delete', 'LogViewerController@delete')
                  ->name('delete'); // log-viewer::logs.delete
 
-            $this->prefix('{date}')->group(function() {
+            $this->prefix('{date}')->group(function () {
                 $this->get('/', 'LogViewerController@show')
                      ->name('show'); // log-viewer::logs.show
 
@@ -54,6 +56,9 @@ class LogViewerRoute extends RouteRegistrar
 
                 $this->get('{level}/search', 'LogViewerController@search')
                      ->name('search'); // log-viewer::logs.search
+
+                $this->get('{level}/similar', 'LogViewerController@showSimilar')
+                     ->name('similar'); // log-viewer::logs.similar
             });
         });
     }

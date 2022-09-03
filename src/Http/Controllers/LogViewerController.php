@@ -111,6 +111,27 @@ class LogViewerController extends Controller
     }
 
     /**
+     * Show similar entries.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string                    $date
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showSimilar(Request $request, $date)
+    {
+        $text = $request->get('text');
+
+        $level   = 'all';
+        $log     = $this->getLogOrFail($date);
+        $query   = $request->get('query');
+        $levels  = $this->logViewer->levelsNames();
+        $entries = $log->getSimilar($text, 76)->paginate($this->perPage);
+
+        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries'));
+    }
+
+    /**
      * Filter the log entries by level.
      *
      * @param  \Illuminate\Http\Request  $request

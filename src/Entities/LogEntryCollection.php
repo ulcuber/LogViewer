@@ -84,6 +84,21 @@ class LogEntryCollection extends LazyCollection
     }
 
     /**
+     * Get filtered log entries by level.
+     *
+     * @param  string  $text
+     * @param  float  $similarity
+     *
+     * @return self
+     */
+    public function filterBySimilarity(string $text, float $similarity)
+    {
+        return $this->filter(function (LogEntry $entry) use ($text, $similarity) {
+            return $entry->isSimilar($text, $similarity);
+        });
+    }
+
+    /**
      * Get log entries stats.
      *
      * @return array

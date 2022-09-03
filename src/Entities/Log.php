@@ -152,6 +152,19 @@ class Log implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
+     * Get filtered log entries by similarity.
+     *
+     * @param  string  $text
+     * @param  float  $similarity
+     *
+     * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
+     */
+    public function getSimilar(string $text, float $similarity)
+    {
+        return $this->entries->filterBySimilarity($text, $similarity);
+    }
+
+    /**
      * Get log stats.
      *
      * @return array
