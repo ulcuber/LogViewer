@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Http\Controllers;
+<?php
+
+namespace Arcanedev\LogViewer\Http\Controllers;
 
 use Arcanedev\LogViewer\Contracts\LogViewer as LogViewerContract;
 use Arcanedev\LogViewer\Entities\LogEntry;
@@ -119,13 +121,14 @@ class LogViewerController extends Controller
      */
     public function showByLevel(Request $request, $date, $level)
     {
-        if ($level === 'all')
+        if ($level === 'all') {
             return redirect()->route($this->showRoute, [$date]);
+        }
 
         $log     = $this->getLogOrFail($date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
-        $entries = $this->logViewer->entries($date, $level)->paginate($this->perPage);
+        $entries = $log->entries($level)->paginate($this->perPage);
 
         return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries'));
     }
@@ -141,10 +144,11 @@ class LogViewerController extends Controller
      */
     public function search(Request $request, $date, $level = 'all')
     {
-        $query   = $request->get('query');
+        $query = $request->get('query');
 
-        if (is_null($query))
+        if (is_null($query)) {
             return redirect()->route($this->showRoute, [$date]);
+        }
 
         $log     = $this->getLogOrFail($date);
         $levels  = $this->logViewer->levelsNames();
@@ -249,8 +253,7 @@ class LogViewerController extends Controller
 
         try {
             $log = $this->logViewer->get($date);
-        }
-        catch (LogNotFoundException $e) {
+        } catch (LogNotFoundException $e) {
             abort(404, $e->getMessage());
         }
 

@@ -75,8 +75,15 @@ class LogEntryTest extends TestCase
     public function it_can_extract_context()
     {
         $entry = new LogEntry(
-            'SUCCESS',
-            '[2020-01-09 10:27:00] production.SUCCESS: New user registered {"id":1,"name":"John DOE"}'
+            [
+                '[2020-01-09 10:27:00] production.SUCCESS: New user registered {"id":1,"name":"John DOE"}',
+                '2020-01-09 10:27:00',
+                ' ', // separator
+                '', // ms
+                '', // tz
+                ' production.SUCCESS: New user registered {"id":1,"name":"John DOE"}',
+            ],
+            null
         );
 
         static::assertTrue($entry->hasContext());

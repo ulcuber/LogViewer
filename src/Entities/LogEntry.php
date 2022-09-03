@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonSerializable;
-use LogicException;
 
 /**
  * Class     LogEntry
@@ -16,10 +15,20 @@ use LogicException;
  */
 class LogEntry implements Arrayable, Jsonable, JsonSerializable
 {
+    protected static $regex = '/(?:\[([^\[\]]*?)\])?(?:\[([^\[\]]*?)\])? ([a-z]+)\.([A-Z]+): (.*)/';
+    protected static $propertyGroups = [
+        1 => 'setUuid',
+        3 => 'setEnv',
+        4 => 'setLevel',
+    ];
+
     /* -----------------------------------------------------------------
      |  Properties
      | -----------------------------------------------------------------
      */
+
+    /** @var string */
+    public $uuid;
 
     /** @var string */
     public $env;
@@ -28,7 +37,7 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     public $level;
 
     /** @var \Carbon\Carbon */
-    public $datetime;
+    protected $datetime;
 
     /** @var string */
     public $header;
@@ -39,6 +48,14 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     /** @var array */
     public $context = [];
 
+    public static function configure()
+    {
+        static::$regex = '/' . config('log-viewer.parser.regex') . '/';
+        foreach (config('log-viewer.parser.property_groups') as $group => $property) {
+            static::$propertyGroups[$group] = 'set' . ucfirst($property);
+        }
+    }
+
     /* -----------------------------------------------------------------
      |  Constructor
      | -----------------------------------------------------------------
@@ -47,13 +64,11 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     /**
      * Construct the log entry instance.
      *
-     * @param  string       $level
-     * @param  string       $header
+     * @param  array       $header
      * @param  string|null  $stack
      */
-    public function __construct($level, $header, $stack = null)
+    public function __construct(array $header, $stack = null)
     {
-        $this->setLevel($level);
         $this->setHeader($header);
         $this->setStack($stack);
     }
@@ -64,47 +79,15 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      */
 
     /**
-     * Set the entry level.
+     * Set entry uuid.
      *
-     * @param  string  $level
-     *
-     * @return self
-     */
-    private function setLevel($level)
-    {
-        $this->level = $level;
-
-        return $this;
-    }
-
-    /**
-     * Set the entry header.
-     *
-     * @param  string  $header
+     * @param  string  $uuid
      *
      * @return self
      */
-    private function setHeader($header)
+    protected function setUuid($uuid)
     {
-        $this->setDatetime(...$this->extractDatetime($header));
-
-        $header = $this->cleanHeader($header);
-
-        $this->header = trim($header);
-
-        return $this;
-    }
-
-    /**
-     * Set the context.
-     *
-     * @param  array  $context
-     *
-     * @return $this
-     */
-    private function setContext(array $context)
-    {
-        $this->context = $context;
+        $this->uuid = $uuid;
 
         return $this;
     }
@@ -116,11 +99,41 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      *
      * @return self
      */
-    private function setEnv($env)
+    protected function setEnv($env)
     {
         $this->env = $env;
 
         return $this;
+    }
+
+    /**
+     * Set the entry level.
+     *
+     * @param  string  $level
+     *
+     * @return self
+     */
+    protected function setLevel($level)
+    {
+        $this->level = strtolower($level);
+
+        return $this;
+    }
+
+    /**
+     * Get the entry date time.
+     *
+     * @param  string  $format
+     * @param  string  $datetime
+     *
+     * @return \Carbon\Carbon
+     */
+    public function getDatetime()
+    {
+        if (is_callable($this->datetime)) {
+            $this->datetime = ($this->datetime)();
+        }
+        return $this->datetime;
     }
 
     /**
@@ -131,9 +144,44 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      *
      * @return \Arcanedev\LogViewer\Entities\LogEntry
      */
-    private function setDatetime($format, $datetime)
+    protected function setDatetime($format, $datetime)
     {
-        $this->datetime = Carbon::createFromFormat($format, $datetime);
+        // defer Carbon instances as they are too heavy
+        $this->datetime = function () use ($format, $datetime) {
+            return Carbon::createFromFormat($format, $datetime);
+        };
+
+        return $this;
+    }
+
+    /**
+     * Set the entry header.
+     *
+     * @param  array  $header
+     *
+     * @return self
+     */
+    protected function setHeader(array $header)
+    {
+        $this->setDatetime(...$this->extractDatetime($header));
+
+        $reminder = array_pop($header);
+        preg_match_all(static::$regex, $reminder, $matches);
+        foreach ($matches as $index => $value) {
+            if (!empty($value) && isset(static::$propertyGroups[$index])) {
+                call_user_func([$this, static::$propertyGroups[$index]], $value[0]);
+            }
+        }
+
+        $reminder = array_pop($matches)[0];
+        // EXTRACT CONTEXT (Regex from https://stackoverflow.com/a/21995025)
+        preg_match_all('/{(?:[^{}]|(?R))*}/x', $reminder, $out);
+        if (isset($out[0][0]) && !is_null($context = json_decode($out[0][0], true))) {
+            $reminder = str_replace($out[0][0], '', $reminder);
+            $this->setContext($context);
+        }
+
+        $this->header = trim($reminder);
 
         return $this;
     }
@@ -145,9 +193,23 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      *
      * @return self
      */
-    private function setStack($stack)
+    protected function setStack($stack)
     {
         $this->stack = $stack;
+
+        return $this;
+    }
+
+    /**
+     * Set the context.
+     *
+     * @param  array  $context
+     *
+     * @return $this
+     */
+    protected function setContext(array $context)
+    {
+        $this->context = $context;
 
         return $this;
     }
@@ -203,23 +265,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     }
 
     /* -----------------------------------------------------------------
-     |  Check Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Check if same log level.
-     *
-     * @param  string  $level
-     *
-     * @return bool
-     */
-    public function isSameLevel($level)
-    {
-        return $this->level === $level;
-    }
-
-    /* -----------------------------------------------------------------
      |  Convert Methods
      | -----------------------------------------------------------------
      */
@@ -232,10 +277,11 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     public function toArray()
     {
         return [
+            'uuid'    => $this->uuid,
             'level'    => $this->level,
-            'datetime' => $this->datetime->format('Y-m-d H:i:s'),
+            'datetime' => $this->getDatetime()->format('Y-m-d H:i:s'),
             'header'   => $this->header,
-            'stack'    => $this->stack
+            'stack'    => $this->stack,
         ];
     }
 
@@ -286,57 +332,38 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
         return !empty($this->context);
     }
 
+    /**
+     * Check if same log level.
+     *
+     * @param  string  $level
+     *
+     * @return bool
+     */
+    public function isSameLevel($level)
+    {
+        return $this->level === $level;
+    }
+
     /* -----------------------------------------------------------------
      |  Other Methods
      | -----------------------------------------------------------------
      */
 
     /**
-     * Clean the entry header.
-     *
-     * @param  string  $header
-     *
-     * @return string
-     */
-    private function cleanHeader($header)
-    {
-        // REMOVE THE DATE
-        $header = preg_replace('/\[' . REGEX_DATETIME_PATTERN . '\]/', '', $header);
-
-        // EXTRACT ENV
-        $regex = '/.* ([a-z]+)\.[A-Z]+:/';
-        if (preg_match_all($regex, $header, $out)) {
-            $this->setEnv($out[1][0] ?? null);
-            $header = preg_replace($regex, '', $header);
-        }
-
-        // EXTRACT CONTEXT (Regex from https://stackoverflow.com/a/21995025)
-        preg_match_all('/{(?:[^{}]|(?R))*}/x', $header, $out);
-        if (isset($out[0][0]) && !is_null($context = json_decode($out[0][0], true))) {
-            $header = str_replace($out[0][0], '', $header);
-            $this->setContext($context);
-        }
-
-        return $header;
-    }
-
-    /**
      * Extract datetime from the header.
      *
-     * @param  string  $header
+     * @param  array  $header
      *
      * @return array
      */
-    private function extractDatetime($header)
+    protected function extractDatetime(array &$header)
     {
-        if (preg_match_all('/^\[(' . REGEX_DATETIME_PATTERN . ')\].*/', $header, $matches)) {
-            $separator = ($matches[2][0] ?? null) === 'T' ? '\T' : ' ';
-            $ms = ($matches[3][0] ?? null) ? '.u' : '';
-            $tz = ($matches[4][0] ?? null) ? 'P' : '';
-            $format = "Y-m-d{$separator}H:i:s{$ms}{$tz}";
-            $datetime = $matches[1][0];
-            return [$format, $datetime];
-        }
-        return [];
+        $separator = ($header[2] ?? null) === 'T' ? '\T' : ' ';
+        $ms = ($header[3] ?? null) ? '.u' : '';
+        $tz = ($header[4] ?? null) ? 'P' : '';
+        $format = "Y-m-d{$separator}H:i:s{$ms}{$tz}";
+        $datetime = $header[1];
+
+        return [$format, $datetime];
     }
 }

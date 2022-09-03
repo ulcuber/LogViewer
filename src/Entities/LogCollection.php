@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Entities;
+<?php
+
+namespace Arcanedev\LogViewer\Entities;
 
 use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
 use Arcanedev\LogViewer\Exceptions\LogNotFoundException;
@@ -35,12 +37,13 @@ class LogCollection extends LazyCollection
     {
         $this->setFilesystem(app(FilesystemContract::class));
 
-        if (is_null($source))
+        if (is_null($source)) {
             $source = function () {
-                foreach($this->filesystem->dates(true) as $date => $path) {
+                foreach ($this->filesystem->dates(true) as $date => $path) {
                     yield $date => Log::make($date, $path, $this->filesystem->read($date));
                 }
             };
+        }
 
         parent::__construct($source);
     }
@@ -81,10 +84,13 @@ class LogCollection extends LazyCollection
      */
     public function get($date, $default = null)
     {
-        if ( ! $this->has($date))
-            throw new LogNotFoundException("Log not found in this date [$date]");
+        $value = parent::get($date, $default);
 
-        return parent::get($date, $default);
+        if (! $value) {
+            throw new LogNotFoundException("Log not found in this date [$date]");
+        }
+
+        return $value;
     }
 
     /**

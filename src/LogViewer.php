@@ -4,6 +4,7 @@ use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
 use Arcanedev\LogViewer\Contracts\Utilities\Factory as FactoryContract;
 use Arcanedev\LogViewer\Contracts\Utilities\LogLevels as LogLevelsContract;
 use Arcanedev\LogViewer\Contracts\LogViewer as LogViewerContract;
+use Arcanedev\LogViewer\Entities\LogEntry;
 
 /**
  * Class     LogViewer
@@ -69,6 +70,8 @@ class LogViewer implements LogViewerContract
         $this->factory = $factory;
         $this->filesystem = $filesystem;
         $this->levels = $levels;
+
+        LogEntry::configure();
     }
 
     /* -----------------------------------------------------------------

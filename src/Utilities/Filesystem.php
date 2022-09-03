@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Utilities;
 
 use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
 use Arcanedev\LogViewer\Exceptions\FilesystemException;
@@ -106,7 +108,7 @@ class Filesystem implements FilesystemContract
      */
     public function getPattern()
     {
-        return $this->prefixPattern.$this->datePattern.$this->extension;
+        return $this->prefixPattern . $this->datePattern . $this->extension;
     }
 
     /**
@@ -184,7 +186,7 @@ class Filesystem implements FilesystemContract
      */
     public function all()
     {
-        return $this->getFiles('*'.$this->extension);
+        return $this->getFiles('*' . $this->extension);
     }
 
     /**
@@ -231,8 +233,7 @@ class Filesystem implements FilesystemContract
             $log = $this->filesystem->get(
                 $this->getLogPath($date)
             );
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             throw new FilesystemException($e->getMessage());
         }
 
@@ -253,7 +254,7 @@ class Filesystem implements FilesystemContract
         $path = $this->getLogPath($date);
 
         // @codeCoverageIgnoreStart
-        if ( ! $this->filesystem->delete($path)) {
+        if (!$this->filesystem->delete($path)) {
             throw new FilesystemException('There was an error deleting the log.');
         }
         // @codeCoverageIgnoreEnd
@@ -300,7 +301,8 @@ class Filesystem implements FilesystemContract
     private function getFiles($pattern)
     {
         $files = $this->filesystem->glob(
-            $this->storagePath.DS.$pattern, GLOB_BRACE
+            $this->storagePath . DS . $pattern,
+            GLOB_BRACE
         );
 
         return array_filter(array_map('realpath', $files));
@@ -317,9 +319,9 @@ class Filesystem implements FilesystemContract
      */
     private function getLogPath($date)
     {
-        $path = $this->storagePath.DS.$this->prefixPattern.$date.$this->extension;
+        $path = $this->storagePath . DS . $this->prefixPattern . $date . $this->extension;
 
-        if ( ! $this->filesystem->exists($path)) {
+        if (!$this->filesystem->exists($path)) {
             throw new FilesystemException("The log(s) could not be located at : $path");
         }
 

@@ -140,7 +140,7 @@
                                     </td>
                                     <td>
                                         <span class="label label-default">
-                                            {{ $entry->datetime->format('H:i:s') }}
+                                            {{ $entry->getDatetime()->format('H:i:s') }}
                                         </span>
                                     </td>
                                     <td>

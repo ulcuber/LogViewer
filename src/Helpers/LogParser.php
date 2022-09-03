@@ -2,9 +2,6 @@
 
 namespace Arcanedev\LogViewer\Helpers;
 
-use Arcanedev\LogViewer\Utilities\LogLevels;
-use Illuminate\Support\Str;
-
 /**
  * Class     LogParser
  *
@@ -39,7 +36,7 @@ class LogParser
      */
     public static function parse($raw)
     {
-        self::$parsed          = [];
+        static::$parsed          = [];
         list($headings, $data) = self::parseRawData($raw);
 
         // @codeCoverageIgnoreStart
@@ -48,15 +45,18 @@ class LogParser
         }
         // @codeCoverageIgnoreEnd
 
-        foreach ($headings as $heading) {
-            for ($i = 0, $j = count($heading); $i < $j; $i++) {
-                self::populateEntries($heading, $data, $i);
+        foreach ($data as $index => $stack) {
+            static::$parsed[$index][1] = $stack;
+        }
+        foreach ($headings as $groupIndex => $heading) {
+            foreach ($heading as $matchIndex => $match) {
+                static::$parsed[$matchIndex][0][$groupIndex] = $match;
             }
-        };
+        }
 
         unset($headings, $data);
 
-        return array_reverse(self::$parsed);
+        return static::$parsed;
     }
 
     /* -----------------------------------------------------------------
@@ -73,7 +73,7 @@ class LogParser
      */
     private static function parseRawData($raw)
     {
-        $pattern = '/\[' . REGEX_DATETIME_PATTERN . '\].*/';
+        $pattern = '/' . REGEX_DATETIME_PATTERN . '/';
         preg_match_all($pattern, $raw, $headings);
         $data    = preg_split($pattern, $raw);
 
@@ -83,38 +83,5 @@ class LogParser
         }
 
         return [$headings, $data];
-    }
-
-    /**
-     * Populate entries.
-     *
-     * @param  array  $heading
-     * @param  array  $data
-     * @param  int    $key
-     */
-    private static function populateEntries($heading, $data, $key)
-    {
-        foreach (LogLevels::all() as $level) {
-            if (self::hasLogLevel($heading[$key], $level)) {
-                self::$parsed[] = [
-                    'level'  => $level,
-                    'header' => $heading[$key],
-                    'stack'  => $data[$key]
-                ];
-            }
-        }
-    }
-
-    /**
-     * Check if header has a log level.
-     *
-     * @param  string  $heading
-     * @param  string  $level
-     *
-     * @return bool
-     */
-    private static function hasLogLevel($heading, $level)
-    {
-        return Str::contains($heading, strtoupper(".{$level}:"));
     }
 }

@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Providers;
+<?php
+
+namespace Arcanedev\LogViewer\Providers;
 
 use Arcanedev\LogViewer\Http\Routes\LogViewerRoute;
 use Arcanedev\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -49,7 +51,7 @@ class RouteServiceProvider extends ServiceProvider
     public function map(): void
     {
         if ($this->isEnabled()) {
-            $this->group($this->routeAttributes(), function() {
+            $this->group($this->routeAttributes(), function () {
                 LogViewerRoute::register();
             });
         }

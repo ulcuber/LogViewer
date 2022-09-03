@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Entities;
+<?php
+
+namespace Arcanedev\LogViewer\Entities;
 
 use Arcanedev\LogViewer\Helpers\LogParser;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -28,9 +30,9 @@ class LogEntryCollection extends LazyCollection
     {
         return new static(function () use ($raw) {
             foreach (LogParser::parse($raw) as $entry) {
-                list($level, $header, $stack) = array_values($entry);
+                list($header, $stack) = $entry;
 
-                yield new LogEntry($level, $header, $stack);
+                yield new LogEntry($header, $stack);
             }
         });
     }
@@ -44,12 +46,23 @@ class LogEntryCollection extends LazyCollection
      */
     public function paginate($perPage = 20)
     {
-        $page = request()->get('page', 1);
-        $path = request()->url();
+        $request = request();
+        $page = $request->get('page', 1);
+        $path = $request->url();
+
+        /**
+         * NOTE: count iterates through all
+         * and forPage skips offset then takes perPage items
+         * so just taking all items to iterate only once
+        */
+        $items = $this->all();
+        $total = count($items);
+        $offset = max(0, ($page - 1) * $perPage);
+        $items = array_slice($items, $offset, $perPage, true);
 
         return new LengthAwarePaginator(
-            $this->forPage($page, $perPage),
-            $this->count(),
+            $items,
+            $total,
             $perPage,
             $page,
             compact('path')
@@ -65,7 +78,7 @@ class LogEntryCollection extends LazyCollection
      */
     public function filterByLevel($level)
     {
-        return $this->filter(function(LogEntry $entry) use ($level) {
+        return $this->filter(function (LogEntry $entry) use ($level) {
             return $entry->isSameLevel($level);
         });
     }
@@ -98,7 +111,7 @@ class LogEntryCollection extends LazyCollection
     {
         $tree = $this->stats();
 
-        array_walk($tree, function(&$count, $level) use ($trans) {
+        array_walk($tree, function (&$count, $level) use ($trans) {
             $count = [
                 'name'  => $trans ? log_levels()->get($level) : $level,
                 'count' => $count,

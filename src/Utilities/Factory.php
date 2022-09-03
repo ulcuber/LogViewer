@@ -1,9 +1,13 @@
-<?php namespace Arcanedev\LogViewer\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Utilities;
 
 use Arcanedev\LogViewer\Contracts\Utilities\Factory as FactoryContract;
 use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
 use Arcanedev\LogViewer\Contracts\Utilities\LogLevels as LogLevelsContract;
+use Arcanedev\LogViewer\Entities\Log;
 use Arcanedev\LogViewer\Entities\LogCollection;
+use Arcanedev\LogViewer\Exceptions\LogNotFoundException;
 use Arcanedev\LogViewer\Tables\StatsTable;
 
 /**
@@ -44,7 +48,8 @@ class Factory implements FactoryContract
      * @param  \Arcanedev\LogViewer\Contracts\Utilities\Filesystem  $filesystem
      * @param  \Arcanedev\LogViewer\Contracts\Utilities\LogLevels   $levels
      */
-    public function __construct(FilesystemContract $filesystem, LogLevelsContract $levels) {
+    public function __construct(FilesystemContract $filesystem, LogLevelsContract $levels)
+    {
         $this->setFilesystem($filesystem);
         $this->setLevels($levels);
     }
@@ -152,7 +157,7 @@ class Factory implements FactoryContract
      */
     public function logs()
     {
-        return (new LogCollection)->setFilesystem($this->filesystem);
+        return (new LogCollection())->setFilesystem($this->filesystem);
     }
 
     /* -----------------------------------------------------------------
@@ -193,7 +198,14 @@ class Factory implements FactoryContract
      */
     public function log($date)
     {
-        return $this->logs()->log($date);
+        // NOTE: iterator reads file by file so not using this->logs()->log()
+        foreach ($this->filesystem->dates(true) as $outerDate => $path) {
+            if ($date == $outerDate) {
+                return Log::make($date, $path, $this->filesystem->read($date));
+            }
+        }
+
+        throw new LogNotFoundException("Log not found in this date [$date]");
     }
 
     /**

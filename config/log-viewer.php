@@ -5,6 +5,21 @@ use Arcanedev\LogViewer\Contracts\Utilities\Filesystem;
 return [
 
     /* -----------------------------------------------------------------
+     |  Parser regex after date and its groups
+     | -----------------------------------------------------------------
+     */
+
+    'parser'  => [
+        // regex should be without trailing slashes and end with (.*)
+        'regex' => '(?:\[([^\[\]]*?)\])?(?:\[([^\[\]]*?)\])? ([a-z]+)\.([A-Z]+): (.*)',
+        'property_groups' => [
+            1 => 'uuid',
+            3 => 'env',
+            4 => 'level',
+        ],
+    ],
+
+    /* -----------------------------------------------------------------
      |  Log files storage path
      | -----------------------------------------------------------------
      */

@@ -136,8 +136,8 @@ abstract class TestCase extends BaseTestCase
         $dt = Carbon::createFromFormat('Y-m-d', $date);
 
         self::assertInLogLevels($entry->level);
-        self::assertInstanceOf(Carbon::class, $entry->datetime);
-        self::assertTrue($entry->datetime->isSameDay($dt));
+        self::assertInstanceOf(Carbon::class, $entry->getDatetime());
+        self::assertTrue($entry->getDatetime()->isSameDay($dt));
         self::assertNotEmpty($entry->header);
         self::assertNotEmpty($entry->stack);
     }

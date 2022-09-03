@@ -113,11 +113,8 @@
                     <table id="entries" class="table mb-0">
                         <thead>
                             <tr>
-                                <th>ENV</th>
-                                <th style="width: 120px;">Level</th>
-                                <th style="width: 65px;">Time</th>
+                                <th>Info/Actions</th>
                                 <th>Header</th>
-                                <th class="text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -125,22 +122,14 @@
                                 <?php /** @var  Arcanedev\LogViewer\Entities\LogEntry  $entry */ ?>
                                 <tr>
                                     <td>
+                                        <span class="badge badge-env">{{ $entry->uuid }}</span>
                                         <span class="badge badge-env">{{ $entry->env }}</span>
-                                    </td>
-                                    <td>
                                         <span class="badge badge-level-{{ $entry->level }}">
                                             {!! $entry->level() !!}
                                         </span>
-                                    </td>
-                                    <td>
                                         <span class="badge badge-secondary">
-                                            {{ $entry->datetime->format('H:i:s') }}
+                                            {{ $entry->getDatetime()->format('H:i:s') }}
                                         </span>
-                                    </td>
-                                    <td>
-                                        {{ $entry->header }}
-                                    </td>
-                                    <td class="text-right">
                                         @if ($entry->hasStack())
                                         <a class="btn btn-sm btn-light" role="button" data-toggle="collapse"
                                            href="#log-stack-{{ $key }}" aria-expanded="false" aria-controls="log-stack-{{ $key }}">
@@ -154,6 +143,9 @@
                                             <i class="fa fa-toggle-on"></i> Context
                                         </a>
                                         @endif
+                                    </td>
+                                    <td>
+                                        {{ $entry->header }}
                                     </td>
                                 </tr>
                                 @if ($entry->hasStack() || $entry->hasContext())
