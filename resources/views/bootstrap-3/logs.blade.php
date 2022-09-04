@@ -3,7 +3,7 @@
 <?php /** @var  Illuminate\Pagination\LengthAwarePaginator  $rows */ ?>
 
 @section('content')
-    <h1 class="page-header">Logs</h1>
+    <h1 class="page-header">{{ trans('log-viewer::general.logs') }}</h1>
 
     {{ $rows->render() }}
 
@@ -22,7 +22,7 @@
                         @endif
                     </th>
                     @endforeach
-                    <th class="text-right">Actions</th>
+                    <th class="text-right">{{ trans('log-viewer::general.actions') }}</th>
                 </tr>
             </thead>
             <tbody>

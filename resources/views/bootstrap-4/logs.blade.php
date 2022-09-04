@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="page-header mb-4">
-        <h1>Logs</h1>
+        <h1>{{ trans('log-viewer::general.logs') }}</h1>
     </div>
 
     <div class="table-responsive">
@@ -22,7 +22,7 @@
                         @endif
                     </th>
                     @endforeach
-                    <th scope="col" class="text-right">Actions</th>
+                    <th scope="col" class="text-right">{{ trans('log-viewer::general.actions') }}</th>
                 </tr>
             </thead>
             <tbody>

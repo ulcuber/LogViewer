@@ -10,7 +10,7 @@
 
 @section('content')
     <div class="page-header mb-4">
-        <h1>Log [{{ $log->date }}]</h1>
+        <h1>{{ trans('log-viewer::general.log') }} [{{ $log->date }}]</h1>
     </div>
 
     <div class="row">
@@ -39,7 +39,7 @@
             {{-- Log Details --}}
             <div class="card mb-4">
                 <div class="card-header">
-                    Log info :
+                    {{ trans('log-viewer::general.log-info') }}
                     <div class="group-btns pull-right">
                         <a href="{{ route('log-viewer::logs.download', [$log->date]) }}" class="btn btn-sm btn-success">
                             <i class="fa fa-download"></i> {{ trans('log-viewer::general.download') }}
@@ -53,23 +53,23 @@
                     <table class="table table-condensed mb-0">
                         <tbody>
                             <tr>
-                                <td>File path :</td>
+                                <td>{{ trans('log-viewer::general.file-path') }}</td>
                                 <td colspan="7">{{ $log->getPath() }}</td>
                             </tr>
                             <tr>
-                                <td>Log entries :</td>
+                                <td>{{ trans('log-viewer::general.log-entries') }}</td>
                                 <td>
                                     <span class="badge badge-primary">{{ $entries->total() }}</span>
                                 </td>
-                                <td>Size :</td>
+                                <td>{{ trans('log-viewer::general.size') }}</td>
                                 <td>
                                     <span class="badge badge-primary">{{ $log->size() }}</span>
                                 </td>
-                                <td>Created at :</td>
+                                <td>{{ trans('log-viewer::general.created-at') }}</td>
                                 <td>
                                     <span class="badge badge-primary">{{ $log->createdAt() }}</span>
                                 </td>
-                                <td>Updated at :</td>
+                                <td>{{ trans('log-viewer::general.updated-at') }}</td>
                                 <td>
                                     <span class="badge badge-primary">{{ $log->updatedAt() }}</span>
                                 </td>
@@ -82,11 +82,11 @@
                     <form action="{{ route('log-viewer::logs.search', [$log->date, $level]) }}" method="GET">
                         <div class="form-group">
                             <div class="input-group">
-                                <input id="query" name="query" class="form-control" value="{{ $query }}" placeholder="Type here to search">
+                                <input id="query" name="query" class="form-control" value="{{ $query }}" placeholder="{{ trans('log-viewer::general.search-placeholder') }}">
                                 <div class="input-group-append">
                                     @unless (is_null($query))
                                         <a href="{{ route('log-viewer::logs.show', [$log->date]) }}" class="btn btn-secondary">
-                                            ({{ $entries->count() }} results) <i class="fa fa-fw fa-times"></i>
+                                            ({{ $entries->count() }} {{ trans('log-viewer::general.of-results') }}) <i class="fa fa-fw fa-times"></i>
                                         </a>
                                     @endunless
                                     <button id="search-btn" class="btn btn-primary">
@@ -104,7 +104,7 @@
                 @if ($entries->hasPages())
                     <div class="card-header">
                         <span class="badge badge-info float-right">
-                            Page {{ $entries->currentPage() }} of {{ $entries->lastPage() }}
+                            {{ trans('log-viewer::general.page') }} {{ $entries->currentPage() }} {{ trans('log-viewer::general.of') }} {{ $entries->lastPage() }}
                         </span>
                     </div>
                 @endif

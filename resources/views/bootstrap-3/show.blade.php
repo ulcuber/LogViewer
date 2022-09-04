@@ -9,12 +9,12 @@
 @extends('log-viewer::bootstrap-3._master')
 
 @section('content')
-    <h1 class="page-header">Log [{{ $log->date }}]</h1>
+    <h1 class="page-header">{{ trans('log-viewer::general.log') }} [{{ $log->date }}]</h1>
 
     <div class="row">
         <div class="col-md-2">
             <div class="panel panel-default">
-                <div class="panel-heading"><i class="fa fa-fw fa-flag"></i> Levels</div>
+                <div class="panel-heading"><i class="fa fa-fw fa-flag"></i> {{ trans('log-viewer::general.levels') }}</div>
                 <ul class="list-group">
                     @foreach($log->menu() as $levelKey => $item)
                         @if ($item['count'] === 0)
@@ -42,14 +42,14 @@
             {{-- Log Details --}}
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Log info :
+                    {{ trans('log-viewer::general.log-info') }}
 
                     <div class="group-btns pull-right">
                         <a href="{{ route('log-viewer::logs.download', [$log->date]) }}" class="btn btn-xs btn-success">
-                            <i class="fa fa-download"></i> DOWNLOAD
+                            <i class="fa fa-download"></i> {{ trans('log-viewer::general.download') }}
                         </a>
                         <a href="#delete-log-modal" class="btn btn-xs btn-danger" data-toggle="modal">
-                            <i class="fa fa-trash-o"></i> DELETE
+                            <i class="fa fa-trash-o"></i> {{ trans('log-viewer::general.delete') }}
                         </a>
                     </div>
                 </div>
@@ -57,25 +57,25 @@
                     <table class="table table-condensed">
                         <thead>
                             <tr>
-                                <td>File path :</td>
+                                <td>{{ trans('log-viewer::general.file-path') }}</td>
                                 <td colspan="5">{{ $log->getPath() }}</td>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Log entries :</td>
+                                <td>{{ trans('log-viewer::general.log-entries') }}</td>
                                 <td>
                                     <span class="label label-primary">{{ $entries->total() }}</span>
                                 </td>
-                                <td>Size :</td>
+                                <td>{{ trans('log-viewer::general.size') }}</td>
                                 <td>
                                     <span class="label label-primary">{{ $log->size() }}</span>
                                 </td>
-                                <td>Created at :</td>
+                                <td>{{ trans('log-viewer::general.created-at') }}</td>
                                 <td>
                                     <span class="label label-primary">{{ $log->createdAt() }}</span>
                                 </td>
-                                <td>Updated at :</td>
+                                <td>{{ trans('log-viewer::general.updated-at') }}</td>
                                 <td>
                                     <span class="label label-primary">{{ $log->updatedAt() }}</span>
                                 </td>
@@ -86,13 +86,13 @@
                 <div class="panel-footer">
                     {{-- Search --}}
                     <form action="{{ route('log-viewer::logs.search', [$log->date, $level]) }}" method="GET">
-                        <div class=form-group">
+                        <div class="form-group">
                             <div class="input-group">
                                 <input id="query" name="query" class="form-control" value="{{ $query }}" placeholder="Type here to search">
                                 <span class="input-group-btn">
                                     @unless (is_null($query))
                                         <a href="{{ route('log-viewer::logs.show', [$log->date]) }}" class="btn btn-default">
-                                            ({{ $entries->count() }} results) <span class="glyphicon glyphicon-remove"></span>
+                                            ({{ $entries->count() }} {{ trans('log-viewer::general.of-results') }}) <span class="glyphicon glyphicon-remove"></span>
                                         </a>
                                     @endunless
                                     <button id="search-btn" class="btn btn-primary">
@@ -112,7 +112,7 @@
                         {{ $entries->appends(compact('query'))->render() }}
 
                         <span class="label label-info pull-right">
-                            Page {{ $entries->currentPage() }} of {{ $entries->lastPage() }}
+                            {{ trans('log-viewer::general.page') }} {{ $entries->currentPage() }} {{ trans('log-viewer::general.of') }} {{ $entries->lastPage() }}
                         </span>
                     </div>
                 @endif
@@ -121,11 +121,9 @@
                     <table id="entries" class="table table-condensed">
                         <thead>
                             <tr>
-                                <th>ENV</th>
-                                <th style="width: 120px;">Level</th>
-                                <th style="width: 65px;">Time</th>
-                                <th>Header</th>
-                                <th class="text-right">Actions</th>
+                                <th>{{ trans('log-viewer::general.info-actions') }}</th>
+                                <th>{{ trans('log-viewer::general.header') }}</th>
+                                <th class="text-right">{{ trans('log-viewer::general.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -133,15 +131,18 @@
                                 <?php /** @var  Arcanedev\LogViewer\Entities\LogEntry  $entry */ ?>
                                 <tr>
                                     <td>
+                                        @foreach ($entry->extra as $key => $extra)
+                                            <a class="label label-env label-extra-{{ $key }}" href="{{ route('log-viewer::logs.show', array_merge(request()->input(), ['date' => $log->date, $key => $extra])) }}">
+                                                {{ $extra }}
+                                            </a>
+                                        @endforeach
                                         <span class="label label-env">{{ $entry->env }}</span>
-                                    </td>
-                                    <td>
                                         <span class="level level-{{ $entry->level }}">{!! $entry->level() !!}</span>
-                                    </td>
-                                    <td>
                                         <span class="label label-default">
                                             {{ $entry->getDatetime()->format('H:i:s') }}
                                         </span>
+                                        <br/>
+                                        <a class="btn btn-xs btn-default" href="{{ route('log-viewer::logs.similar', [$log->date, $entry->level, 'text' => $entry->header]) }}">{{ trans('log-viewer::general.similar') }}</a>
                                     </td>
                                     <td>
                                         <p>{{ $entry->header }}</p>
@@ -195,7 +196,7 @@
                         {!! $entries->appends(compact('query'))->render() !!}
 
                         <span class="label label-info pull-right">
-                            Page {{ $entries->currentPage() }} of {{ $entries->lastPage() }}
+                            {{ trans('log-viewer::general.page') }} {{ $entries->currentPage() }} {{ trans('log-viewer::general.of') }} {{ $entries->lastPage() }}
                         </span>
                     </div>
                 @endif

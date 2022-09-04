@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer;
+<?php
+
+namespace Arcanedev\LogViewer;
 
 use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
 use Arcanedev\LogViewer\Contracts\Utilities\Factory as FactoryContract;
@@ -22,7 +24,7 @@ class LogViewer implements LogViewerContract
     /**
      * LogViewer Version
      */
-    const VERSION = '5.2.0';
+    public const VERSION = '5.2.0';
 
     /* -----------------------------------------------------------------
      |  Properties
@@ -355,6 +357,10 @@ class LogViewer implements LogViewerContract
      */
     public function version()
     {
-        return self::VERSION;
+        try {
+            return \Composer\InstalledVersions::getPrettyVersion('arcanedev/log-viewer');
+        } catch (\Throwable $th) {
+            return self::VERSION;
+        }
     }
 }

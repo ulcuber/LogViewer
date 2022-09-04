@@ -223,6 +223,10 @@
         .info-box.level-info,
         .info-box.level-debug {
             color: #FFF;
+            margin: 10px 2px;
+        }
+        .label {
+            margin: 10px 2px;
         }
 
         .label-env {
@@ -272,6 +276,11 @@
         .badge.label-env, .label.label-env {
             background-color: #6A1B9A;
         }
+        @foreach (log_styler()->extraColors() as $key => $color)
+            .label.label-extra-{{ $key }} {
+                background-color: {{ $color }};
+            }
+        @endforeach
     </style>
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -297,12 +306,12 @@
                 <ul class="nav navbar-nav">
                     <li class="{{ Route::is('log-viewer::dashboard') ? 'active' : '' }}">
                         <a href="{{ route('log-viewer::dashboard') }}">
-                            <i class="fa fa-dashboard"></i> Dashboard
+                            <i class="fa fa-dashboard"></i> {{ trans('log-viewer::general.dashboard') }}
                         </a>
                     </li>
                     <li class="{{ Route::is('log-viewer::logs.list') ? 'active' : '' }}">
                         <a href="{{ route('log-viewer::logs.list') }}">
-                            <i class="fa fa-archive"></i> Logs
+                            <i class="fa fa-archive"></i> {{ trans('log-viewer::general.logs') }}
                         </a>
                     </li>
                 </ul>

@@ -229,12 +229,12 @@
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item {{ Route::is('log-viewer::dashboard') ? 'active' : '' }}">
                     <a href="{{ route('log-viewer::dashboard') }}" class="nav-link">
-                        <i class="fa fa-dashboard"></i> Dashboard
+                        <i class="fa fa-dashboard"></i> {{ trans('log-viewer::general.dashboard') }}
                     </a>
                 </li>
                 <li class="nav-item {{ Route::is('log-viewer::logs.list') ? 'active' : '' }}">
                     <a href="{{ route('log-viewer::logs.list') }}" class="nav-link">
-                        <i class="fa fa-archive"></i> Logs
+                        <i class="fa fa-archive"></i> {{ trans('log-viewer::general.logs') }}
                     </a>
                 </li>
             </ul>
@@ -254,7 +254,7 @@
                 LogViewer - <span class="badge badge-info">version {{ log_viewer()->version() }}</span>
             </p>
             <p class="text-muted pull-right">
-                Created with <i class="fa fa-heart"></i> by ARCANEDEV <sup>&copy;</sup>
+                Created with <i class="fa fa-heart"></i> by <a href="https://github.com/ARCANEDEV">ARCANEDEV</a> <sup>&copy;</sup> adopted by <a href="https://github.com/ulcuber/">&#64;ulcuber</a>
             </p>
         </div>
     </footer>
