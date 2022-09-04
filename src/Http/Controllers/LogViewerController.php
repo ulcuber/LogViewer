@@ -105,10 +105,33 @@ class LogViewerController extends Controller
         $log     = $this->getLogOrFail($date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
+
+        $extras = $request->only(config('log-viewer.parser.extra_groups'));
+        $uuidKeys = ['uuid', 'parentUuid'];
+        $uuids = Arr::only($extras, $uuidKeys);
+        $extras = Arr::except($extras, $uuidKeys);
+
         $entries = $log->entries($level)
-            ->when($request->get('uuid'), function (LogEntryCollection $entries, string $uuid) {
-                return $entries->filter(function (LogEntry $entry) use ($uuid) {
-                    return $entry->uuid === $uuid;
+            ->unless(empty($uuids), function (LogEntryCollection $entries) use ($uuids, $uuidKeys) {
+                return $entries->filter(function (LogEntry $entry) use ($uuids, $uuidKeys) {
+                    foreach ($uuidKeys as $key) {
+                        foreach ($uuids as $uuid) {
+                            if ($entry->{$key} === $uuid) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                });
+            })
+            ->unless(empty($extras), function (LogEntryCollection $entries) use ($extras) {
+                return $entries->filter(function (LogEntry $entry) use ($extras) {
+                    foreach ($extras as $key => $extra) {
+                        if ($entry->{$key} === $extra) {
+                            return true;
+                        }
+                    }
+                    return false;
                 });
             })
             ->paginate($this->perPage);

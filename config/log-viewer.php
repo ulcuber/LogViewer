@@ -13,9 +13,12 @@ return [
         // regex should be without trailing slashes and end with (.*)
         'regex' => '(?:\[([^\[\]]*?)\])?(?:\[([^\[\]]*?)\])? ([a-z]+)\.([A-Z]+): (.*)',
         'property_groups' => [
-            1 => 'uuid',
             3 => 'env',
             4 => 'level',
+        ],
+        'extra_groups' => [
+            1 => 'uuid',
+            2 => 'parentUuid',
         ],
     ],
 
@@ -140,6 +143,10 @@ return [
             'notice'    => '#4CAF50',
             'info'      => '#1976D2',
             'debug'     => '#90CAF9',
+        ],
+        'extras' => [
+            'uuid' => '#1976D2',
+            'parentUuid' => '#4CAF50',
         ],
     ],
 

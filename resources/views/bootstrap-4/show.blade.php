@@ -122,9 +122,11 @@
                                 <?php /** @var  Arcanedev\LogViewer\Entities\LogEntry  $entry */ ?>
                                 <tr>
                                     <td>
-                                        <a class="badge badge-env" href="{{ route('log-viewer::logs.show', array_merge(request()->input(), ['date' => $log->date, 'uuid' => $entry->uuid])) }}">
-                                            {{ $entry->uuid }}
-                                        </a>
+                                        @foreach ($entry->extra as $key => $extra)
+                                            <a class="badge badge-env badge-extra-{{ $key }}" href="{{ route('log-viewer::logs.show', array_merge(request()->input(), ['date' => $log->date, $key => $extra])) }}">
+                                                {{ $extra }}
+                                            </a>
+                                        @endforeach
                                         <span class="badge badge-env">{{ $entry->env }}</span>
                                         <span class="badge badge-level-{{ $entry->level }}">
                                             {!! $entry->level() !!}

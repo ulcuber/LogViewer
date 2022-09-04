@@ -210,6 +210,11 @@
         .badge.badge-env {
             background-color: #6A1B9A;
         }
+        @foreach (log_styler()->extraColors() as $key => $color)
+            .badge.badge-extra-{{ $key }} {
+                background-color: {{ $color }};
+            }
+        @endforeach
     </style>
 </head>
 <body>

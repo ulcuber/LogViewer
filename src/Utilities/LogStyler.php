@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Utilities;
 
 use Arcanedev\LogViewer\Contracts\Utilities\LogStyler as LogStylerContract;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
@@ -73,7 +75,7 @@ class LogStyler implements LogStylerContract
     public function icon($level, $default = null)
     {
         return new HtmlString(
-            '<i class="'.$this->get("icons.$level", $default).'"></i>'
+            '<i class="' . $this->get("icons.$level", $default) . '"></i>'
         );
     }
 
@@ -88,6 +90,16 @@ class LogStyler implements LogStylerContract
     public function color($level, $default = null)
     {
         return $this->get("colors.levels.$level", $default);
+    }
+
+    /**
+     * Get extra color.
+     *
+     * @return array
+     */
+    public function extraColors(): array
+    {
+        return $this->get("colors.extras");
     }
 
     /**
