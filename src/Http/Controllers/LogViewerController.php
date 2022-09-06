@@ -106,6 +106,8 @@ class LogViewerController extends Controller
             config(['log-viewer.reversed_order' => $order === 'desc']);
         }
 
+        $filters = array_merge($request->except('page'), $request->route()->parameters());
+
         $level   = 'all';
         $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
@@ -141,7 +143,7 @@ class LogViewerController extends Controller
             })
             ->paginate($this->perPage);
 
-        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries'));
+        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries', 'filters'));
     }
 
     /**
@@ -150,24 +152,26 @@ class LogViewerController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  string                    $prefix
      * @param  string                    $date
+     * @param  string                    $level
      *
      * @return \Illuminate\View\View
      */
-    public function showSimilar(Request $request, string $prefix, string $date)
+    public function showSimilar(Request $request, string $prefix, string $date, string $level)
     {
         if ($order = $request->order) {
             config(['log-viewer.reversed_order' => $order === 'desc']);
         }
 
+        $filters = array_merge($request->except('page'), $request->route()->parameters());
+
         $text = $request->get('text');
 
-        $level   = 'all';
         $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
         $entries = $log->getSimilar($text, 76)->paginate($this->perPage);
 
-        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries'));
+        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries', 'filters'));
     }
 
     /**
@@ -190,12 +194,14 @@ class LogViewerController extends Controller
             return redirect()->route($this->showRoute, [$prefix, $date]);
         }
 
+        $filters = array_merge($request->except('page'), $request->route()->parameters());
+
         $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
         $entries = $log->entries($level)->paginate($this->perPage);
 
-        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries'));
+        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries', 'filters'));
     }
 
     /**
@@ -220,6 +226,8 @@ class LogViewerController extends Controller
             return redirect()->route($this->showRoute, [$prefix, $date]);
         }
 
+        $filters = array_merge($request->except('page'), $request->route()->parameters());
+
         $log     = $this->getLogOrFail($prefix, $date);
         $levels  = $this->logViewer->levelsNames();
         $needles = array_map(function ($needle) {
@@ -233,7 +241,7 @@ class LogViewerController extends Controller
             })
             ->paginate($this->perPage);
 
-        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries'));
+        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries', 'filters'));
     }
 
     /**

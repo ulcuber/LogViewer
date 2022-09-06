@@ -97,9 +97,9 @@
                         </div>
                     </form>
                     @if (config('log-viewer.reversed_order'))
-                        <a class="btn btn-sm btn-info" href="{{ route($route, array_merge(request()->all(), ['prefix' => $log->prefix, 'date' => $log->date, 'level' => $level === 'all' && $route !== 'log-viewer::logs.search' ? null : $level, 'order' => 'asc', 'page' => null])) }}">{{ trans('log-viewer::general.order-asc') }}</a>
+                        <a class="btn btn-sm btn-info" href="{{ route($route, array_merge($filters, ['order' => 'asc'])) }}">{{ trans('log-viewer::general.order-asc') }}</a>
                     @else
-                        <a class="btn btn-sm btn-info" href="{{ route($route, array_merge(request()->all(), ['prefix' => $log->prefix, 'date' => $log->date, 'level' => $level === 'all' && $route !== 'log-viewer::logs.search' ? null : $level, 'order' => 'desc', 'page' => null])) }}">{{ trans('log-viewer::general.order-desc') }}</a>
+                        <a class="btn btn-sm btn-info" href="{{ route($route, array_merge($filters, ['order' => 'desc'])) }}">{{ trans('log-viewer::general.order-desc') }}</a>
                     @endif
                 </div>
             </div>
