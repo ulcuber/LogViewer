@@ -43,6 +43,7 @@ class LogViewerServiceProvider extends PackageServiceProvider
             Commands\StatsCommand::class,
             Commands\CheckCommand::class,
             Commands\ClearCommand::class,
+            Commands\LatestCommand::class,
         ]);
     }
 
