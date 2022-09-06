@@ -44,21 +44,23 @@ class LogViewerRoute extends RouteRegistrar
             $this->delete('delete', 'LogViewerController@delete')
                  ->name('delete'); // log-viewer::logs.delete
 
-            $this->prefix('{date}')->group(function () {
-                $this->get('/', 'LogViewerController@show')
-                     ->name('show'); // log-viewer::logs.show
+            $this->prefix('{prefix}')->group(function () {
+                $this->prefix('{date}')->group(function () {
+                    $this->get('/', 'LogViewerController@show')
+                         ->name('show'); // log-viewer::logs.show
 
-                $this->get('download', 'LogViewerController@download')
-                     ->name('download'); // log-viewer::logs.download
+                    $this->get('download', 'LogViewerController@download')
+                         ->name('download'); // log-viewer::logs.download
 
-                $this->get('{level}', 'LogViewerController@showByLevel')
-                     ->name('filter'); // log-viewer::logs.filter
+                    $this->get('{level}', 'LogViewerController@showByLevel')
+                         ->name('filter'); // log-viewer::logs.filter
 
-                $this->get('{level}/search', 'LogViewerController@search')
-                     ->name('search'); // log-viewer::logs.search
+                    $this->get('{level}/search', 'LogViewerController@search')
+                         ->name('search'); // log-viewer::logs.search
 
-                $this->get('{level}/similar', 'LogViewerController@showSimilar')
-                     ->name('similar'); // log-viewer::logs.similar
+                    $this->get('{level}/similar', 'LogViewerController@showSimilar')
+                         ->name('similar'); // log-viewer::logs.similar
+                });
             });
         });
     }

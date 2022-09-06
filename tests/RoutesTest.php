@@ -43,13 +43,14 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_can_show_a_log_page()
     {
+        $prefix = 'laravel';
         $date = '2015-01-01';
 
-        $response = $this->get(route('log-viewer::logs.show', [$date]));
+        $response = $this->get(route('log-viewer::logs.show', [$prefix, $date]));
         $response->assertSuccessful();
 
         static::assertStringContainsString(
-            "<h1>Log [{$date}]</h1>",
+            "[{$date}]</h1>",
             $response->getContent()
         );
         // TODO: Add more assertion => list all log entries
@@ -58,14 +59,15 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_can_see_a_filtered_log_entries_page()
     {
+        $prefix = 'laravel';
         $date     = '2015-01-01';
         $level    = 'error';
 
-        $response = $this->get(route('log-viewer::logs.filter', [$date, $level]));
+        $response = $this->get(route('log-viewer::logs.filter', [$prefix, $date, $level]));
         $response->assertSuccessful();
 
         static::assertStringContainsString(
-            "<h1>Log [{$date}]</h1>",
+            "[{$date}]</h1>",
             $response->getContent()
         );
         // TODO: Add more assertion => log entries is filtered by a level
@@ -74,11 +76,12 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_can_search_if_log_entries_contains_same_header_page()
     {
+        $prefix = 'laravel';
         $date     = '2015-01-01';
         $level    = 'all';
         $query    = 'This is an error log.';
 
-        $response = $this->get(route('log-viewer::logs.search', compact('date', 'level', 'query')));
+        $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
         $response->assertSuccessful();
 
         /** @var \Illuminate\View\View $view */
@@ -95,13 +98,14 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_can_search_using_shuffled_query()
     {
+        $prefix = 'laravel';
         $date     = '2015-01-01';
         $level    = 'all';
         $query    = explode(' ', 'This is a error log');
         shuffle($query);
         $query    = implode(' ', $query);
 
-        $response = $this->get(route('log-viewer::logs.search', compact('date', 'level', 'query')));
+        $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
         $response->assertSuccessful();
 
         /** @var \Illuminate\View\View $view */
@@ -118,13 +122,14 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_can_search_using_case_insensitive_query()
     {
+        $prefix = 'laravel';
         $date     = '2015-01-01';
         $level    = 'all';
         $query    = explode(' ', 'ThiS Is A ErROr loG');
         shuffle($query);
         $query    = implode(' ', $query);
 
-        $response = $this->get(route('log-viewer::logs.search', compact('date', 'level', 'query')));
+        $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
         $response->assertSuccessful();
 
         /** @var \Illuminate\View\View $view */
@@ -141,13 +146,14 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_can_still_search_if_extra_spacing_is_in_query()
     {
+        $prefix = 'laravel';
         $date     = '2015-01-01';
         $level    = 'all';
         $query    = explode(' ', 'ThiS  Is  A  ErROr  loG');
         shuffle($query);
         $query    = implode(' ', $query);
 
-        $response = $this->get(route('log-viewer::logs.search', compact('date', 'level', 'query')));
+        $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
         $response->assertSuccessful();
 
         /** @var \Illuminate\View\View $view */
@@ -164,10 +170,11 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_must_redirect_on_all_level()
     {
+        $prefix = 'laravel';
         $date     = '2015-01-01';
         $level    = 'all';
 
-        $response = $this->get(route('log-viewer::logs.filter', [$date, $level]));
+        $response = $this->get(route('log-viewer::logs.filter', [$prefix, $date, $level]));
 
         static::assertTrue($response->isRedirection());
         static::assertEquals(302, $response->getStatusCode());
@@ -177,9 +184,10 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_can_download_a_log_page()
     {
+        $prefix = 'laravel';
         $date = '2015-01-01';
 
-        $response = $this->get(route('log-viewer::logs.download', [$date]));
+        $response = $this->get(route('log-viewer::logs.download', [$prefix, $date]));
         $response->assertSuccessful();
 
         /** @var  \Symfony\Component\HttpFoundation\BinaryFileResponse  $base */
@@ -194,18 +202,20 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_can_delete_a_log()
     {
+        $prefix = 'laravel';
         static::createDummyLog(
             $date = date('Y-m-d')
         );
 
-        $response = $this->call('DELETE', route('log-viewer::logs.delete', compact('date')), [], [], [], ['HTTP_X-Requested-With' => 'XMLHttpRequest']);
+        $response = $this->call('DELETE', route('log-viewer::logs.delete', compact('prefix', 'date')), [], [], [], ['HTTP_X-Requested-With' => 'XMLHttpRequest']);
         $response->assertExactJson(['result' => 'success']);
     }
 
     /** @test */
     public function it_must_throw_log_not_found_exception_on_show()
     {
-        $response = $this->get(route('log-viewer::logs.show', ['0000-00-00']));
+        $prefix = 'laravel';
+        $response = $this->get(route('log-viewer::logs.show', [$prefix, '0000-00-00']));
 
         static::assertInstanceOf(
             \Symfony\Component\HttpKernel\Exception\HttpException::class,
@@ -213,16 +223,16 @@ class RoutesTest extends TestCase
         );
 
         static::assertSame(404, $response->getStatusCode());
-        static::assertSame('Log not found in this date [0000-00-00]', $response->exception->getMessage());
+        static::assertSame("Log not found for [$prefix][0000-00-00]", $response->exception->getMessage());
     }
 
     /** @test */
-    public function it_must_throw_log_not_found_exception_on_delete()
+    public function it_must_throw_validation_exception_on_delete()
     {
-        $response = $this->call('DELETE', route('log-viewer::logs.delete', ['0000-00-00']), [], [], [], ['HTTP_X-Requested-With' => 'XMLHttpRequest']);
+        $response = $this->call('DELETE', route('log-viewer::logs.delete', []), [], [], [], ['HTTP_X-Requested-With' => 'XMLHttpRequest']);
 
-        static::assertInstanceOf(\Arcanedev\LogViewer\Exceptions\FilesystemException::class, $response->exception);
-        static::assertStringStartsWith('The log(s) could not be located at : ', $response->exception->getMessage());
+        static::assertInstanceOf(\Illuminate\Validation\ValidationException::class, $response->exception);
+        static::assertSame('The given data was invalid.', $response->exception->getMessage());
     }
 
     /** @test */

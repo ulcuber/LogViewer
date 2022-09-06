@@ -3,6 +3,7 @@
 return [
     'all'                => 'All',
     'actions'            => 'Actions',
+    'prefix'             => 'Prefix',
     'date'               => 'Date',
     'empty-logs'         => 'The list of logs is empty!',
     'similar'            => 'Similar',
@@ -25,4 +26,6 @@ return [
     'dashboard'          => 'Dashboard',
     'of-entries'         => 'entries',
     'of-results'         => 'results',
+    'order-asc'          => 'Ascending',
+    'order-desc'         => 'Descending',
 ];

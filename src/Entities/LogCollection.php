@@ -39,8 +39,10 @@ class LogCollection extends LazyCollection
 
         if (is_null($source)) {
             $source = function () {
-                foreach ($this->filesystem->dates(true) as $date => $path) {
-                    yield $date => Log::make($date, $path, $this->filesystem->read($date));
+                foreach ($this->filesystem->paths(true) as $prefix => $paths) {
+                    foreach ($paths as $date => $path) {
+                        yield $path => Log::make($prefix, $date, $path, $this->filesystem->readPath($path));
+                    }
                 }
             };
         }
@@ -75,19 +77,19 @@ class LogCollection extends LazyCollection
     /**
      * Get a log.
      *
-     * @param  string      $date
+     * @param  string      $path
      * @param  mixed|null  $default
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      *
      * @throws \Arcanedev\LogViewer\Exceptions\LogNotFoundException
      */
-    public function get($date, $default = null)
+    public function get($path, $default = null)
     {
-        $value = parent::get($date, $default);
+        $value = parent::get($path, $default);
 
         if (! $value) {
-            throw new LogNotFoundException("Log not found in this date [$date]");
+            throw new LogNotFoundException("Log not found in this path [$path]");
         }
 
         return $value;
@@ -100,10 +102,11 @@ class LogCollection extends LazyCollection
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 30)
+    public function paginate(int $perPage = 30)
     {
-        $page = request()->get('page', 1);
-        $path = request()->url();
+        $request = request();
+        $page = $request->get('page', 1);
+        $path = $request->url();
 
         return new LengthAwarePaginator(
             $this->forPage($page, $perPage),
@@ -115,31 +118,34 @@ class LogCollection extends LazyCollection
     }
 
     /**
-     * Get a log (alias).
+     * Get a log via prefix and date.
      *
      * @see get()
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
-    public function log($date)
+    public function log(string $prefix, string $date)
     {
-        return $this->get($date);
+        $path = $this->filesystem->path($prefix, $date);
+        return $this->get($path);
     }
 
 
     /**
      * Get log entries.
      *
+     * @param  string  $prefix
      * @param  string  $date
      * @param  string  $level
      *
      * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
      */
-    public function entries($date, $level = 'all')
+    public function entries(string $prefix, string $date, string $level = 'all')
     {
-        return $this->get($date)->entries($level);
+        return $this->log($prefix, $date)->entries($level);
     }
 
     /**
@@ -147,24 +153,24 @@ class LogCollection extends LazyCollection
      *
      * @return array
      */
-    public function stats()
+    public function stats(): array
     {
         $stats = [];
 
-        foreach ($this->all() as $date => $log) {
+        foreach ($this->all() as $log) {
             /** @var \Arcanedev\LogViewer\Entities\Log $log */
-            $stats[$date] = $log->stats();
+            $stats[$log->prefix][$log->date] = $log->stats();
         }
 
         return $stats;
     }
 
     /**
-     * List the log files (dates).
+     * List the log files (paths).
      *
      * @return array
      */
-    public function dates()
+    public function paths()
     {
         return $this->keys()->toArray();
     }
@@ -176,7 +182,7 @@ class LogCollection extends LazyCollection
      *
      * @return int
      */
-    public function total($level = 'all')
+    public function total(string $level = 'all')
     {
         return (int) $this->sum(function (Log $log) use ($level) {
             return $log->entries($level)->count();
@@ -190,13 +196,13 @@ class LogCollection extends LazyCollection
      *
      * @return array
      */
-    public function tree($trans = false)
+    public function tree(bool $trans = false)
     {
         $tree = [];
 
-        foreach ($this->all() as $date => $log) {
+        foreach ($this->all() as $log) {
             /** @var \Arcanedev\LogViewer\Entities\Log $log */
-            $tree[$date] = $log->tree($trans);
+            $tree[$log->prefix][$log->date] = $log->tree($trans);
         }
 
         return $tree;
@@ -209,13 +215,13 @@ class LogCollection extends LazyCollection
      *
      * @return array
      */
-    public function menu($trans = true)
+    public function menu(bool $trans = true)
     {
         $menu = [];
 
-        foreach ($this->all() as $date => $log) {
+        foreach ($this->all() as $path => $log) {
             /** @var \Arcanedev\LogViewer\Entities\Log $log */
-            $menu[$date] = $log->menu($trans);
+            $menu[$path] = $log->menu($trans);
         }
 
         return $menu;

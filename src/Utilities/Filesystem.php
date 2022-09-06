@@ -54,6 +54,20 @@ class Filesystem implements FilesystemContract
      */
     protected $extension;
 
+    /**
+     * Regex to match parts of filename.
+     *
+     * @var string
+     */
+    protected $regex;
+
+    /**
+     * Logs cache to use glob once
+     *
+     * @var array
+     */
+    protected $logsCache;
+
     /* -----------------------------------------------------------------
      |  Constructor
      | -----------------------------------------------------------------
@@ -67,9 +81,11 @@ class Filesystem implements FilesystemContract
      */
     public function __construct(IlluminateFilesystem $files, $storagePath)
     {
-        $this->filesystem  = $files;
+        $this->filesystem = $files;
         $this->setPath($storagePath);
         $this->setPattern();
+
+        $this->regex = '/' . '([\w-]+)-(' . REGEX_DATE_PATTERN . ')' . '/';
     }
 
     /* -----------------------------------------------------------------
@@ -82,7 +98,7 @@ class Filesystem implements FilesystemContract
      *
      * @return \Illuminate\Filesystem\Filesystem
      */
-    public function getInstance()
+    public function getInstance(): IlluminateFilesystem
     {
         return $this->filesystem;
     }
@@ -106,7 +122,7 @@ class Filesystem implements FilesystemContract
      *
      * @return string
      */
-    public function getPattern()
+    public function getPattern(): string
     {
         return $this->prefixPattern . $this->datePattern . $this->extension;
     }
@@ -184,7 +200,7 @@ class Filesystem implements FilesystemContract
      *
      * @return array
      */
-    public function all()
+    public function all(): array
     {
         return $this->getFiles('*' . $this->extension);
     }
@@ -194,44 +210,78 @@ class Filesystem implements FilesystemContract
      *
      * @return array
      */
-    public function logs()
+    public function logs(): array
     {
-        return $this->getFiles($this->getPattern());
+        if (!$this->logsCache) {
+            $this->logsCache = $this->getFiles($this->getPattern());
+        }
+        return $this->logsCache;
     }
 
     /**
      * List the log files (Only dates).
      *
-     * @param  bool  $withPaths
+     * @param  bool  $extract
      *
      * @return array
      */
-    public function dates($withPaths = false)
+    public function paths($extract = false): array
     {
-        $files = array_reverse($this->logs());
-        $dates = $this->extractDates($files);
+        $paths = array_reverse($this->logs());
 
-        if ($withPaths) {
-            $dates = array_combine($dates, $files); // [date => file]
+        if ($extract) {
+            $dict = [];
+            foreach ($paths as $path) {
+                $filename = basename($path);
+                preg_match_all($this->regex, $filename, $matches);
+                $prefix = $matches[1][0];
+                $date = $matches[2][0];
+                $dict[$prefix][$date] = $path;
+            }
+
+            return $dict; // [prefix => [date => file]]
         }
 
-        return $dates;
+        return $paths;
     }
 
     /**
      * Read the log.
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return string
      *
      * @throws \Arcanedev\LogViewer\Exceptions\FilesystemException
      */
-    public function read($date)
+    public function read(string $prefix, string $date)
     {
         try {
             $log = $this->filesystem->get(
-                $this->getLogPath($date)
+                $this->path($prefix, $date)
+            );
+        } catch (\Exception $e) {
+            throw new FilesystemException($e->getMessage());
+        }
+
+        return $log;
+    }
+
+    /**
+     * Read the log.
+     *
+     * @param  string  $path
+     *
+     * @return string
+     *
+     * @throws \Arcanedev\LogViewer\Exceptions\FilesystemException
+     */
+    public function readPath(string $path)
+    {
+        try {
+            $log = $this->filesystem->get(
+                $path
             );
         } catch (\Exception $e) {
             throw new FilesystemException($e->getMessage());
@@ -243,15 +293,16 @@ class Filesystem implements FilesystemContract
     /**
      * Delete the log.
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return bool
      *
      * @throws \Arcanedev\LogViewer\Exceptions\FilesystemException
      */
-    public function delete($date)
+    public function delete(string $prefix, string $date)
     {
-        $path = $this->getLogPath($date);
+        $path = $this->path($prefix, $date);
 
         // @codeCoverageIgnoreStart
         if (!$this->filesystem->delete($path)) {
@@ -277,28 +328,30 @@ class Filesystem implements FilesystemContract
     /**
      * Get the log file path.
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return string
      */
-    public function path($date)
+    public function path(string $prefix, string $date)
     {
-        return $this->getLogPath($date);
+        $dict = $this->paths(true);
+
+        if (!($path = ($dict[$prefix][$date] ?? null)) || !$this->filesystem->exists($path)) {
+            throw new FilesystemException("The log(s) could not be located at: [$path] via [$prefix][$date]");
+        }
+
+        return realpath($path);
     }
 
-    /* -----------------------------------------------------------------
-     |  Other Methods
-     | -----------------------------------------------------------------
-     */
-
     /**
-     * Get all files.
+     * Get files matching pattern.
      *
      * @param  string  $pattern
      *
      * @return array
      */
-    private function getFiles($pattern)
+    public function getFiles(string $pattern): array
     {
         $files = $this->filesystem->glob(
             $this->storagePath . DS . $pattern,
@@ -309,36 +362,12 @@ class Filesystem implements FilesystemContract
     }
 
     /**
-     * Get the log file path.
+     * Clears path caches
      *
-     * @param  string  $date
-     *
-     * @return string
-     *
-     * @throws \Arcanedev\LogViewer\Exceptions\FilesystemException
+     * @return void
      */
-    private function getLogPath($date)
+    public function clearCache(): void
     {
-        $path = $this->storagePath . DS . $this->prefixPattern . $date . $this->extension;
-
-        if (!$this->filesystem->exists($path)) {
-            throw new FilesystemException("The log(s) could not be located at : $path");
-        }
-
-        return realpath($path);
-    }
-
-    /**
-     * Extract dates from files.
-     *
-     * @param  array  $files
-     *
-     * @return array
-     */
-    private function extractDates(array $files)
-    {
-        return array_map(function ($file) {
-            return extract_date(basename($file));
-        }, $files);
+        $this->logsCache = null;
     }
 }

@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tables;
+<?php
+
+namespace Arcanedev\LogViewer\Tables;
 
 use Arcanedev\LogViewer\Contracts\Utilities\LogLevels as LogLevelsContract;
 use Illuminate\Support\Arr;
@@ -43,10 +45,11 @@ class StatsTable extends AbstractTable
      *
      * @return array
      */
-    protected function prepareHeader(array $data)
+    protected function prepareHeader(array $data): array
     {
         return array_merge_recursive(
             [
+                'prefix' => $this->translate('general.prefix'),
                 'date' => $this->translate('general.date'),
                 'all'  => $this->translate('general.all'),
             ],
@@ -61,12 +64,14 @@ class StatsTable extends AbstractTable
      *
      * @return array
      */
-    protected function prepareRows(array $data)
+    protected function prepareRows(array $data): array
     {
         $rows = [];
 
-        foreach ($data as $date => $levels) {
-            $rows[$date] = array_merge(compact('date'), $levels);
+        foreach ($data as $prefix => $dates) {
+            foreach ($dates as $date => $levels) {
+                $rows[$prefix][$date] = array_merge(compact('prefix', 'date'), $levels);
+            }
         }
 
         return $rows;
@@ -79,17 +84,19 @@ class StatsTable extends AbstractTable
      *
      * @return array
      */
-    protected function prepareFooter(array $data)
+    protected function prepareFooter(array $data): array
     {
         $footer = [];
 
-        foreach ($data as $date => $levels) {
-            foreach ($levels as $level => $count) {
-                if ( ! isset($footer[$level])) {
-                    $footer[$level] = 0;
-                }
+        foreach ($data as $dates) {
+            foreach ($dates as $levels) {
+                foreach ($levels as $level => $count) {
+                    if (! isset($footer[$level])) {
+                        $footer[$level] = 0;
+                    }
 
-                $footer[$level] += $count;
+                    $footer[$level] += $count;
+                }
             }
         }
 
@@ -103,7 +110,7 @@ class StatsTable extends AbstractTable
      *
      * @return \Illuminate\Support\Collection
      */
-    public function totals()
+    public function totals(): Collection
     {
         $totals = Collection::make();
 
@@ -126,7 +133,7 @@ class StatsTable extends AbstractTable
      *
      * @return string
      */
-    public function totalsJson($locale = null)
+    public function totalsJson(?string $locale = null): string
     {
         return $this->totals($locale)->toJson(JSON_PRETTY_PRINT);
     }

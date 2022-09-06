@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Contracts\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Contracts\Utilities;
 
 use Illuminate\Contracts\Config\Repository as ConfigContract;
 
@@ -19,10 +21,10 @@ interface LogChecker
      * @link http://laravel.com/docs/5.4/errors#configuration
      * @link https://github.com/Seldaek/monolog/blob/master/doc/02-handlers-formatters-processors.md#log-to-files-and-syslog
      */
-    const HANDLER_DAILY    = 'daily';
-    const HANDLER_SINGLE   = 'single';
-    const HANDLER_SYSLOG   = 'syslog';
-    const HANDLER_ERRORLOG = 'errorlog';
+    public const HANDLER_DAILY    = 'daily';
+    public const HANDLER_SINGLE   = 'single';
+    public const HANDLER_SYSLOG   = 'syslog';
+    public const HANDLER_ERRORLOG = 'errorlog';
 
     /* -----------------------------------------------------------------
      |  Getters & Setters

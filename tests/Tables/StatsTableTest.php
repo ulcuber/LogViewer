@@ -154,7 +154,7 @@ class StatsTableTest extends TestCase
     {
         $header = $table->header();
 
-        self::assertCount(10, $header);
+        self::assertCount(11, $header);
         // TODO: Add more assertions to check the content
     }
 
@@ -165,23 +165,30 @@ class StatsTableTest extends TestCase
      */
     protected static function assertTableRows(TableContract $table)
     {
-        foreach ($table->rows() as $date => $row) {
-            self::assertDate($date);
-            self::assertCount(10, $row);
+        foreach ($table->rows() as $prefix => $dates) {
+            self::assertEquals('laravel', $prefix);
+            foreach ($dates as $date => $row) {
+                self::assertDate($date);
+                self::assertCount(11, $row);
 
-            foreach ($row as $key => $value) {
-                switch ($key) {
-                    case 'date':
-                        self::assertDate($value);
-                        break;
+                foreach ($row as $key => $value) {
+                    switch ($key) {
+                        case 'prefix':
+                            self::assertEquals('laravel', $value);
+                            break;
 
-                    case 'all':
-                        self::assertEquals(8, $value);
-                        break;
+                        case 'date':
+                            self::assertDate($value);
+                            break;
 
-                    default:
-                        self::assertEquals(1, $value);
-                        break;
+                        case 'all':
+                            self::assertEquals(8, $value);
+                            break;
+
+                        default:
+                            self::assertEquals(1, $value);
+                            break;
+                    }
                 }
             }
         }

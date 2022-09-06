@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Entities;
+<?php
+
+namespace Arcanedev\LogViewer\Entities;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -20,16 +22,19 @@ class Log implements Arrayable, Jsonable, JsonSerializable
      */
 
     /** @var string */
+    public $prefix;
+
+    /** @var string */
     public $date;
 
     /** @var string */
-    private $path;
+    protected $path;
 
     /** @var \Arcanedev\LogViewer\Entities\LogEntryCollection */
-    private $entries;
+    protected $entries;
 
     /** @var \SplFileInfo */
-    private $file;
+    protected $file;
 
     /* -----------------------------------------------------------------
      |  Constructor
@@ -39,12 +44,14 @@ class Log implements Arrayable, Jsonable, JsonSerializable
     /**
      * Log constructor.
      *
+     * @param  string  $prefix
      * @param  string  $date
      * @param  string  $path
      * @param  string  $raw
      */
-    public function __construct($date, $path, $raw)
+    public function __construct(string $prefix, string $date, string $path, string $raw)
     {
+        $this->prefix    = $prefix;
         $this->date    = $date;
         $this->path    = $path;
         $this->file    = new SplFileInfo($path);
@@ -114,15 +121,16 @@ class Log implements Arrayable, Jsonable, JsonSerializable
     /**
      * Make a log object.
      *
+     * @param  string  $prefix
      * @param  string  $date
      * @param  string  $path
      * @param  string  $raw
      *
      * @return self
      */
-    public static function make($date, $path, $raw)
+    public static function make(string $prefix, string $date, string $path, string $raw)
     {
-        return new self($date, $path, $raw);
+        return new self($prefix, $date, $path, $raw);
     }
 
     /**
@@ -132,7 +140,7 @@ class Log implements Arrayable, Jsonable, JsonSerializable
      *
      * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
      */
-    public function entries($level = 'all')
+    public function entries(string $level = 'all')
     {
         return $level === 'all'
             ? $this->entries
@@ -169,7 +177,7 @@ class Log implements Arrayable, Jsonable, JsonSerializable
      *
      * @return array
      */
-    public function stats()
+    public function stats(): array
     {
         return $this->entries->stats();
     }
@@ -211,6 +219,7 @@ class Log implements Arrayable, Jsonable, JsonSerializable
     public function toArray()
     {
         return [
+            'prefix'    => $this->prefix,
             'date'    => $this->date,
             'path'    => $this->path,
             'entries' => $this->entries->toArray()
@@ -260,6 +269,6 @@ class Log implements Arrayable, Jsonable, JsonSerializable
         $pow   = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow   = min($pow, count($units) - 1);
 
-        return round($bytes / pow(1024, $pow), $precision).' '.$units[$pow];
+        return round($bytes / pow(1024, $pow), $precision) . ' ' . $units[$pow];
     }
 }

@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Commands;
+<?php
+
+namespace Arcanedev\LogViewer\Commands;
 
 /**
  * Class     ClearCommand

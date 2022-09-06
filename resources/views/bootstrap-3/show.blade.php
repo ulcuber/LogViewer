@@ -9,7 +9,7 @@
 @extends('log-viewer::bootstrap-3._master')
 
 @section('content')
-    <h1 class="page-header">{{ trans('log-viewer::general.log') }} [{{ $log->date }}]</h1>
+    <h1 class="page-header">{{ trans('log-viewer::general.log') }} <span class="text-muted">{{ $log->prefix }}</span> [{{ $log->date }}]</h1>
 
     <div class="row">
         <div class="col-md-2">
@@ -45,7 +45,7 @@
                     {{ trans('log-viewer::general.log-info') }}
 
                     <div class="group-btns pull-right">
-                        <a href="{{ route('log-viewer::logs.download', [$log->date]) }}" class="btn btn-xs btn-success">
+                        <a href="{{ route('log-viewer::logs.download', [$log->prefix, $log->date]) }}" class="btn btn-xs btn-success">
                             <i class="fa fa-download"></i> {{ trans('log-viewer::general.download') }}
                         </a>
                         <a href="#delete-log-modal" class="btn btn-xs btn-danger" data-toggle="modal">
@@ -85,13 +85,13 @@
                 </div>
                 <div class="panel-footer">
                     {{-- Search --}}
-                    <form action="{{ route('log-viewer::logs.search', [$log->date, $level]) }}" method="GET">
+                    <form action="{{ route('log-viewer::logs.search', [$log->prefix, $log->date, $level]) }}" method="GET">
                         <div class="form-group">
                             <div class="input-group">
                                 <input id="query" name="query" class="form-control" value="{{ $query }}" placeholder="Type here to search">
                                 <span class="input-group-btn">
                                     @unless (is_null($query))
-                                        <a href="{{ route('log-viewer::logs.show', [$log->date]) }}" class="btn btn-default">
+                                        <a href="{{ route('log-viewer::logs.show', [$log->prefix, $log->date]) }}" class="btn btn-default">
                                             ({{ $entries->count() }} {{ trans('log-viewer::general.of-results') }}) <span class="glyphicon glyphicon-remove"></span>
                                         </a>
                                     @endunless
@@ -102,6 +102,11 @@
                             </div>
                         </div>
                     </form>
+                    @if (config('log-viewer.reversed_order'))
+                        <a class="btn btn-xs btn-info" href="{{ route($route, array_merge(request()->all(), ['prefix' => $log->prefix, 'date' => $log->date, 'level' => $level === 'all' && $route !== 'log-viewer::logs.search' ? null : $level, 'order' => 'asc', 'page' => null])) }}">{{ trans('log-viewer::general.order-asc') }}</a>
+                    @else
+                        <a class="btn btn-xs btn-info" href="{{ route($route, array_merge(request()->all(), ['prefix' => $log->prefix, 'date' => $log->date, 'level' => $level === 'all' && $route !== 'log-viewer::logs.search' ? null : $level, 'order' => 'desc', 'page' => null])) }}">{{ trans('log-viewer::general.order-desc') }}</a>
+                    @endif
                 </div>
             </div>
 
@@ -132,7 +137,7 @@
                                 <tr>
                                     <td>
                                         @foreach ($entry->extra as $key => $extra)
-                                            <a class="label label-env label-extra-{{ $key }}" href="{{ route('log-viewer::logs.show', array_merge(request()->input(), ['date' => $log->date, $key => $extra])) }}">
+                                            <a class="label label-env label-extra-{{ $key }}" href="{{ route('log-viewer::logs.show', array_merge(request()->input(), ['prefix' => $log->prefix, 'date' => $log->date, $key => $extra])) }}">
                                                 {{ $extra }}
                                             </a>
                                         @endforeach
@@ -142,40 +147,38 @@
                                             {{ $entry->getDatetime()->format('H:i:s') }}
                                         </span>
                                         <br/>
-                                        <a class="btn btn-xs btn-default" href="{{ route('log-viewer::logs.similar', [$log->date, $entry->level, 'text' => $entry->header]) }}">{{ trans('log-viewer::general.similar') }}</a>
+                                        <a class="btn btn-xs btn-default" href="{{ route('log-viewer::logs.similar', [$log->prefix, $log->date, $entry->level, 'text' => $entry->header]) }}">{{ trans('log-viewer::general.similar') }}</a>
                                     </td>
                                     <td>
                                         <p>{{ $entry->header }}</p>
                                     </td>
                                     <td class="text-right">
-                                        @if ($entry->hasStack())
-                                        <a class="btn btn-xs btn-default" role="button" data-toggle="collapse"
-                                           href="#log-stack-{{ $key }}" aria-expanded="false" aria-controls="log-stack-{{ $key }}">
-                                            <i class="fa fa-toggle-on"></i> Stack
-                                        </a>
-                                        @endif
-
                                         @if ($entry->hasContext())
-                                        <a class="btn btn-xs btn-default" role="button" data-toggle="collapse"
-                                           href="#log-context-{{ $key }}" aria-expanded="false" aria-controls="log-context-{{ $key }}">
-                                            <i class="fa fa-toggle-on"></i> Context
-                                        </a>
+                                            <a class="btn btn-xs btn-default" role="button" data-toggle="collapse"
+                                            href="#log-context-{{ $key }}" aria-expanded="false" aria-controls="log-context-{{ $key }}">
+                                                <i class="fa fa-toggle-on"></i> Context
+                                            </a>
+                                        @endif
+                                        @if ($entry->hasStack())
+                                            <a class="btn btn-xs btn-default" role="button" data-toggle="collapse"
+                                            href="#log-stack-{{ $key }}" aria-expanded="false" aria-controls="log-stack-{{ $key }}">
+                                                <i class="fa fa-toggle-on"></i> Stack
+                                            </a>
                                         @endif
                                     </td>
                                 </tr>
                                 @if ($entry->hasStack() || $entry->hasContext())
                                     <tr>
                                         <td colspan="5" class="stack">
-                                            @if ($entry->hasStack())
-                                            <div class="stack-content collapse" id="log-stack-{{ $key }}">
-                                                {!! $entry->stack() !!}
-                                            </div>
-                                            @endif
-
                                             @if ($entry->hasContext())
-                                            <div class="stack-content collapse" id="log-context-{{ $key }}">
-                                                <pre>{{ $entry->context() }}</pre>
-                                            </div>
+                                                <div class="stack-content collapse" id="log-context-{{ $key }}">
+                                                    <pre>{{ $entry->context() }}</pre>
+                                                </div>
+                                            @endif
+                                            @if ($entry->hasStack())
+                                                <div class="stack-content collapse" id="log-stack-{{ $key }}">
+                                                    {!! $entry->stack() !!}
+                                                </div>
                                             @endif
                                         </td>
                                     </tr>
@@ -212,6 +215,7 @@
             <form id="delete-log-form" action="{{ route('log-viewer::logs.delete') }}" method="POST">
                 <input type="hidden" name="_method" value="DELETE">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="prefix" value="{{ $log->prefix }}">
                 <input type="hidden" name="date" value="{{ $log->date }}">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -221,7 +225,7 @@
                         <h4 class="modal-title">DELETE LOG FILE</h4>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to <span class="label label-danger">DELETE</span> this log file <span class="label label-primary">{{ $log->date }}</span> ?</p>
+                        <p>Are you sure you want to <span class="label label-danger">DELETE</span> this log file <span class="label label-secondary">{{ $log->prefix }}</span> <span class="label label-primary">{{ $log->date }}</span> ?</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-sm btn-default pull-left" data-dismiss="modal">Cancel</button>

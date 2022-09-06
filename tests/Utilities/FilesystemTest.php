@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Tests\Utilities;
 
 use Arcanedev\LogViewer\Tests\TestCase;
 use Arcanedev\LogViewer\Utilities\Filesystem;
@@ -89,28 +91,33 @@ class FilesystemTest extends TestCase
     /** @test */
     public function it_can_read_file()
     {
-        $file = $this->filesystem->read($date = '2015-01-01');
+        $prefix = 'laravel';
+        $date = '2015-01-01';
+
+        $file = $this->filesystem->read($prefix, $date);
 
         static::assertNotEmpty($file);
-        static::assertStringStartsWith('['.$date, $file);
+        static::assertStringStartsWith('[' . $date, $file);
     }
 
     /** @test */
     public function it_can_delete_file()
     {
-        static::createDummyLog($date = date('Y-m-d'));
+        $prefix = 'laravel';
+        $date = date('Y-m-d');
+
+        static::createDummyLog($date);
 
         // Assert log exists
-        $file = $this->filesystem->read($date);
+        $file = $this->filesystem->read($prefix, $date);
 
         static::assertNotEmpty($file);
 
         // Assert log deletion
         try {
-            $deleted = $this->filesystem->delete($date);
+            $deleted = $this->filesystem->delete($prefix, $date);
             $message = '';
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $deleted = false;
             $message = $e->getMessage();
         }
@@ -146,27 +153,30 @@ class FilesystemTest extends TestCase
 
 
     /** @test */
-    public function it_can_get_file_path_by_date()
+    public function it_can_get_file_path_by_prefix_and_date()
     {
         static::assertFileExists(
-            $this->filesystem->path('2015-01-01')
+            $this->filesystem->path('laravel', '2015-01-01')
         );
     }
 
     /** @test */
-    public function it_can_get_dates_from_log_files()
+    public function it_can_get_paths_from_log_files()
     {
-        static::assertDates(
-            $this->filesystem->dates()
-        );
+        foreach ($this->filesystem->paths() as $path) {
+            $this->assertFileExists($path);
+        }
     }
 
     /** @test */
-    public function it_can_get_dates_with_paths_from_log_files()
+    public function it_can_get_paths_with_prefixes_and_dates_from_log_files()
     {
-        foreach ($this->filesystem->dates(true) as $date => $path) {
-            static::assertDate($date);
-            static::assertFileExists($path);
+        foreach ($this->filesystem->paths(true) as $prefix => $dates) {
+            $this->assertSame('laravel', $prefix);
+            foreach ($dates as $date => $path) {
+                static::assertDate($date);
+                static::assertFileExists($path);
+            }
         }
     }
 
@@ -175,7 +185,7 @@ class FilesystemTest extends TestCase
     {
         $this->expectException(\Arcanedev\LogViewer\Exceptions\FilesystemException::class);
 
-        $this->filesystem->read('2222-11-11'); // Future FTW
+        $this->filesystem->read('laravel', '2222-11-11'); // Future FTW
     }
 
     /** @test */
@@ -183,7 +193,7 @@ class FilesystemTest extends TestCase
     {
         $this->expectException(\Arcanedev\LogViewer\Exceptions\FilesystemException::class);
 
-        $this->filesystem->delete('2222-11-11'); // Future FTW
+        $this->filesystem->delete('laravel', '2222-11-11'); // Future FTW
     }
 
     /** @test */
@@ -223,7 +233,9 @@ class FilesystemTest extends TestCase
         );
 
         $this->filesystem->setPattern(
-            'laravel-', '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]', '.log'
+            'laravel-',
+            '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]',
+            '.log'
         );
 
         static::assertSame(

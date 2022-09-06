@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tables;
+<?php
+
+namespace Arcanedev\LogViewer\Tables;
 
 use Arcanedev\LogViewer\Contracts\Table as TableContract;
 use Arcanedev\LogViewer\Contracts\Utilities\LogLevels as LogLevelsContract;
@@ -80,7 +82,7 @@ abstract class AbstractTable implements TableContract
      *
      * @return self
      */
-    protected function setLocale($locale)
+    protected function setLocale(?string $locale)
     {
         if (is_null($locale) || $locale === 'auto') {
             $locale = app()->getLocale();
@@ -96,7 +98,7 @@ abstract class AbstractTable implements TableContract
      *
      * @return array
      */
-    public function header()
+    public function header(): array
     {
         return $this->header;
     }
@@ -106,7 +108,7 @@ abstract class AbstractTable implements TableContract
      *
      * @return array
      */
-    public function rows()
+    public function rows(): array
     {
         return $this->rows;
     }
@@ -116,7 +118,7 @@ abstract class AbstractTable implements TableContract
      *
      * @return array
      */
-    public function footer()
+    public function footer(): array
     {
         return $this->footer;
     }
@@ -126,7 +128,7 @@ abstract class AbstractTable implements TableContract
      *
      * @return array
      */
-    public function data()
+    public function data(): array
     {
         return $this->data;
     }
@@ -153,7 +155,7 @@ abstract class AbstractTable implements TableContract
     /**
      * Prepare the table.
      */
-    private function init()
+    protected function init()
     {
         $this->header = $this->prepareHeader($this->data);
         $this->rows   = $this->prepareRows($this->data);
@@ -167,7 +169,7 @@ abstract class AbstractTable implements TableContract
      *
      * @return array
      */
-    abstract protected function prepareHeader(array $data);
+    abstract protected function prepareHeader(array $data): array;
 
     /**
      * Prepare table rows.
@@ -176,7 +178,7 @@ abstract class AbstractTable implements TableContract
      *
      * @return array
      */
-    abstract protected function prepareRows(array $data);
+    abstract protected function prepareRows(array $data): array;
 
     /**
      * Prepare table footer.
@@ -185,7 +187,7 @@ abstract class AbstractTable implements TableContract
      *
      * @return array
      */
-    abstract protected function prepareFooter(array $data);
+    abstract protected function prepareFooter(array $data): array;
 
     /* -----------------------------------------------------------------
      |  Other Methods
@@ -199,12 +201,12 @@ abstract class AbstractTable implements TableContract
      *
      * @return string
      */
-    protected function translate($key)
+    protected function translate(string $key): string
     {
         /** @var \Illuminate\Translation\Translator $translator */
         $translator = trans();
 
-        return $translator->get('log-viewer::'.$key,  [], $this->locale);
+        return $translator->get('log-viewer::' . $key, [], $this->locale);
     }
 
     /**
@@ -214,7 +216,7 @@ abstract class AbstractTable implements TableContract
      *
      * @return string
      */
-    protected function color($level)
+    protected function color(string $level): string
     {
         return log_styler()->color($level);
     }

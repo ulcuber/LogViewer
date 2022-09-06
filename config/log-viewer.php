@@ -30,7 +30,7 @@ return [
     'storage-path'  => storage_path('logs'),
 
     /* -----------------------------------------------------------------
-     |  Log files pattern
+     |  Log files pattern (glob pattern, not regex)
      | -----------------------------------------------------------------
      */
 
@@ -84,15 +84,12 @@ return [
     'per-page'      => 30,
 
     /* -----------------------------------------------------------------
-     |  Download settings
+     |  Log entries in reversed order
      | -----------------------------------------------------------------
+     |  Shows latest entries first if enabled
      */
 
-    'download'      => [
-        'prefix'    => 'laravel-',
-
-        'extension' => 'log',
-    ],
+    'reversed_order'      => true,
 
     /* -----------------------------------------------------------------
      |  Menu settings

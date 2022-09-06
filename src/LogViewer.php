@@ -6,7 +6,11 @@ use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
 use Arcanedev\LogViewer\Contracts\Utilities\Factory as FactoryContract;
 use Arcanedev\LogViewer\Contracts\Utilities\LogLevels as LogLevelsContract;
 use Arcanedev\LogViewer\Contracts\LogViewer as LogViewerContract;
+use Arcanedev\LogViewer\Entities\LogCollection;
 use Arcanedev\LogViewer\Entities\LogEntry;
+use Arcanedev\LogViewer\Entities\LogEntryCollection;
+use Arcanedev\LogViewer\Tables\StatsTable;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 
 /**
  * Class     LogViewer
@@ -88,7 +92,7 @@ class LogViewer implements LogViewerContract
      *
      * @return array
      */
-    public function levels($flip = false)
+    public function levels(bool $flip = false): array
     {
         return $this->levels->lists($flip);
     }
@@ -100,7 +104,7 @@ class LogViewer implements LogViewerContract
      *
      * @return array
      */
-    public function levelsNames($locale = null)
+    public function levelsNames(?string $locale = null): array
     {
         return $this->levels->names($locale);
     }
@@ -112,7 +116,7 @@ class LogViewer implements LogViewerContract
      *
      * @return self
      */
-    public function setPath($path)
+    public function setPath(string $path)
     {
         $this->factory->setPath($path);
 
@@ -124,7 +128,7 @@ class LogViewer implements LogViewerContract
      *
      * @return string
      */
-    public function getPattern()
+    public function getPattern(): string
     {
         return $this->factory->getPattern();
     }
@@ -132,8 +136,8 @@ class LogViewer implements LogViewerContract
     /**
      * Set the log pattern.
      *
-     * @param string $date
      * @param string $prefix
+     * @param string $date
      * @param string $extension
      *
      * @return self
@@ -158,7 +162,7 @@ class LogViewer implements LogViewerContract
      *
      * @return \Arcanedev\LogViewer\Entities\LogCollection
      */
-    public function all()
+    public function all(): LogCollection
     {
         return $this->factory->all();
     }
@@ -170,7 +174,7 @@ class LogViewer implements LogViewerContract
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 30)
+    public function paginate($perPage = 30): LengthAwarePaginatorContract
     {
         return $this->factory->paginate($perPage);
     }
@@ -178,26 +182,28 @@ class LogViewer implements LogViewerContract
     /**
      * Get a log.
      *
+     * @param string $prefix
      * @param string $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
-    public function get($date)
+    public function get(string $prefix, string $date)
     {
-        return $this->factory->log($date);
+        return $this->factory->log($prefix, $date);
     }
 
     /**
      * Get the log entries.
      *
+     * @param string $prefix
      * @param string $date
      * @param string $level
      *
      * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
      */
-    public function entries($date, $level = 'all')
+    public function entries(string $prefix, string $date, string $level = 'all'): LogEntryCollection
     {
-        return $this->factory->entries($date, $level);
+        return $this->factory->entries($prefix, $date, $level);
     }
 
     /**
@@ -209,13 +215,13 @@ class LogViewer implements LogViewerContract
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function download($date, $filename = null, $headers = [])
+    public function download(string $prefix, string $date, ?string $filename = null, array $headers = [])
     {
         if (is_null($filename)) {
-            $filename = "laravel-{$date}.log";
+            $filename = "{$prefix}-{$date}.log";
         }
 
-        $path = $this->filesystem->path($date);
+        $path = $this->filesystem->path($prefix, $date);
 
         return response()->download($path, $filename, $headers);
     }
@@ -225,7 +231,7 @@ class LogViewer implements LogViewerContract
      *
      * @return array
      */
-    public function stats()
+    public function stats(): array
     {
         return $this->factory->stats();
     }
@@ -237,7 +243,7 @@ class LogViewer implements LogViewerContract
      *
      * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
-    public function statsTable($locale = null)
+    public function statsTable(?string $locale = null): StatsTable
     {
         return $this->factory->statsTable($locale);
     }
@@ -245,13 +251,14 @@ class LogViewer implements LogViewerContract
     /**
      * Delete the log.
      *
+     * @param string $prefix
      * @param string $date
      *
      * @return bool
      */
-    public function delete($date)
+    public function delete(string $prefix, string $date): bool
     {
-        return $this->filesystem->delete($date);
+        return $this->filesystem->delete($prefix, $date);
     }
 
     /**
@@ -259,9 +266,19 @@ class LogViewer implements LogViewerContract
      *
      * @return bool
      */
-    public function clear()
+    public function clear(): bool
     {
         return $this->filesystem->clear();
+    }
+
+    /**
+     * Clear path cache.
+     *
+     * @return void
+     */
+    public function clearCache(): void
+    {
+        $this->filesystem->clearCache();
     }
 
     /**
@@ -269,19 +286,19 @@ class LogViewer implements LogViewerContract
      *
      * @return array
      */
-    public function files()
+    public function files(): array
     {
         return $this->filesystem->logs();
     }
 
     /**
-     * List the log files (only dates).
+     * List the log files (only paths).
      *
      * @return array
      */
-    public function dates()
+    public function paths(): array
     {
-        return $this->factory->dates();
+        return $this->factory->paths();
     }
 
     /**
@@ -289,7 +306,7 @@ class LogViewer implements LogViewerContract
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->factory->count();
     }
@@ -301,7 +318,7 @@ class LogViewer implements LogViewerContract
      *
      * @return int
      */
-    public function total($level = 'all')
+    public function total(string $level = 'all'): int
     {
         return $this->factory->total($level);
     }
@@ -313,7 +330,7 @@ class LogViewer implements LogViewerContract
      *
      * @return array
      */
-    public function tree($trans = false)
+    public function tree(bool $trans = false): array
     {
         return $this->factory->tree($trans);
     }
@@ -325,7 +342,7 @@ class LogViewer implements LogViewerContract
      *
      * @return array
      */
-    public function menu($trans = true)
+    public function menu(bool $trans = true): array
     {
         return $this->factory->menu($trans);
     }
@@ -340,7 +357,7 @@ class LogViewer implements LogViewerContract
      *
      * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return $this->factory->isEmpty();
     }
@@ -355,7 +372,7 @@ class LogViewer implements LogViewerContract
      *
      * @return string
      */
-    public function version()
+    public function version(): string
     {
         try {
             return \Composer\InstalledVersions::getPrettyVersion('arcanedev/log-viewer');

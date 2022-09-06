@@ -96,8 +96,8 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      */
     public function __construct(array $header, $stack = null)
     {
-        $this->setHeader($header);
         $this->setStack($stack);
+        $this->setHeader($header);
     }
 
     /* -----------------------------------------------------------------
@@ -215,11 +215,23 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
         }
 
         $reminder = array_pop($matches)[0];
-        // EXTRACT CONTEXT (Regex from https://stackoverflow.com/a/21995025)
-        preg_match_all('/{(?:[^{}]|(?R))*}/x', $reminder, $out);
-        if (isset($out[0][0]) && !is_null($context = json_decode($out[0][0], true))) {
-            $reminder = str_replace($out[0][0], '', $reminder);
-            $this->setContext($context);
+
+        $regex = '/{(?:[^{}]|(?R))*}/xm';
+        $reminder = preg_replace_callback($regex, function ($replacable) {
+            if (!is_null($context = json_decode($replacable[0], true))) {
+                $this->setContext($context);
+                return '';
+            }
+            return $replacable[0];
+        }, $reminder);
+        if (!$this->context && !strpos($this->stack, '>>>>>>>>')) {
+            $this->stack = preg_replace_callback($regex, function ($replacable) {
+                if (!is_null($context = json_decode($replacable[0], true))) {
+                    $this->setContext($context);
+                    return '';
+                }
+                return $replacable[0];
+            }, $this->stack);
         }
 
         $this->header = trim($reminder);

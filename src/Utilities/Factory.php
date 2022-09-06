@@ -7,8 +7,11 @@ use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
 use Arcanedev\LogViewer\Contracts\Utilities\LogLevels as LogLevelsContract;
 use Arcanedev\LogViewer\Entities\Log;
 use Arcanedev\LogViewer\Entities\LogCollection;
+use Arcanedev\LogViewer\Entities\LogEntryCollection;
+use Arcanedev\LogViewer\Exceptions\FilesystemException;
 use Arcanedev\LogViewer\Exceptions\LogNotFoundException;
 use Arcanedev\LogViewer\Tables\StatsTable;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Class     Factory
@@ -64,7 +67,7 @@ class Factory implements FactoryContract
      *
      * @return \Arcanedev\LogViewer\Contracts\Utilities\Filesystem
      */
-    public function getFilesystem()
+    public function getFilesystem(): FilesystemContract
     {
         return $this->filesystem;
     }
@@ -88,7 +91,7 @@ class Factory implements FactoryContract
      *
      * @return \Arcanedev\LogViewer\Contracts\Utilities\LogLevels
      */
-    public function getLevels()
+    public function getLevels(): LogLevelsContract
     {
         return $this->levels;
     }
@@ -114,7 +117,7 @@ class Factory implements FactoryContract
      *
      * @return self
      */
-    public function setPath($storagePath)
+    public function setPath(string $storagePath)
     {
         $this->filesystem->setPath($storagePath);
 
@@ -126,7 +129,7 @@ class Factory implements FactoryContract
      *
      * @return string
      */
-    public function getPattern()
+    public function getPattern(): string
     {
         return $this->filesystem->getPattern();
     }
@@ -155,7 +158,7 @@ class Factory implements FactoryContract
      *
      * @return \Arcanedev\LogViewer\Entities\LogCollection
      */
-    public function logs()
+    public function logs(): LogCollection
     {
         return (new LogCollection())->setFilesystem($this->filesystem);
     }
@@ -172,7 +175,7 @@ class Factory implements FactoryContract
      *
      * @return \Arcanedev\LogViewer\Entities\LogCollection
      */
-    public function all()
+    public function all(): LogCollection
     {
         return $this->logs();
     }
@@ -184,7 +187,7 @@ class Factory implements FactoryContract
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 30)
+    public function paginate(int $perPage = 30): LengthAwarePaginator
     {
         return $this->logs()->paginate($perPage);
     }
@@ -192,45 +195,47 @@ class Factory implements FactoryContract
     /**
      * Get a log by date.
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
-    public function log($date)
+    public function log(string $prefix, string $date): Log
     {
         // NOTE: iterator reads file by file so not using this->logs()->log()
-        foreach ($this->filesystem->dates(true) as $outerDate => $path) {
-            if ($date == $outerDate) {
-                return Log::make($date, $path, $this->filesystem->read($date));
-            }
+        try {
+            $path = $this->filesystem->path($prefix, $date);
+            return Log::make($prefix, $date, $path, $this->filesystem->readPath($path));
+        } catch (FilesystemException $th) {
+            throw new LogNotFoundException("Log not found for [$prefix][$date]", 1, $th);
         }
-
-        throw new LogNotFoundException("Log not found in this date [$date]");
     }
 
     /**
      * Get a log by date (alias).
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
-    public function get($date)
+    public function get(string $prefix, string $date): Log
     {
-        return $this->log($date);
+        return $this->log($prefix, $date);
     }
 
     /**
      * Get log entries.
      *
+     * @param  string  $prefix
      * @param  string  $date
      * @param  string  $level
      *
      * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
      */
-    public function entries($date, $level = 'all')
+    public function entries(string $prefix, string $date, string $level = 'all'): LogEntryCollection
     {
-        return $this->logs()->entries($date, $level);
+        return $this->logs()->entries($prefix, $date, $level);
     }
 
     /**
@@ -238,7 +243,7 @@ class Factory implements FactoryContract
      *
      * @return array
      */
-    public function stats()
+    public function stats(): array
     {
         return $this->logs()->stats();
     }
@@ -250,19 +255,19 @@ class Factory implements FactoryContract
      *
      * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
-    public function statsTable($locale = null)
+    public function statsTable(?string $locale = null): StatsTable
     {
         return StatsTable::make($this->stats(), $this->levels, $locale);
     }
 
     /**
-     * List the log files (dates).
+     * List the log files (paths).
      *
      * @return array
      */
-    public function dates()
+    public function paths(): array
     {
-        return $this->logs()->dates();
+        return $this->logs()->paths();
     }
 
     /**
@@ -270,7 +275,7 @@ class Factory implements FactoryContract
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->logs()->count();
     }
@@ -282,7 +287,7 @@ class Factory implements FactoryContract
      *
      * @return int
      */
-    public function total($level = 'all')
+    public function total(string $level = 'all'): int
     {
         return $this->logs()->total($level);
     }
@@ -294,7 +299,7 @@ class Factory implements FactoryContract
      *
      * @return array
      */
-    public function tree($trans = false)
+    public function tree(bool $trans = false): array
     {
         return $this->logs()->tree($trans);
     }
@@ -306,7 +311,7 @@ class Factory implements FactoryContract
      *
      * @return array
      */
-    public function menu($trans = true)
+    public function menu(bool $trans = true): array
     {
         return $this->logs()->menu($trans);
     }
@@ -321,7 +326,7 @@ class Factory implements FactoryContract
      *
      * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return $this->logs()->isEmpty();
     }

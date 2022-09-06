@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Contracts\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Contracts\Utilities;
 
 use Arcanedev\LogViewer\Contracts\Patternable;
 
@@ -15,9 +17,9 @@ interface Filesystem extends Patternable
      | -----------------------------------------------------------------
      */
 
-    const PATTERN_PREFIX    = 'laravel-';
-    const PATTERN_DATE      = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]';
-    const PATTERN_EXTENSION = '.log';
+    public const PATTERN_PREFIX    = 'laravel-';
+    public const PATTERN_DATE      = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]';
+    public const PATTERN_EXTENSION = '.log';
 
     /* -----------------------------------------------------------------
      |  Getters & Setters
@@ -87,35 +89,28 @@ interface Filesystem extends Patternable
     public function logs();
 
     /**
-     * List the log files (Only dates).
-     *
-     * @param  bool  $withPaths
-     *
-     * @return array
-     */
-    public function dates($withPaths = false);
-
-    /**
      * Read the log.
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return string
      *
      * @throws \Arcanedev\LogViewer\Exceptions\FilesystemException
      */
-    public function read($date);
+    public function read(string $prefix, string $date);
 
     /**
      * Delete the log.
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return bool
      *
      * @throws \Arcanedev\LogViewer\Exceptions\FilesystemException
      */
-    public function delete($date);
+    public function delete(string $prefix, string $date);
 
     /**
      * Clear the log files.
@@ -127,9 +122,19 @@ interface Filesystem extends Patternable
     /**
      * Get the log file path.
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return string
      */
-    public function path($date);
+    public function path(string $prefix, string $date);
+
+    /**
+     * Get files matching pattern.
+     *
+     * @param  string  $pattern
+     *
+     * @return array
+     */
+    public function getFiles(string $pattern): array;
 }

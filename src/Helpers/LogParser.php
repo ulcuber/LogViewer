@@ -56,7 +56,7 @@ class LogParser
 
         unset($headings, $data);
 
-        return static::$parsed;
+        return config('log-viewer.reversed_order') ? array_reverse(static::$parsed) : static::$parsed;
     }
 
     /* -----------------------------------------------------------------

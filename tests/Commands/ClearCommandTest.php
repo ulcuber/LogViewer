@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests\Commands;
+<?php
+
+namespace Arcanedev\LogViewer\Tests\Commands;
 
 use Arcanedev\LogViewer\Tests\TestCase;
 
@@ -49,15 +51,15 @@ class ClearCommandTest extends TestCase
     |  Tests
     | -----------------------------------------------------------------
     */
-    
+
     /** @test */
-    
     public function it_can_delete_all_log_files()
     {
         static::assertEquals(0, $this->logViewer->count());
 
         static::createDummyLog(date('Y-m-d'), 'logs-to-clear');
 
+        $this->logViewer->clearCache();
         static::assertEquals(1, $this->logViewer->count());
 
         $this->artisan('log-viewer:clear')
@@ -65,6 +67,7 @@ class ClearCommandTest extends TestCase
              ->expectsOutput('Successfully cleared the logs!')
              ->assertExitCode(0);
 
+        $this->logViewer->clearCache();
         static::assertEquals(0, $this->logViewer->count());
     }
 
@@ -78,8 +81,9 @@ class ClearCommandTest extends TestCase
      */
     private function setupForTests()
     {
-        if ( ! file_exists($this->path))
+        if (! file_exists($this->path)) {
             mkdir($this->path, 0777, true);
+        }
 
         $this->logViewer->setPath($this->path);
         $this->app['config']->set(['log-viewer.storage-path' => $this->path]);

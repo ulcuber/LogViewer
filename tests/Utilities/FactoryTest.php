@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Tests\Utilities;
 
 use Arcanedev\LogViewer\Tests\TestCase;
 use Arcanedev\LogViewer\Utilities\Factory;
@@ -78,7 +80,9 @@ class FactoryTest extends TestCase
     /** @test */
     public function it_can_get_log_entries()
     {
-        $logEntries = $this->logFactory->entries($date = '2015-01-01');
+        $prefix = 'laravel';
+        $date = '2015-01-01';
+        $logEntries = $this->logFactory->entries($prefix, $date);
 
         foreach ($logEntries as $logEntry) {
             static::assertLogEntry($date, $logEntry);
@@ -86,12 +90,14 @@ class FactoryTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_dates()
+    public function it_can_get_paths()
     {
-        $dates = $this->logFactory->dates();
+        $paths = $this->logFactory->paths();
 
-        static::assertCount(3, $dates);
-        static::assertDates($dates);
+        static::assertCount(3, $paths);
+        foreach ($paths as $path) {
+            static::assertFileExists($path);
+        }
     }
 
     /** @test */
@@ -125,11 +131,14 @@ class FactoryTest extends TestCase
     /** @test */
     public function it_can_can_set_custom_path()
     {
+        $prefix = 'laravel';
+        $date = '2015-01-03';
+
         $this->logFactory->setPath(storage_path('custom-path-logs'));
 
         static::assertSame(1, $this->logFactory->count());
 
-        $logEntries = $this->logFactory->entries($date = '2015-01-03');
+        $logEntries = $this->logFactory->entries($prefix, $date);
 
         foreach ($logEntries as $logEntry) {
             static::assertLogEntry($date, $logEntry);
@@ -155,10 +164,13 @@ class FactoryTest extends TestCase
     {
         $tree = $this->logFactory->tree();
 
-        foreach ($tree as $date => $levels) {
-            static::assertDate($date);
+        foreach ($tree as $prefix => $dates) {
+            static::assertSame('laravel', $prefix);
+            foreach ($dates as $date => $levels) {
+                static::assertDate($date);
 
-            // TODO: Complete the assertions
+                // TODO: Complete the assertions
+            }
         }
     }
 
@@ -168,42 +180,44 @@ class FactoryTest extends TestCase
         $this->app->setLocale('fr');
 
         $expected = [
-            '2015-01-03' => [
-                'all'       => ['name' => 'Tous', 'count' => 8],
-                'emergency' => ['name' => 'Urgence', 'count' => 1],
-                'alert'     => ['name' => 'Alerte', 'count' => 1],
-                'critical'  => ['name' => 'Critique', 'count' => 1],
-                'error'     => ['name' => 'Erreur', 'count' => 1],
-                'warning'   => ['name' => 'Avertissement', 'count' => 1],
-                'notice'    => ['name' => 'Notice', 'count' => 1],
-                'info'      => ['name' => 'Info', 'count' => 1],
-                'debug'     => ['name' => 'Debug', 'count' => 1],
+            'laravel' => [
+                '2015-01-03' => [
+                    'all'       => ['name' => 'Tous', 'count' => 8],
+                    'emergency' => ['name' => 'Urgence', 'count' => 1],
+                    'alert'     => ['name' => 'Alerte', 'count' => 1],
+                    'critical'  => ['name' => 'Critique', 'count' => 1],
+                    'error'     => ['name' => 'Erreur', 'count' => 1],
+                    'warning'   => ['name' => 'Avertissement', 'count' => 1],
+                    'notice'    => ['name' => 'Notice', 'count' => 1],
+                    'info'      => ['name' => 'Info', 'count' => 1],
+                    'debug'     => ['name' => 'Debug', 'count' => 1],
+                ],
+                '2015-01-02' => [
+                    'all'       => ['name' => 'Tous', 'count' => 8],
+                    'emergency' => ['name' => 'Urgence', 'count' => 1],
+                    'alert'     => ['name' => 'Alerte', 'count' => 1],
+                    'critical'  => ['name' => 'Critique', 'count' => 1],
+                    'error'     => ['name' => 'Erreur', 'count' => 1],
+                    'warning'   => ['name' => 'Avertissement', 'count' => 1],
+                    'notice'    => ['name' => 'Notice', 'count' => 1],
+                    'info'      => ['name' => 'Info', 'count' => 1],
+                    'debug'     => ['name' => 'Debug', 'count' => 1],
+                ],
+                '2015-01-01' => [
+                    'all'       => ['name' => 'Tous', 'count' => 8],
+                    'emergency' => ['name' => 'Urgence', 'count' => 1],
+                    'alert'     => ['name' => 'Alerte', 'count' => 1],
+                    'critical'  => ['name' => 'Critique', 'count' => 1],
+                    'error'     => ['name' => 'Erreur', 'count' => 1],
+                    'warning'   => ['name' => 'Avertissement', 'count' => 1],
+                    'notice'    => ['name' => 'Notice', 'count' => 1],
+                    'info'      => ['name' => 'Info', 'count' => 1],
+                    'debug'     => ['name' => 'Debug', 'count' => 1],
+                ],
             ],
-            '2015-01-02' => [
-                'all'       => ['name' => 'Tous', 'count' => 8],
-                'emergency' => ['name' => 'Urgence', 'count' => 1],
-                'alert'     => ['name' => 'Alerte', 'count' => 1],
-                'critical'  => ['name' => 'Critique', 'count' => 1],
-                'error'     => ['name' => 'Erreur', 'count' => 1],
-                'warning'   => ['name' => 'Avertissement', 'count' => 1],
-                'notice'    => ['name' => 'Notice', 'count' => 1],
-                'info'      => ['name' => 'Info', 'count' => 1],
-                'debug'     => ['name' => 'Debug', 'count' => 1],
-            ],
-            '2015-01-01' => [
-                'all'       => ['name' => 'Tous', 'count' => 8],
-                'emergency' => ['name' => 'Urgence', 'count' => 1],
-                'alert'     => ['name' => 'Alerte', 'count' => 1],
-                'critical'  => ['name' => 'Critique', 'count' => 1],
-                'error'     => ['name' => 'Erreur', 'count' => 1],
-                'warning'   => ['name' => 'Avertissement', 'count' => 1],
-                'notice'    => ['name' => 'Notice', 'count' => 1],
-                'info'      => ['name' => 'Info', 'count' => 1],
-                'debug'     => ['name' => 'Debug', 'count' => 1],
-            ]
         ];
 
-        static::assertSame($expected, $tree = $this->logFactory->tree(true));
+        static::assertSame($expected, $this->logFactory->tree(true));
     }
 
     /** @test */
@@ -241,7 +255,7 @@ class FactoryTest extends TestCase
     {
         $this->expectException(\Arcanedev\LogViewer\Exceptions\LogNotFoundException::class);
 
-        $this->logFactory->get('2222-11-11'); // Future FTW
+        $this->logFactory->get('laravel', '2222-11-11'); // Future FTW
     }
 
     /** @test */
@@ -252,28 +266,28 @@ class FactoryTest extends TestCase
         $extension = '.log';
 
         static::assertSame(
-            $prefix.$date.$extension,
+            $prefix . $date . $extension,
             $this->logFactory->getPattern()
         );
 
         $this->logFactory->setPattern($prefix, $date, $extension = '');
 
         static::assertSame(
-            $prefix.$date.$extension,
+            $prefix . $date . $extension,
             $this->logFactory->getPattern()
         );
 
         $this->logFactory->setPattern($prefix = 'laravel-cli-', $date, $extension);
 
         static::assertSame(
-            $prefix.$date.$extension,
+            $prefix . $date . $extension,
             $this->logFactory->getPattern()
         );
 
         $this->logFactory->setPattern($prefix, $date = '[0-9][0-9][0-9][0-9]', $extension);
 
         static::assertSame(
-            $prefix.$date.$extension,
+            $prefix . $date . $extension,
             $this->logFactory->getPattern()
         );
 
@@ -285,7 +299,9 @@ class FactoryTest extends TestCase
         );
 
         $this->logFactory->setPattern(
-            'laravel-', '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]', '.log'
+            'laravel-',
+            '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]',
+            '.log'
         );
 
         static::assertSame(

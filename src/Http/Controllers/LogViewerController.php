@@ -95,14 +95,19 @@ class LogViewerController extends Controller
      * Show the log.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string                    $prefix
      * @param  string                    $date
      *
      * @return \Illuminate\View\View
      */
-    public function show(Request $request, $date)
+    public function show(Request $request, string $prefix, string $date)
     {
+        if ($order = $request->order) {
+            config(['log-viewer.reversed_order' => $order === 'desc']);
+        }
+
         $level   = 'all';
-        $log     = $this->getLogOrFail($date);
+        $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
 
@@ -143,16 +148,21 @@ class LogViewerController extends Controller
      * Show similar entries.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string                    $prefix
      * @param  string                    $date
      *
      * @return \Illuminate\View\View
      */
-    public function showSimilar(Request $request, $date)
+    public function showSimilar(Request $request, string $prefix, string $date)
     {
+        if ($order = $request->order) {
+            config(['log-viewer.reversed_order' => $order === 'desc']);
+        }
+
         $text = $request->get('text');
 
         $level   = 'all';
-        $log     = $this->getLogOrFail($date);
+        $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
         $entries = $log->getSimilar($text, 76)->paginate($this->perPage);
@@ -164,18 +174,23 @@ class LogViewerController extends Controller
      * Filter the log entries by level.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string                    $prefix
      * @param  string                    $date
      * @param  string                    $level
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function showByLevel(Request $request, $date, $level)
+    public function showByLevel(Request $request, string $prefix, string $date, string $level)
     {
-        if ($level === 'all') {
-            return redirect()->route($this->showRoute, [$date]);
+        if ($order = $request->order) {
+            config(['log-viewer.reversed_order' => $order === 'desc']);
         }
 
-        $log     = $this->getLogOrFail($date);
+        if ($level === 'all') {
+            return redirect()->route($this->showRoute, [$prefix, $date]);
+        }
+
+        $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
         $entries = $log->entries($level)->paginate($this->perPage);
@@ -187,20 +202,25 @@ class LogViewerController extends Controller
      * Show the log with the search query.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string                    $prefix
      * @param  string                    $date
      * @param  string                    $level
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function search(Request $request, $date, $level = 'all')
+    public function search(Request $request, string $prefix, string $date, string $level = 'all')
     {
+        if ($order = $request->order) {
+            config(['log-viewer.reversed_order' => $order === 'desc']);
+        }
+
         $query = $request->get('query');
 
         if (is_null($query)) {
-            return redirect()->route($this->showRoute, [$date]);
+            return redirect()->route($this->showRoute, [$prefix, $date]);
         }
 
-        $log     = $this->getLogOrFail($date);
+        $log     = $this->getLogOrFail($prefix, $date);
         $levels  = $this->logViewer->levelsNames();
         $needles = array_map(function ($needle) {
             return Str::lower($needle);
@@ -219,13 +239,14 @@ class LogViewerController extends Controller
     /**
      * Download the log
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function download($date)
+    public function download(string $prefix, string $date)
     {
-        return $this->logViewer->download($date);
+        return $this->logViewer->download($prefix, $date);
     }
 
     /**
@@ -239,10 +260,18 @@ class LogViewerController extends Controller
     {
         abort_unless($request->ajax(), 405, 'Method Not Allowed');
 
-        $date = $request->get('date');
+        $validator = validator($request->all(), [
+            'prefix' => 'required|string',
+            'date' => 'required|string',
+        ]);
+        $validator->validate();
+        $validated = $validator->validated();
+
+        $prefix = $validated['prefix'];
+        $date = $validated['date'];
 
         return response()->json([
-            'result' => $this->logViewer->delete($date) ? 'success' : 'error'
+            'result' => $this->logViewer->delete($prefix, $date) ? 'success' : 'error'
         ]);
     }
 
@@ -263,6 +292,8 @@ class LogViewerController extends Controller
     protected function view($view, $data = [], $mergeData = [])
     {
         $theme = config('log-viewer.theme');
+
+        $data['route'] = app('router')->currentRouteName();
 
         return view()->make("log-viewer::{$theme}.{$view}", $data, $mergeData);
     }
@@ -293,16 +324,17 @@ class LogViewerController extends Controller
     /**
      * Get a log or fail
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log|null
      */
-    protected function getLogOrFail($date)
+    protected function getLogOrFail(string $prefix, string $date)
     {
         $log = null;
 
         try {
-            $log = $this->logViewer->get($date);
+            $log = $this->logViewer->get($prefix, $date);
         } catch (LogNotFoundException $e) {
             abort(404, $e->getMessage());
         }

@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests\Entities;
+<?php
+
+namespace Arcanedev\LogViewer\Tests\Entities;
 
 use Arcanedev\LogViewer\Entities\LogEntryCollection;
 use Arcanedev\LogViewer\Tests\TestCase;
@@ -28,7 +30,7 @@ class LogEntryCollectionTest extends TestCase
     {
         parent::setUp();
 
-        $this->entries = new LogEntryCollection;
+        $this->entries = new LogEntryCollection();
     }
 
     protected function tearDown(): void
@@ -54,25 +56,29 @@ class LogEntryCollectionTest extends TestCase
     /** @test */
     public function it_can_load_raw_entries()
     {
-        foreach ($this->getDates() as $date) {
-            $entries = $this->getEntries($date);
+        foreach ($this->getPaths(true) as $dates) {
+            foreach ($dates as $date => $path) {
+                $entries = $this->getEntries($path);
 
-            static::assertLogEntries($date, $entries);
-            static::assertCount(8, $entries);
-            static::assertSame(8, $entries->count());
+                static::assertLogEntries($date, $entries);
+                static::assertCount(8, $entries);
+                static::assertSame(8, $entries->count());
+            }
         }
     }
 
     /** @test */
     public function it_can_get_entries_by_level()
     {
-        foreach ($this->getDates() as $date) {
-            $this->entries = $this->getEntries($date);
+        foreach ($this->getPaths(true) as $dates) {
+            foreach ($dates as $date => $path) {
+                $this->entries = $this->getEntries($path);
 
-            foreach (self::$logLevels as $level) {
-                $entry = $this->entries->filterByLevel($level);
+                foreach (self::$logLevels as $level) {
+                    $entry = $this->entries->filterByLevel($level);
 
-                static::assertLogEntries($date, $entry);
+                    static::assertLogEntries($date, $entry);
+                }
             }
         }
     }
@@ -80,8 +86,8 @@ class LogEntryCollectionTest extends TestCase
     /** @test */
     public function it_can_get_stats()
     {
-        foreach ($this->getDates() as $date) {
-            $this->entries = $this->getEntries($date);
+        foreach ($this->getPaths() as $path) {
+            $this->entries = $this->getEntries($path);
 
             $stats = $this->entries->stats();
 
@@ -94,19 +100,21 @@ class LogEntryCollectionTest extends TestCase
     /** @test */
     public function it_can_get_tree()
     {
-        foreach ($this->getDates() as $date) {
-            $this->entries = $this->getEntries($date);
+        foreach ($this->getPaths(true) as $dates) {
+            foreach ($dates as $date => $path) {
+                $this->entries = $this->getEntries($path);
 
-            $tree = $this->entries->tree();
+                $tree = $this->entries->tree();
 
-            static::assertCount(9, $tree);
+                static::assertCount(9, $tree);
 
-            foreach ($tree as $level => $item) {
-                static::assertArrayHasKey('name', $item);
-                static::assertArrayHasKey('count', $item);
+                foreach ($tree as $level => $item) {
+                    static::assertArrayHasKey('name', $item);
+                    static::assertArrayHasKey('count', $item);
 
-                static::assertEquals($level, $item['name']);
-                static::assertSame(($level === 'all') ? 8 : 1, $item['count']);
+                    static::assertEquals($level, $item['name']);
+                    static::assertSame(($level === 'all') ? 8 : 1, $item['count']);
+                }
             }
         }
     }
@@ -119,14 +127,14 @@ class LogEntryCollectionTest extends TestCase
     /**
      * Get log entries
      *
-     * @param  string  $date
+     * @param  string  $path
      *
      * @return LogEntryCollection
      */
-    private function getEntries($date)
+    private function getEntries(string $path)
     {
-        return (new LogEntryCollection)->load(
-            $this->getLogContent($date)
+        return (new LogEntryCollection())->load(
+            $this->getLogContent($path)
         );
     }
 }

@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Contracts\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Contracts\Utilities;
 
 use Arcanedev\LogViewer\Entities\Log;
 use Illuminate\Contracts\Config\Repository as ConfigContract;
@@ -47,5 +49,5 @@ interface LogMenu
      *
      * @return array
      */
-    public function make(Log $log, $trans = true);
+    public function make(Log $log, bool $trans = true);
 }

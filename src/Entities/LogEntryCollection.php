@@ -103,7 +103,7 @@ class LogEntryCollection extends LazyCollection
      *
      * @return array
      */
-    public function stats()
+    public function stats(): array
     {
         $counters = $this->initStats();
 
@@ -146,7 +146,7 @@ class LogEntryCollection extends LazyCollection
      *
      * @return array
      */
-    private function initStats()
+    protected function initStats(): array
     {
         $levels = array_merge_recursive(
             ['all'],

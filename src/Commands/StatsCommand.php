@@ -1,6 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Commands;
+<?php
 
-use Arcanedev\LogViewer\Tables\StatsTable;
+namespace Arcanedev\LogViewer\Commands;
 
 /**
  * Class     StatsCommand
@@ -46,36 +46,24 @@ class StatsCommand extends Command
      */
     public function handle()
     {
-        // Load Data
-        $stats   = $this->logViewer->statsTable('en');
+        $stats = $this->logViewer->statsTable('en');
 
-        $rows    = $stats->rows();
-        $rows[]  = $this->tableSeparator();
-        $rows[]  = $this->prepareFooter($stats);
+        $rows = [];
+        foreach ($stats->rows() as $prefix => $dates) {
+            foreach ($dates as $date => $value) {
+                $rows[] = array_merge(compact('prefix', 'date'), $value);
+            }
+        }
+        $total = count($rows);
+
+        $rows[] = $this->tableSeparator();
+        $rows[] = array_merge([
+            'Total',
+            $total,
+        ], $stats->footer());
 
         // Display Data
         $this->displayLogViewer();
         $this->table($stats->header(), $rows);
-    }
-
-    /* -----------------------------------------------------------------
-     |  Other Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Prepare footer.
-     *
-     * @param  \Arcanedev\LogViewer\Tables\StatsTable  $stats
-     *
-     * @return array
-     */
-    private function prepareFooter(StatsTable $stats)
-    {
-        $files = [
-            'count' => count($stats->rows()).' log file(s)'
-        ];
-
-        return $files + $stats->footer();
     }
 }

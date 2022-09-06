@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Utilities;
 
 use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
 use Arcanedev\LogViewer\Contracts\Utilities\LogChecker as LogCheckerContract;
@@ -22,14 +24,14 @@ class LogChecker implements LogCheckerContract
      *
      * @var \Illuminate\Contracts\Config\Repository
      */
-    private $config;
+    protected $config;
 
     /**
      * The filesystem instance.
      *
      * @var \Arcanedev\LogViewer\Contracts\Utilities\Filesystem
      */
-    private $filesystem;
+    protected $filesystem;
 
     /**
      * Log handler mode.
@@ -39,25 +41,39 @@ class LogChecker implements LogCheckerContract
     protected $handler = '';
 
     /**
+     * Pattern.
+     *
+     * @var string
+     */
+    public $pattern = '';
+
+    /**
      * The check status.
      *
      * @var bool
      */
-    private $status = true;
+    protected $status = true;
 
     /**
      * The check messages.
      *
      * @var array
      */
-    private $messages;
+    protected $messages;
 
     /**
      * Log files statuses.
      *
      * @var array
      */
-    private $files = [];
+    protected $files = [];
+
+    /**
+     * Keys of logs matching pattern.
+     *
+     * @var array
+     */
+    protected $logs = [];
 
     /* -----------------------------------------------------------------
      |  Constructor
@@ -205,7 +221,7 @@ class LogChecker implements LogCheckerContract
      *
      * @return bool
      */
-    private function isSameHandler($handler)
+    protected function isSameHandler($handler)
     {
         return $this->handler === $handler;
     }
@@ -220,7 +236,7 @@ class LogChecker implements LogCheckerContract
      *
      * @return \Arcanedev\LogViewer\Utilities\LogChecker
      */
-    private function refresh()
+    protected function refresh()
     {
         $this->setHandler($this->config->get('logging.default', 'stack'));
 
@@ -229,6 +245,9 @@ class LogChecker implements LogCheckerContract
             'files'   => [],
         ];
         $this->files    = [];
+
+        $this->pattern = $this->filesystem->getPattern();
+        $this->logs = array_flip($this->filesystem->getFiles($this->pattern));
 
         $this->checkHandler();
         $this->checkLogFiles();
@@ -239,9 +258,11 @@ class LogChecker implements LogCheckerContract
     /**
      * Check the handler mode.
      */
-    private function checkHandler()
+    protected function checkHandler()
     {
-        if ($this->isDaily()) return;
+        if ($this->isDaily()) {
+            return;
+        }
 
         $this->messages['handler'] = 'You should set the log handler to `daily` mode. Please check the LogViewer wiki page (Requirements) for more details.';
     }
@@ -249,7 +270,7 @@ class LogChecker implements LogCheckerContract
     /**
      * Check all log files.
      */
-    private function checkLogFiles()
+    protected function checkLogFiles()
     {
         foreach ($this->filesystem->all() as $path) {
             $this->checkLogFile($path);
@@ -261,22 +282,20 @@ class LogChecker implements LogCheckerContract
      *
      * @param  string  $path
      */
-    private function checkLogFile($path)
+    protected function checkLogFile(string $path)
     {
         $status   = true;
         $filename = basename($path);
         $message  = "The log file [$filename] is valid.";
-        $pattern  = $this->filesystem->getPattern();
 
         if ($this->isSingleLogFile($filename)) {
             $this->status = $status = false;
             $this->messages['files'][$filename] = $message =
                 "You have a single log file in your application, you should split the [$filename] into separate log files.";
-        }
-        elseif ($this->isInvalidLogPattern($filename, $pattern)) {
+        } elseif ($this->isInvalidLogPattern($path)) {
             $this->status = $status = false;
             $this->messages['files'][$filename] = $message =
-                "The log file [$filename] has an invalid date, the format must be like {$pattern}.";
+                "The log filename has an invalid format";
         }
 
         $this->files[$filename] = compact('filename', 'status', 'message', 'path');
@@ -289,21 +308,20 @@ class LogChecker implements LogCheckerContract
      *
      * @return bool
      */
-    private function isSingleLogFile($file)
+    protected function isSingleLogFile(string $file)
     {
         return $file === 'laravel.log';
     }
 
     /**
-     * Check the date of the log file.
+     * Check the log file matches glob pattern.
      *
-     * @param  string  $file
-     * @param  string  $pattern
+     * @param  string  $path
      *
      * @return bool
      */
-    private function isInvalidLogPattern($file, $pattern)
+    protected function isInvalidLogPattern(string $path)
     {
-        return ((bool) preg_match("/{$pattern}/", $file, $matches)) === false;
+        return !isset($this->logs[$path]);
     }
 }

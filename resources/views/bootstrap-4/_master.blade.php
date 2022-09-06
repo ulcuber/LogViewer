@@ -215,6 +215,11 @@
                 background-color: {{ $color }};
             }
         @endforeach
+
+        .table-sm th,
+        .table-sm td {
+            padding: 0.1rem;
+        }
     </style>
 </head>
 <body>

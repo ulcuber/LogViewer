@@ -104,11 +104,9 @@ abstract class TestCase extends BaseTestCase
      * Assert Log object.
      *
      * @param  \Arcanedev\LogViewer\Entities\Log  $log
-     * @param  string                             $date
      */
-    protected static function assertLog(Log $log, $date)
+    protected static function assertLog(Log $log)
     {
-        self::assertEquals($date, $log->date);
         self::assertLogEntries($log->date, $log->entries());
     }
 
@@ -133,11 +131,13 @@ abstract class TestCase extends BaseTestCase
      */
     protected static function assertLogEntry($date, LogEntry $entry)
     {
-        $dt = Carbon::createFromFormat('Y-m-d', $date);
-
         self::assertInLogLevels($entry->level);
-        self::assertInstanceOf(Carbon::class, $entry->getDatetime());
-        self::assertTrue($entry->getDatetime()->isSameDay($dt));
+
+        $dt = Carbon::createFromFormat('Y-m-d', $date);
+        $datetime = $entry->getDatetime();
+        self::assertInstanceOf(Carbon::class, $datetime);
+        self::assertTrue($datetime->isSameDay($dt), "{$datetime} is not {$date} ({$dt})");
+
         self::assertNotEmpty($entry->header);
         self::assertNotEmpty($entry->stack);
     }
@@ -304,50 +304,52 @@ abstract class TestCase extends BaseTestCase
     /**
      * Get log path.
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return string
      */
-    public function getLogPath($date)
+    public function getLogPath(string $prefix, string $date)
     {
-        return $this->filesystem()->path($date);
+        return $this->filesystem()->path($prefix, $date);
     }
 
     /**
      * Get log content.
      *
-     * @param  string  $date
+     * @param  string  $path
      *
      * @return string
      */
-    public function getLogContent($date)
+    public function getLogContent($path)
     {
-        return $this->filesystem()->read($date);
+        return $this->filesystem()->readPath($path);
     }
 
     /**
-     * Get logs dates.
+     * Get logs paths.
      *
      * @return array
      */
-    public function getDates()
+    public function getPaths(bool $extract = false)
     {
-        return $this->filesystem()->dates();
+        return $this->filesystem()->paths($extract);
     }
 
     /**
      * Get log object from fixture.
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
-    protected function getLog($date)
+    protected function getLog(string $prefix, string $date)
     {
-        $path = $this->getLogPath($date);
-        $raw  = $this->getLogContent($date);
+        $path = $this->getLogPath($prefix, $date);
+        $raw  = $this->getLogContent($path);
 
-        return Log::make($date, $path, $raw);
+        return Log::make($prefix, $date, $path, $raw);
     }
 
     /**
@@ -359,7 +361,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getRandomLogEntry($date)
     {
-        return $this->getLog($date)
+        return $this->getLog('laravel', $date)
             ->entries()
             ->random(1)
             ->first();

@@ -1,6 +1,13 @@
-<?php namespace Arcanedev\LogViewer\Contracts\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Contracts\Utilities;
 
 use Arcanedev\LogViewer\Contracts\Patternable;
+use Arcanedev\LogViewer\Entities\Log;
+use Arcanedev\LogViewer\Entities\LogCollection;
+use Arcanedev\LogViewer\Entities\LogEntryCollection;
+use Arcanedev\LogViewer\Tables\StatsTable;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Interface  Factory
@@ -20,7 +27,7 @@ interface Factory extends Patternable
      *
      * @return \Arcanedev\LogViewer\Contracts\Utilities\Filesystem
      */
-    public function getFilesystem();
+    public function getFilesystem(): Filesystem;
 
     /**
      * Set the filesystem instance.
@@ -36,7 +43,7 @@ interface Factory extends Patternable
      *
      * @return  \Arcanedev\LogViewer\Contracts\Utilities\LogLevels  $levels
      */
-    public function getLevels();
+    public function getLevels(): LogLevels;
 
     /**
      * Set the log levels instance.
@@ -54,14 +61,14 @@ interface Factory extends Patternable
      *
      * @return self
      */
-    public function setPath($storagePath);
+    public function setPath(string $storagePath);
 
     /**
      * Get all logs.
      *
      * @return \Arcanedev\LogViewer\Entities\LogCollection
      */
-    public function logs();
+    public function logs(): LogCollection;
 
     /* -----------------------------------------------------------------
      |  Main Methods
@@ -75,7 +82,7 @@ interface Factory extends Patternable
      *
      * @return \Arcanedev\LogViewer\Entities\LogCollection
      */
-    public function all();
+    public function all(): LogCollection;
 
     /**
      * Paginate all logs.
@@ -84,49 +91,52 @@ interface Factory extends Patternable
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function paginate($perPage = 30);
+    public function paginate(int $perPage = 30): LengthAwarePaginator;
 
     /**
      * Get a log by date.
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
-    public function log($date);
+    public function log(string $prefix, string $date): Log;
 
     /**
      * Get a log by date (alias).
      *
+     * @param  string  $prefix
      * @param  string  $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
-    public function get($date);
+    public function get(string $prefix, string $date): Log;
 
     /**
      * Get log entries.
      *
+     * @param  string  $prefix
      * @param  string  $date
      * @param  string  $level
      *
      * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
      */
-    public function entries($date, $level = 'all');
+    public function entries(string $prefix, string $date, string $level = 'all'): LogEntryCollection;
 
     /**
-     * List the log files (dates).
+     * List the log files (paths).
      *
      * @return array
      */
-    public function dates();
+    public function paths(): array;
 
     /**
      * Get logs count.
      *
      * @return int
      */
-    public function count();
+    public function count(): int;
 
     /**
      * Get total log entries.
@@ -135,7 +145,7 @@ interface Factory extends Patternable
      *
      * @return int
      */
-    public function total($level = 'all');
+    public function total(string $level = 'all'): int;
 
     /**
      * Get tree menu.
@@ -144,7 +154,7 @@ interface Factory extends Patternable
      *
      * @return array
      */
-    public function tree($trans = false);
+    public function tree(bool $trans = false): array;
 
     /**
      * Get tree menu.
@@ -153,14 +163,14 @@ interface Factory extends Patternable
      *
      * @return array
      */
-    public function menu($trans = true);
+    public function menu(bool $trans = true): array;
 
     /**
      * Get logs statistics.
      *
      * @return array
      */
-    public function stats();
+    public function stats(): array;
 
     /**
      * Get logs statistics table.
@@ -169,7 +179,7 @@ interface Factory extends Patternable
      *
      * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
-    public function statsTable($locale = null);
+    public function statsTable(?string $locale = null): StatsTable;
 
     /* -----------------------------------------------------------------
      |  Check Methods
@@ -181,5 +191,5 @@ interface Factory extends Patternable
      *
      * @return bool
      */
-    public function isEmpty();
+    public function isEmpty(): bool;
 }

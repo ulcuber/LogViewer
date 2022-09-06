@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Commands;
+<?php
+
+namespace Arcanedev\LogViewer\Commands;
 
 use Arcanedev\LogViewer\Contracts\Utilities\LogChecker as LogCheckerContract;
 
@@ -92,16 +94,21 @@ class CheckCommand extends Command
      */
     private function displayMessages()
     {
-        $messages = $this->getChecker()->messages();
+        $checker = $this->getChecker();
+        $messages = $checker->messages();
+        $pattern = $checker->pattern;
 
         $rows = [];
         foreach ($messages['files'] as $file => $message) {
             $rows[] = [$file, $message];
         }
 
-        if ( ! empty($rows)) {
+        if (! empty($rows)) {
             $this->frame('LogViewer messages');
             $this->table(['File', 'Message'], $rows);
+            $this->info('The format must match glob pattern');
+            $this->output->writeln("<info>Glob pattern</info>: <comment>{$pattern}</comment>");
+            $this->output->writeln("<info>Configured in</info>: <comment>config/log-viewer.php</comment> pattern");
         }
     }
 }

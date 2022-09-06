@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Utilities;
 
 use Arcanedev\LogViewer\Contracts\Utilities\LogMenu as LogMenuContract;
 use Arcanedev\LogViewer\Contracts\Utilities\LogStyler as LogStylerContract;
@@ -30,7 +32,7 @@ class LogMenu implements LogMenuContract
      *
      * @var \Arcanedev\LogViewer\Contracts\Utilities\LogStyler
      */
-    private $styler;
+    protected $styler;
 
     /* -----------------------------------------------------------------
      |  Constructor
@@ -95,14 +97,14 @@ class LogMenu implements LogMenuContract
      *
      * @return array
      */
-    public function make(Log $log, $trans = true)
+    public function make(Log $log, bool $trans = true)
     {
         $items = [];
         $route = $this->config('menu.filter-route');
 
-        foreach($log->tree($trans) as $level => $item) {
+        foreach ($log->tree($trans) as $level => $item) {
             $items[$level] = array_merge($item, [
-                'url'  => route($route, [$log->date, $level]),
+                'url'  => route($route, [$log->prefix, $log->date, $level]),
                 'icon' => $this->isIconsEnabled() ? $this->styler->icon($level)->toHtml() : '',
             ]);
         }
@@ -120,7 +122,7 @@ class LogMenu implements LogMenuContract
      *
      * @return bool
      */
-    private function isIconsEnabled()
+    protected function isIconsEnabled(): bool
     {
         return (bool) $this->config('menu.icons-enabled', false);
     }
@@ -138,7 +140,7 @@ class LogMenu implements LogMenuContract
      *
      * @return mixed
      */
-    private function config($key, $default = null)
+    protected function config(string $key, $default = null)
     {
         return $this->config->get("log-viewer.$key", $default);
     }

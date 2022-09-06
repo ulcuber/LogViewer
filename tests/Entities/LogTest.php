@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests\Entities;
+<?php
+
+namespace Arcanedev\LogViewer\Tests\Entities;
 
 use Arcanedev\LogViewer\Entities\Log;
 use Arcanedev\LogViewer\Tests\TestCase;
@@ -28,7 +30,7 @@ class LogTest extends TestCase
     {
         parent::setUp();
 
-        $this->log = $this->getLog('2015-01-01');
+        $this->log = $this->getLog('laravel', '2015-01-01');
     }
 
     protected function tearDown(): void
@@ -62,9 +64,26 @@ class LogTest extends TestCase
      *
      * @param  string  $date
      */
+    public function it_can_get_prefix($date)
+    {
+        $prefix = 'laravel';
+        $log = $this->getLog($prefix, $date);
+
+        static::assertSame($prefix, $log->prefix);
+        static::assertDate($log->date);
+        static::assertSame($date, $log->date);
+    }
+
+    /**
+     * @test
+     *
+     * @dataProvider provideDates
+     *
+     * @param  string  $date
+     */
     public function it_can_get_date($date)
     {
-        $log = $this->getLog($date);
+        $log = $this->getLog('laravel', $date);
 
         static::assertDate($log->date);
         static::assertSame($date, $log->date);
@@ -79,7 +98,7 @@ class LogTest extends TestCase
      */
     public function it_can_get_path($date)
     {
-        static::assertFileExists($this->getLog($date)->getPath());
+        static::assertFileExists($this->getLog('laravel', $date)->getPath());
     }
 
     /**
@@ -91,7 +110,7 @@ class LogTest extends TestCase
      */
     public function it_can_get_all_entries($date)
     {
-        $entries = $this->getLog($date)->entries();
+        $entries = $this->getLog('laravel', $date)->entries();
 
         static::assertCount(8, $entries);
         static::assertSame(8, $entries->count());
@@ -107,7 +126,7 @@ class LogTest extends TestCase
      */
     public function it_can_get_all_entries_by_level($date)
     {
-        $log = $this->getLog($date);
+        $log = $this->getLog('laravel', $date);
 
         foreach ($this->getLogLevels() as $level) {
             static::assertCount(1, $log->entries($level));
@@ -132,15 +151,14 @@ class LogTest extends TestCase
      */
     public function it_can_get_tree($date)
     {
-        $menu = $this->getLog($date)->tree();
+        $menu = $this->getLog('laravel', $date)->tree();
 
         static::assertCount(9, $menu);
 
         foreach ($menu as $level => $menuItem) {
             if ($level === 'all') {
                 static::assertEquals(8, $menuItem['count']);
-            }
-            else {
+            } else {
                 static::assertInLogLevels($level);
                 static::assertInLogLevels($menuItem['name']);
                 static::assertEquals(1, $menuItem['count']);
@@ -160,7 +178,7 @@ class LogTest extends TestCase
         foreach (self::$locales as $locale) {
             $this->app->setLocale($locale);
 
-            $menu = $this->getLog($date)->menu();
+            $menu = $this->getLog('laravel', $date)->menu();
 
             static::assertCount(9, $menu);
 
@@ -168,8 +186,7 @@ class LogTest extends TestCase
                 if ($level === 'all') {
                     static::assertSame(8, $menuItem['count']);
                     static::assertTranslatedLevel($locale, $level, $menuItem['name']);
-                }
-                else {
+                } else {
                     static::assertInLogLevels($level);
                     static::assertTranslatedLevel($locale, $level, $menuItem['name']);
                     static::assertSame(1, $menuItem['count']);
