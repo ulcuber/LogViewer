@@ -164,7 +164,7 @@ class LogViewerController extends Controller
 
         $filters = array_merge($request->except('page'), $request->route()->parameters());
 
-        $text = $request->get('text');
+        $text = $request->get('text', '');
 
         $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
