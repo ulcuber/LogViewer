@@ -17,6 +17,11 @@ use JsonSerializable;
 class LogEntry implements Arrayable, Jsonable, JsonSerializable
 {
     /**
+     * Flag to encode context
+     */
+    public const JSON_FLAGS = JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES;
+
+    /**
      * Regex to search groups after date
      *
      * @var string
@@ -314,7 +319,7 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      */
     public function context(): string
     {
-        return json_encode($this->context, JSON_PRETTY_PRINT);
+        return json_encode($this->context, static::JSON_FLAGS);
     }
 
     /* -----------------------------------------------------------------
