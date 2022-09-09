@@ -107,6 +107,13 @@
                     @else
                         <a class="btn btn-xs btn-info" href="{{ route($route, array_merge($filters, ['order' => 'desc'])) }}">{{ trans('log-viewer::general.order-desc') }}</a>
                     @endif
+                    <div class="pull-right">
+                        <span class="badge badge-info">{{ $similarity }}</span>
+                        <div class="btn-group">
+                            <a class="btn btn-sm btn-info" href="{{ route($route, array_merge($filters, ['similarity' => $similarity - 1])) }}">-</a>
+                            <a class="btn btn-sm btn-info" href="{{ route($route, array_merge($filters, ['similarity' => $similarity + 1])) }}">+</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -66,13 +66,13 @@ class LogViewerController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
         $stats     = $this->logViewer->statsTable();
         $chartData = $this->prepareChartData($stats);
         $percents  = $this->calcPercentages($stats->footer(), $stats->header());
 
-        return $this->view('dashboard', compact('chartData', 'percents'));
+        return $this->view($request, 'dashboard', compact('chartData', 'percents'));
     }
 
     /**
@@ -88,7 +88,7 @@ class LogViewerController extends Controller
         $headers = $stats->header();
         $rows    = $this->paginate($stats->rows(), $request);
 
-        return $this->view('logs', compact('headers', 'rows'));
+        return $this->view($request, 'logs', compact('headers', 'rows'));
     }
 
     /**
@@ -106,44 +106,14 @@ class LogViewerController extends Controller
             config(['log-viewer.reversed_order' => $order === 'desc']);
         }
 
-        $filters = array_merge($request->except('page'), $request->route()->parameters());
-
         $level   = 'all';
         $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
 
-        $extras = $request->only(config('log-viewer.parser.extra_groups'));
-        $uuidKeys = ['uuid', 'parentUuid'];
-        $uuids = Arr::only($extras, $uuidKeys);
-        $extras = Arr::except($extras, $uuidKeys);
+        $entries = $this->filter($log->entries($level), $request)->paginate($this->perPage);
 
-        $entries = $log->entries($level)
-            ->unless(empty($uuids), function (LogEntryCollection $entries) use ($uuids, $uuidKeys) {
-                return $entries->filter(function (LogEntry $entry) use ($uuids, $uuidKeys) {
-                    foreach ($uuidKeys as $key) {
-                        foreach ($uuids as $uuid) {
-                            if ($entry->{$key} === $uuid) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                });
-            })
-            ->unless(empty($extras), function (LogEntryCollection $entries) use ($extras) {
-                return $entries->filter(function (LogEntry $entry) use ($extras) {
-                    foreach ($extras as $key => $extra) {
-                        if ($entry->{$key} === $extra) {
-                            return true;
-                        }
-                    }
-                    return false;
-                });
-            })
-            ->paginate($this->perPage);
-
-        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries', 'filters'));
+        return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
     }
 
     /**
@@ -162,16 +132,14 @@ class LogViewerController extends Controller
             config(['log-viewer.reversed_order' => $order === 'desc']);
         }
 
-        $filters = array_merge($request->except('page'), $request->route()->parameters());
-
         $text = $request->get('text', '');
 
         $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
-        $entries = $log->getSimilar($text, 76)->paginate($this->perPage);
+        $entries = $log->getSimilar($text, $this->similarity)->paginate($this->perPage);
 
-        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries', 'filters'));
+        return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
     }
 
     /**
@@ -194,14 +162,12 @@ class LogViewerController extends Controller
             return redirect()->route($this->showRoute, [$prefix, $date]);
         }
 
-        $filters = array_merge($request->except('page'), $request->route()->parameters());
-
         $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
-        $entries = $log->entries($level)->paginate($this->perPage);
+        $entries = $this->filter($log->entries($level), $request)->paginate($this->perPage);
 
-        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries', 'filters'));
+        return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
     }
 
     /**
@@ -226,14 +192,12 @@ class LogViewerController extends Controller
             return redirect()->route($this->showRoute, [$prefix, $date]);
         }
 
-        $filters = array_merge($request->except('page'), $request->route()->parameters());
-
         $log     = $this->getLogOrFail($prefix, $date);
         $levels  = $this->logViewer->levelsNames();
         $needles = array_map(function ($needle) {
             return Str::lower($needle);
         }, array_filter(explode(' ', $query)));
-        $entries = $log->entries($level)
+        $entries = $this->filter($log->entries($level), $request)
             ->unless(empty($needles), function (LogEntryCollection $entries) use ($needles) {
                 return $entries->filter(function (LogEntry $entry) use ($needles) {
                     return Str::containsAll(Str::lower($entry->header), $needles);
@@ -241,7 +205,7 @@ class LogViewerController extends Controller
             })
             ->paginate($this->perPage);
 
-        return $this->view('show', compact('level', 'log', 'query', 'levels', 'entries', 'filters'));
+        return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
     }
 
     /**
@@ -297,11 +261,19 @@ class LogViewerController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    protected function view($view, $data = [], $mergeData = [])
+    protected function view(Request $request, $view, $data = [], $mergeData = [])
     {
         $theme = config('log-viewer.theme');
 
         $data['route'] = app('router')->currentRouteName();
+
+        $filters = array_merge($request->except('page'), $request->route()->parameters());
+        if ($exclude = $request->exclude_similar) {
+            $filters['exclude_similar'] = (array) $exclude;
+        }
+        $data['filters'] = $filters;
+
+        $data['similarity'] = $request->get('similarity', config('log-viewer.similarity', 76));
 
         return view()->make("log-viewer::{$theme}.{$view}", $data, $mergeData);
     }
@@ -348,6 +320,48 @@ class LogViewerController extends Controller
         }
 
         return $log;
+    }
+
+    protected function filter(LogEntryCollection $entries, Request $request): LogEntryCollection
+    {
+        $extras = $request->only(config('log-viewer.parser.extra_groups'));
+        $uuidKeys = ['uuid', 'parentUuid'];
+        $uuids = Arr::only($extras, $uuidKeys);
+        $extras = Arr::except($extras, $uuidKeys);
+
+        return $entries->unless(empty($uuids), function (LogEntryCollection $entries) use ($uuids, $uuidKeys) {
+            return $entries->filter(function (LogEntry $entry) use ($uuids, $uuidKeys) {
+                foreach ($uuidKeys as $key) {
+                    foreach ($uuids as $uuid) {
+                        if ($entry->{$key} === $uuid) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            });
+        })
+        ->unless(empty($extras), function (LogEntryCollection $entries) use ($extras) {
+            return $entries->filter(function (LogEntry $entry) use ($extras) {
+                foreach ($extras as $key => $extra) {
+                    if ($entry->{$key} === $extra) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        })
+        ->when($request->exclude_similar, function (LogEntryCollection $entries, $similar) use ($request) {
+            $similarity = $request->get('similarity', config('log-viewer.similarity', 76));
+            return $entries->filter(function (LogEntry $entry) use ($similar, $similarity) {
+                foreach ((array) $similar as $text) {
+                    if ($entry->isSimilar($text, $similarity)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        });
     }
 
     /**

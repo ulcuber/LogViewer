@@ -157,4 +157,11 @@ return [
         '^Stack trace:',
     ],
 
+    /* -----------------------------------------------------------------
+     |  Similarity threshold to show/exclude similar entires
+     | -----------------------------------------------------------------
+     */
+
+    'similarity' => env('ARCANEDEV_LOGVIEWER_SIMILARITY', 76),
+
 ];

@@ -7,6 +7,7 @@ return [
     'date'               => 'Date',
     'empty-logs'         => 'The list of logs is empty!',
     'similar'            => 'Similar',
+    'exclude-similar'    => 'Exclude similar',
     'header'             => 'Header',
     'download'           => 'Download',
     'delete'             => 'Delete',

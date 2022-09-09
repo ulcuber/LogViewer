@@ -7,6 +7,7 @@ return [
     'date'               => 'Дата',
     'empty-logs'         => 'Список журналов пуст!',
     'similar'            => 'Похожие',
+    'exclude-similar'    => 'Исключить похожие',
     'header'             => 'Заголовок',
     'download'           => 'Скачать',
     'delete'             => 'Удалить',

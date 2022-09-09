@@ -101,6 +101,13 @@
                     @else
                         <a class="btn btn-sm btn-info" href="{{ route($route, array_merge($filters, ['order' => 'desc'])) }}">{{ trans('log-viewer::general.order-desc') }}</a>
                     @endif
+                    <div class="pull-right">
+                        <span class="badge badge-info">{{ $similarity }}</span>
+                        <div class="btn-group">
+                            <a class="btn btn-sm btn-info" href="{{ route($route, array_merge($filters, ['similarity' => $similarity - 1])) }}">-</a>
+                            <a class="btn btn-sm btn-info" href="{{ route($route, array_merge($filters, ['similarity' => $similarity + 1])) }}">+</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -142,7 +149,12 @@
 
                                         <br/>
 
-                                        <a class="btn btn-sm btn-light" href="{{ route('log-viewer::logs.similar', [$log->prefix, $log->date, $entry->level, 'text' => $entry->header]) }}">{{ trans('log-viewer::general.similar') }}</a>
+                                        <div class="btn-group">
+                                            <a class="btn btn-sm btn-light" href="{{ route('log-viewer::logs.similar', [$log->prefix, $log->date, $entry->level, 'text' => $entry->header]) }}">{{ trans('log-viewer::general.similar') }}</a>
+                                            @if (!request('text'))
+                                                <a class="btn btn-sm btn-light" href="{{ route($route, array_merge($filters, ['exclude_similar' => array_merge($filters['exclude_similar'] ?? [], [$entry->header])])) }}">{{ trans('log-viewer::general.exclude-similar') }}</a>
+                                            @endif
+                                        </div>
 
                                         @if ($entry->hasContext())
                                             <a class="btn btn-sm btn-light" role="button" data-toggle="collapse"
