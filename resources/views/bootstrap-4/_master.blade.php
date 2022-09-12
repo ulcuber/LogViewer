@@ -220,6 +220,19 @@
         .table-sm td {
             padding: 0.1rem;
         }
+
+        .btn-group>.btn-group:not(:first-child)>.badge, .btn-group>.badge:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .btn-group>.btn-group:not(:last-child)>.badge, .btn-group>.badge:not(:last-child):not(.dropdown-toggle) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .pagination {
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>

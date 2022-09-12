@@ -133,7 +133,7 @@ class LogViewerController extends Controller
         }
 
         $text = $request->get('text', '');
-        $similarity = $request->get('similarity', config('log-viewer.similarity', 76));
+        $similarity = (float) $request->get('similarity', config('log-viewer.similarity', 76));
 
         $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
@@ -274,7 +274,7 @@ class LogViewerController extends Controller
         }
         $data['filters'] = $filters;
 
-        $data['similarity'] = $request->get('similarity', config('log-viewer.similarity', 76));
+        $data['similarity'] = (float) $request->get('similarity', config('log-viewer.similarity', 76));
 
         return view()->make("log-viewer::{$theme}.{$view}", $data, $mergeData);
     }
@@ -342,27 +342,47 @@ class LogViewerController extends Controller
                 return false;
             });
         })
-        ->unless(empty($extras), function (LogEntryCollection $entries) use ($extras) {
-            return $entries->filter(function (LogEntry $entry) use ($extras) {
-                foreach ($extras as $key => $extra) {
-                    if ($entry->{$key} === $extra) {
-                        return true;
+            ->unless(empty($extras), function (LogEntryCollection $entries) use ($extras) {
+                return $entries->filter(function (LogEntry $entry) use ($extras) {
+                    foreach ($extras as $key => $extra) {
+                        if ($entry->{$key} === $extra) {
+                            return true;
+                        }
                     }
-                }
-                return false;
-            });
-        })
-        ->when($request->exclude_similar, function (LogEntryCollection $entries, $similar) use ($request) {
-            $similarity = $request->get('similarity', config('log-viewer.similarity', 76));
-            return $entries->filter(function (LogEntry $entry) use ($similar, $similarity) {
-                foreach ((array) $similar as $text) {
-                    if ($entry->isSimilar($text, $similarity)) {
+                    return false;
+                });
+            })
+            ->when($request->exclude_similar, function (LogEntryCollection $entries, $similar) use ($request) {
+                $similarity = (float) $request->get('similarity', config('log-viewer.similarity', 76));
+                return $entries->filter(function (LogEntry $entry) use ($similar, $similarity) {
+                    foreach ((array) $similar as $text) {
+                        if ($entry->isSimilar($text, $similarity)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            })
+            ->when($request->unique, function (LogEntryCollection $entries) use ($request) {
+                $was = [];
+                $similarity = (float) $request->get('similarity', config('log-viewer.similarity', 76));
+                return $entries->filter(function (LogEntry $entry) use (&$was, $similarity) {
+                    $header = $entry->header;
+                    if (isset($was[$header])) {
                         return false;
                     }
-                }
-                return true;
+
+                    foreach ($was as $text => $b) {
+                        if ($entry->isSimilar($text, $similarity)) {
+                            return false;
+                        }
+                    }
+
+                    $was[$header] = true;
+
+                    return true;
+                });
             });
-        });
     }
 
     /**

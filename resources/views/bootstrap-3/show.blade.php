@@ -107,11 +107,16 @@
                     @else
                         <a class="btn btn-xs btn-info" href="{{ route($route, array_merge($filters, ['order' => 'desc'])) }}">{{ trans('log-viewer::general.order-desc') }}</a>
                     @endif
+                    @if (request('unique'))
+                        <a class="btn btn-xs btn-info active" aria-pressed="true" href="{{ route($route, array_merge($filters, ['unique' => null])) }}">{{ trans('log-viewer::general.unique') }}</a>
+                    @else
+                        <a class="btn btn-xs btn-info" href="{{ route($route, array_merge($filters, ['unique' => true])) }}">{{ trans('log-viewer::general.unique') }}</a>
+                    @endif
                     <div class="pull-right">
-                        <span class="badge badge-info">{{ $similarity }}</span>
                         <div class="btn-group">
-                            <a class="btn btn-sm btn-info" href="{{ route($route, array_merge($filters, ['similarity' => $similarity - 1])) }}">-</a>
-                            <a class="btn btn-sm btn-info" href="{{ route($route, array_merge($filters, ['similarity' => $similarity + 1])) }}">+</a>
+                            <span class="badge badge-info">{{ trans('log-viewer::general.similarity') }} {{ $similarity }}</span>
+                            <a class="btn badge badge-info" href="{{ route($route, array_merge($filters, ['similarity' => $similarity - 1])) }}">-</a>
+                            <a class="btn badge badge-info" href="{{ route($route, array_merge($filters, ['similarity' => $similarity + 1])) }}">+</a>
                         </div>
                     </div>
                 </div>

@@ -281,6 +281,20 @@
                 background-color: {{ $color }};
             }
         @endforeach
+
+        btn-group-vertical>.badge, .btn-group>.badge {
+            position: relative;
+            float: left;
+            border: 1px;
+        }
+        .btn-group>.btn-group:not(:first-child)>.badge, .btn-group>.badge:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .btn-group>.btn-group:not(:last-child)>.badge, .btn-group>.badge:not(:last-child):not(.dropdown-toggle) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
     </style>
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
