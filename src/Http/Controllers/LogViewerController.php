@@ -133,11 +133,12 @@ class LogViewerController extends Controller
         }
 
         $text = $request->get('text', '');
+        $similarity = $request->get('similarity', config('log-viewer.similarity', 76));
 
         $log     = $this->getLogOrFail($prefix, $date);
         $query   = $request->get('query');
         $levels  = $this->logViewer->levelsNames();
-        $entries = $log->getSimilar($text, $this->similarity)->paginate($this->perPage);
+        $entries = $log->getSimilar($text, $similarity)->paginate($this->perPage);
 
         return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
     }
