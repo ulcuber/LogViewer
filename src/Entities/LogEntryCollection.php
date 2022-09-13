@@ -60,13 +60,16 @@ class LogEntryCollection extends LazyCollection
         $offset = max(0, ($page - 1) * $perPage);
         $items = array_slice($items, $offset, $perPage, true);
 
-        return new LengthAwarePaginator(
+        $paginator = new LengthAwarePaginator(
             $items,
             $total,
             $perPage,
             $page,
             compact('path')
         );
+        $paginator->appends($request->all());
+
+        return $paginator;
     }
 
     /**
