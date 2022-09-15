@@ -3,6 +3,8 @@
 namespace Arcanedev\LogViewer\Http\Controllers;
 
 use Arcanedev\LogViewer\Contracts\LogViewer as LogViewerContract;
+use Arcanedev\LogViewer\Entities\Log;
+use Arcanedev\LogViewer\Entities\LogCollection;
 use Arcanedev\LogViewer\Entities\LogEntry;
 use Arcanedev\LogViewer\Entities\LogEntryCollection;
 use Arcanedev\LogViewer\Exceptions\LogNotFoundException;
@@ -100,7 +102,22 @@ class LogViewerController extends Controller
      */
     public function listLogs(Request $request)
     {
-        $stats   = $this->logViewer->statsTable();
+        $filters = $request->only(['prefix', 'date']);
+
+        $stats = $this->logViewer->logs()
+            ->when(!empty($filters), function (LogCollection $files) use ($filters) {
+                return $files->filter(function (Log $log) use ($filters) {
+                    foreach ($filters as $key => $value) {
+                        if ($log->{$key} !== $value) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            })
+        ->stats();
+
+        $stats   = $this->logViewer->statsTableFor($stats);
         $headers = $stats->header();
         $rows    = $this->paginate($stats->rows(), $request);
 

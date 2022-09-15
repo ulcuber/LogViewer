@@ -190,6 +190,16 @@ interface Factory extends Patternable
      */
     public function statsTable(?string $locale = null): StatsTable;
 
+    /**
+     * Get logs statistics table for stats.
+     *
+     * @param  array  $stats
+     * @param  string|null  $locale
+     *
+     * @return \Arcanedev\LogViewer\Tables\StatsTable
+     */
+    public function statsTableFor(array $stats, ?string $locale = null): StatsTable;
+
     /* -----------------------------------------------------------------
      |  Check Methods
      | -----------------------------------------------------------------

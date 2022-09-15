@@ -31,8 +31,10 @@
                         <tr>
                             @foreach($row as $key => $value)
                                 <td class="text-center">
-                                    @if ($key == 'date' || $key == 'prefix')
-                                        <span class="badge badge-primary">{{ $value }}</span>
+                                    @if ($key == 'date')
+                                        <a href="{{ route('log-viewer::logs.list', compact('date')) }}"><span class="badge badge-primary">{{ $value }}</span></a>
+                                    @elseif ($key == 'prefix')
+                                        <a href="{{ route('log-viewer::logs.list', ['prefix' => $value]) }}"><span class="badge badge-primary">{{ $value }}</span></a>
                                     @elseif ($value == 0)
                                         <span class="badge empty">{{ $value }}</span>
                                     @else

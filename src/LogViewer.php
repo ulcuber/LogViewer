@@ -249,6 +249,19 @@ class LogViewer implements LogViewerContract
     }
 
     /**
+     * Get logs statistics table for stats.
+     *
+     * @param array $stats
+     * @param string|null $locale
+     *
+     * @return \Arcanedev\LogViewer\Tables\StatsTable
+     */
+    public function statsTableFor(array $stats, ?string $locale = null): StatsTable
+    {
+        return $this->factory->statsTableFor($stats, $locale);
+    }
+
+    /**
      * Get logs statistics table for date.
      *
      * @param string $date
@@ -302,6 +315,16 @@ class LogViewer implements LogViewerContract
     public function files(): array
     {
         return $this->filesystem->logs();
+    }
+
+    /**
+     * Get all logs.
+     *
+     * @return LogCollection
+     */
+    public function logs(): LogCollection
+    {
+        return $this->factory->logs();
     }
 
     /**

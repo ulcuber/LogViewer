@@ -118,6 +118,16 @@ interface LogViewer extends Patternable
     public function statsTable(?string $locale = null): StatsTable;
 
     /**
+     * Get logs statistics table for stats.
+     *
+     * @param array $stats
+     * @param string|null $locale
+     *
+     * @return \Arcanedev\LogViewer\Tables\StatsTable
+     */
+    public function statsTableFor(array $stats, ?string $locale = null): StatsTable;
+
+    /**
      * Get logs statistics table for date.
      *
      * @param  string  $date
@@ -151,6 +161,13 @@ interface LogViewer extends Patternable
      * @return array
      */
     public function files(): array;
+
+    /**
+     * Get all logs.
+     *
+     * @return LogCollection
+     */
+    public function logs(): LogCollection;
 
     /**
      * List the log files (only paths).
