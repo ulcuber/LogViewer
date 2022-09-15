@@ -5,7 +5,7 @@
         <h1>
             {{ trans('log-viewer::general.dashboard') }}
             @isset($date)
-                [{{ $date }}]
+                [<a href="{{ route('log-viewer::logs.list', compact('date')) }}">{{ $date }}</a>]
             @endisset
         </h1>
     </div>
