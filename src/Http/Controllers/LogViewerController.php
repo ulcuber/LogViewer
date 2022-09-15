@@ -76,6 +76,22 @@ class LogViewerController extends Controller
     }
 
     /**
+     * Show the dashboard for today.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function today(Request $request)
+    {
+        $date = date('Y-m-d');
+
+        $stats     = $this->logViewer->statsTableForDate($date);
+        $chartData = $this->prepareChartData($stats);
+        $percents  = $this->calcPercentages($stats->footer(), $stats->header());
+
+        return $this->view($request, 'dashboard', compact('chartData', 'percents', 'date'));
+    }
+
+    /**
      * List all logs.
      *
      * @param  \Illuminate\Http\Request  $request

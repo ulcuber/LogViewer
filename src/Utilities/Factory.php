@@ -249,6 +249,18 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Get logs statistics for date.
+     *
+     * @param string $date
+     *
+     * @return array
+     */
+    public function statsForDate(string $date): array
+    {
+        return $this->logs()->statsForDate($date);
+    }
+
+    /**
      * Get logs statistics table.
      *
      * @param  string|null  $locale
@@ -258,6 +270,19 @@ class Factory implements FactoryContract
     public function statsTable(?string $locale = null): StatsTable
     {
         return StatsTable::make($this->stats(), $this->levels, $locale);
+    }
+
+    /**
+     * Get logs statistics table for log.
+     *
+     * @param  string  $date
+     * @param  string|null  $locale
+     *
+     * @return \Arcanedev\LogViewer\Tables\StatsTable
+     */
+    public function statsTableForDate(string $date, ?string $locale = null): StatsTable
+    {
+        return StatsTable::make($this->statsForDate($date), $this->levels, $locale);
     }
 
     /**

@@ -118,6 +118,16 @@ interface LogViewer extends Patternable
     public function statsTable(?string $locale = null): StatsTable;
 
     /**
+     * Get logs statistics table for date.
+     *
+     * @param  string  $date
+     * @param  string|null  $locale
+     *
+     * @return \Arcanedev\LogViewer\Tables\StatsTable
+     */
+    public function statsTableForDate(string $date, ?string $locale = null): StatsTable;
+
+    /**
      * Delete the log.
      *
      * @param  string  $date

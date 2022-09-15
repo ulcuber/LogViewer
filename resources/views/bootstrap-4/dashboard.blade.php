@@ -2,7 +2,12 @@
 
 @section('content')
     <div class="page-header mb-4">
-        <h1>{{ trans('log-viewer::general.dashboard') }}</h1>
+        <h1>
+            {{ trans('log-viewer::general.dashboard') }}
+            @isset($date)
+                [{{ $date }}]
+            @endisset
+        </h1>
     </div>
 
     <div class="row">
@@ -14,6 +19,9 @@
             <div class="row">
                 @foreach($percents as $level => $item)
                     <div class="col-sm-6 col-md-12 col-lg-4 mb-3">
+                        @isset($date)
+                        <a class="box-link" href="{{ route('log-viewer::logs.filter', [config('log-viewer.default_prefix', 'laravel'), $date, $level]) }}">
+                        @endisset
                         <div class="box level-{{ $level }} {{ $item['count'] === 0 ? 'empty' : '' }}">
                             <div class="box-icon">
                                 {!! log_styler()->icon($level) !!}
@@ -29,6 +37,9 @@
                                 </div>
                             </div>
                         </div>
+                        @isset($date)
+                        </a>
+                        @endisset
                     </div>
                 @endforeach
             </div>

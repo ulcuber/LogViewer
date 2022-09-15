@@ -166,6 +166,29 @@ class LogCollection extends LazyCollection
     }
 
     /**
+     * Get logs statistics for date.
+     *
+     * @param string $date
+     *
+     * @return array
+     */
+    public function statsForDate(string $date): array
+    {
+        $stats = [];
+
+        $logs = $this->filter(function (Log $log) use ($date) {
+            return $log->date === $date;
+        });
+
+        foreach ($logs as $log) {
+            /** @var \Arcanedev\LogViewer\Entities\Log $log */
+            $stats[$log->prefix][$log->date] = $log->stats();
+        }
+
+        return $stats;
+    }
+
+    /**
      * List the log files (paths).
      *
      * @return array

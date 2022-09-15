@@ -31,4 +31,5 @@ return [
     'of-results'         => 'results',
     'order-asc'          => 'Ascending',
     'order-desc'         => 'Descending',
+    'today'              => 'Today',
 ];

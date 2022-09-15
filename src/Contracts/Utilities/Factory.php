@@ -173,6 +173,15 @@ interface Factory extends Patternable
     public function stats(): array;
 
     /**
+     * Get logs statistics for date.
+     *
+     * @param  string  $date
+     *
+     * @return array
+     */
+    public function statsForDate(string $date): array;
+
+    /**
      * Get logs statistics table.
      *
      * @param  string|null  $locale

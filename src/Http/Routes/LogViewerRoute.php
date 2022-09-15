@@ -28,6 +28,9 @@ class LogViewerRoute extends RouteRegistrar
             // log-viewer::dashboard
             $this->get('/', 'LogViewerController@index')->name('dashboard');
 
+            // log-viewer::today
+            $this->get('today', 'LogViewerController@today')->name('today');
+
             $this->mapLogsRoutes();
         });
     }

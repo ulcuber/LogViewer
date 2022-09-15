@@ -249,6 +249,19 @@ class LogViewer implements LogViewerContract
     }
 
     /**
+     * Get logs statistics table for date.
+     *
+     * @param string $date
+     * @param string|null $locale
+     *
+     * @return \Arcanedev\LogViewer\Tables\StatsTable
+     */
+    public function statsTableForDate(string $date, ?string $locale = null): StatsTable
+    {
+        return $this->factory->statsTableForDate($date, $locale);
+    }
+
+    /**
      * Delete the log.
      *
      * @param string $prefix
