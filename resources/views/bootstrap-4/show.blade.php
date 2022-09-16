@@ -14,10 +14,10 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-2">
+        <aside class="col-lg-2">
             {{-- Log Menu --}}
             <div class="card mb-4">
-                <div class="card-header"><i class="fa fa-fw fa-flag"></i> {{ trans('log-viewer::general.levels') }}</div>
+                <div class="card-header"><i class="fa fa-fw fa-flag"></i> {{ trans('log-viewer::general.levels') }}<span class="pl-3 aside-hide">&lt;&lt;</span></div>
                 <div class="list-group list-group-flush log-menu">
                     @foreach($log->menu() as $levelKey => $item)
                         @if ($item['count'] === 0)
@@ -34,8 +34,8 @@
                     @endforeach
                 </div>
             </div>
-        </div>
-        <div class="col-lg-10">
+        </aside>
+        <main class="col">
             {{-- Log Details --}}
             <div class="card mb-4">
                 <div class="card-header">
@@ -211,7 +211,7 @@
             </div>
 
             {!! $entries->appends(compact('query'))->render() !!}
-        </div>
+        </main>
     </div>
 @endsection
 
@@ -242,6 +242,18 @@
             </form>
         </div>
     </div>
+    <div class="aside-show card btn btn-default" style="display: none;">&gt;&gt;</div>
+    <style>
+        .aside-show {
+            z-index: 1;
+            position: absolute;
+            top: 7.5rem;
+            left: 0;
+        }
+        .aside-hide {
+            cursor: pointer;
+        }
+    </style>
 @endsection
 
 @section('scripts')
@@ -279,6 +291,15 @@
 
                 return false;
             });
+
+            $('aside .aside-hide').click(function () {
+                $('aside').hide();
+                $('.aside-show').show();
+            })
+            $('.aside-show').click(function () {
+                $('.aside-show').hide();
+                $('aside').show();
+            })
 
             @unless (empty(log_styler()->toHighlight()))
                 @php
