@@ -17,7 +17,7 @@
         <aside class="col-lg-2">
             {{-- Log Menu --}}
             <div class="card mb-4">
-                <div class="card-header"><i class="fa fa-fw fa-flag"></i> {{ trans('log-viewer::general.levels') }}<span class="pl-3 aside-hide">&lt;&lt;</span></div>
+                <div class="card-header"><i class="fa fa-fw fa-flag"></i> {{ trans('log-viewer::general.levels') }}<span class="btn btn-light ml-3 aside-hide">&lt;&lt;</span></div>
                 <div class="list-group list-group-flush log-menu">
                     @foreach($log->menu() as $levelKey => $item)
                         @if ($item['count'] === 0)
@@ -252,6 +252,7 @@
         }
         .aside-hide {
             cursor: pointer;
+            padding: 0;
         }
     </style>
 @endsection
