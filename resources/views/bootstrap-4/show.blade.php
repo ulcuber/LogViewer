@@ -35,7 +35,7 @@
                 </div>
             </div>
         </aside>
-        <main class="col">
+        <section class="main-col col-lg-10">
             {{-- Log Details --}}
             <div class="card mb-4">
                 <div class="card-header">
@@ -211,7 +211,7 @@
             </div>
 
             {!! $entries->appends(compact('query'))->render() !!}
-        </main>
+        </section>
     </div>
 @endsection
 
@@ -296,11 +296,15 @@
             $('aside .aside-hide').click(function () {
                 $('aside').hide();
                 $('.aside-show').show();
-            })
+                $('.main-col').removeClass('col-lg-10');
+                $('.main-col').addClass('col-lg-12');
+            });
             $('.aside-show').click(function () {
                 $('.aside-show').hide();
                 $('aside').show();
-            })
+                $('.main-col').removeClass('col-lg-12');
+                $('.main-col').addClass('col-lg-10');
+            });
 
             @unless (empty(log_styler()->toHighlight()))
                 @php
