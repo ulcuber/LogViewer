@@ -2,12 +2,7 @@
 
 @section('content')
     <div class="page-header mb-4">
-        <h1>
-            {{ trans('log-viewer::general.dashboard') }}
-            @isset($date)
-                [<a href="{{ route('log-viewer::logs.list', compact('date')) }}">{{ $date }}</a>]
-            @endisset
-        </h1>
+        <h1>{{ trans('log-viewer::general.dashboard') }}@isset($date)[<a href="{{ route('log-viewer::logs.list', compact('date')) }}">{{ $date }}</a>]@endisset</h1>
     </div>
 
     <div class="row">

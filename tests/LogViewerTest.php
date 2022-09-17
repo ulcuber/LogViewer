@@ -314,12 +314,6 @@ class LogViewerTest extends TestCase
     }
 
     /** @test */
-    public function it_can_get_version()
-    {
-        static::assertEquals(LogViewer::VERSION, $this->logViewer->version());
-    }
-
-    /** @test */
     public function it_can_set_custom_storage_path()
     {
         $this->logViewer->setPath(storage_path('custom-path-logs'));
