@@ -74,4 +74,19 @@ class RouteServiceProvider extends ServiceProvider
     {
         return $this->app['config']->get("log-viewer.route.$key", $default);
     }
+
+    /**
+     * Load the cached routes for the application.
+     *
+     * @return void
+     */
+    protected function loadCachedRoutes()
+    {
+        $this->app->booted(function () {
+            if ($this->app['router']->getRoutes()->count() === 0) {
+                require $this->app->getCachedRoutesPath();
+            }
+            // else routes cache probably already included
+        });
+    }
 }
