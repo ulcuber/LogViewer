@@ -354,7 +354,7 @@ class Filesystem implements FilesystemContract
     public function getFiles(string $pattern): array
     {
         $files = $this->filesystem->glob(
-            $this->storagePath . DS . $pattern,
+            $this->storagePath . DIRECTORY_SEPARATOR . $pattern,
             GLOB_BRACE
         );
 

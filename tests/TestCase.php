@@ -77,7 +77,7 @@ abstract class TestCase extends BaseTestCase
         /** @var \Illuminate\Config\Repository $config */
         $config = $app['config'];
 
-        $config->set('log-viewer.storage-path', $app['path.storage'].DS.'logs');
+        $config->set('log-viewer.storage-path', $app['path.storage'] . DIRECTORY_SEPARATOR . 'logs');
     }
 
     /* -----------------------------------------------------------------
