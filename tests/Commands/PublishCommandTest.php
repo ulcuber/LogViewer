@@ -91,7 +91,7 @@ class PublishCommandTest extends TestCase
      */
     protected function assertHasNotConfigFile()
     {
-        static::assertFileNotExists($this->getConfigFilePath());
+        static::assertFileDoesNotExist($this->getConfigFilePath());
         static::assertFalse($this->isConfigExists());
     }
 

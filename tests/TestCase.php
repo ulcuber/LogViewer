@@ -216,7 +216,7 @@ abstract class TestCase extends BaseTestCase
      */
     public static function assertDate($date, $message = '')
     {
-        self::assertRegExp('/'.REGEX_DATE_PATTERN.'/', $date, $message);
+        self::assertMatchesRegularExpression('/'.REGEX_DATE_PATTERN.'/', $date, $message);
     }
 
     /**
@@ -253,7 +253,7 @@ abstract class TestCase extends BaseTestCase
     {
         $pattern = '/^#?([a-f0-9]{3}|[a-f0-9]{6})$/i';
 
-        self::assertRegExp($pattern, $color, $message);
+        self::assertMatchesRegularExpression($pattern, $color, $message);
     }
 
     /* -----------------------------------------------------------------
