@@ -2,17 +2,14 @@ forked by @ulcuber
 
 See Fork Features
 
-# LogViewer [![Packagist License][badge_license]](LICENSE.md) [![For Laravel][badge_laravel]][link-github-repo]
+# LogViewer [![For Laravel][badge_laravel]][link-github-repo] [![Github Workflow Status][badge_build]][link-github-status] [![Github Issues][badge_issues]][link-github-issues]
+<!-- [![Coverage Status][badge_coverage]][link-scrutinizer] -->
+<!-- [![Scrutinizer Code Quality][badge_quality]][link-scrutinizer] -->
+<!-- [![SensioLabs Insight][badge_insight]][link-insight] -->
 
-[![Github Workflow Status][badge_build]][link-github-status]
-[![Coverage Status][badge_coverage]][link-scrutinizer]
-[![Scrutinizer Code Quality][badge_quality]][link-scrutinizer]
-[![SensioLabs Insight][badge_insight]][link-insight]
-[![Github Issues][badge_issues]][link-github-issues]
-
-[![Packagist][badge_package]][link-packagist]
-[![Packagist Release][badge_release]][link-packagist]
-[![Packagist Downloads][badge_downloads]][link-packagist]
+<!-- [![Packagist][badge_package]][link-packagist] -->
+<!-- [![Packagist Release][badge_release]][link-packagist] -->
+<!-- [![Packagist Downloads][badge_downloads]][link-packagist] -->
 
 _By [ARCANEDEV©](http://www.arcanedev.net/)_
 
@@ -106,38 +103,38 @@ If you discover any security related issues, please email arcanedev.maroc@gmail.
 ![Logs list](https://raw.githubusercontent.com/ulcuber/LogViewer/v8.x/_screenshots/2-logs-list.jpg)
 ![Single log](https://raw.githubusercontent.com/ulcuber/LogViewer/v8.x/_screenshots/3-single-log.jpg)
 
-[badge_laravel]: https://img.shields.io/badge/Laravel-5.x%20to%206.x-orange.svg?style=flat-square
+[badge_laravel]: https://img.shields.io/badge/Laravel-8.x-orange.svg?style=flat-square
 
-[badge_license]: https://img.shields.io/packagist/l/arcanedev/log-viewer.svg?style=flat-square
+[badge_license]: https://img.shields.io/packagist/l/ulcuber/log-viewer.svg?style=flat-square
 
-[badge_build]: https://img.shields.io/github/workflow/status/ARCANEDEV/LogViewer/run-tests?style=flat-square
+[badge_build]: https://img.shields.io/github/workflow/status/ulcuber/LogViewer/run-tests?style=flat-square
 
-[badge_coverage]: https://img.shields.io/scrutinizer/coverage/g/ARCANEDEV/LogViewer.svg?style=flat-square
+[badge_coverage]: https://img.shields.io/scrutinizer/coverage/g/ulcuber/LogViewer.svg?style=flat-square
 
-[badge_quality]: https://img.shields.io/scrutinizer/g/ARCANEDEV/LogViewer.svg?style=flat-square
+[badge_quality]: https://img.shields.io/scrutinizer/g/ulcuber/LogViewer.svg?style=flat-square
 
 [badge_insight]: https://img.shields.io/sensiolabs/i/d6b4587a-e00d-4dac-98db-f979731fdc4d.svg?style=flat-square
 
-[badge_issues]: https://img.shields.io/github/issues/ARCANEDEV/LogViewer.svg?style=flat-square
+[badge_issues]: https://img.shields.io/github/issues/ulcuber/LogViewer.svg?style=flat-square
 
-[badge_package]: https://img.shields.io/badge/package-arcanedev/log--viewer-blue.svg?style=flat-square
+[badge_package]: https://img.shields.io/badge/package-ulcuber/log--viewer-blue.svg?style=flat-square
 
-[badge_release]: https://img.shields.io/packagist/v/arcanedev/log-viewer.svg?style=flat-square
+[badge_release]: https://img.shields.io/packagist/v/ulcuber/log-viewer.svg?style=flat-square
 
-[badge_downloads]: https://img.shields.io/packagist/dt/arcanedev/log-viewer.svg?style=flat-square
+[badge_downloads]: https://img.shields.io/packagist/dt/ulcuber/log-viewer.svg?style=flat-square
 
 [link-author]: https://github.com/arcanedev-maroc
 
-[link-github-status]: https://github.com/ARCANEDEV/LogViewer/actions
+[link-github-status]: https://github.com/ulcuber/LogViewer/actions
 
-[link-github-repo]: https://github.com/ARCANEDEV/LogViewer
+[link-github-repo]: https://github.com/ulcuber/LogViewer
 
-[link-github-issues]: https://github.com/ARCANEDEV/LogViewer/issues
+[link-github-issues]: https://github.com/ulcuber/LogViewer/issues
 
-[link-contributors]: https://github.com/ARCANEDEV/LogViewer/graphs/contributors
+[link-contributors]: https://github.com/ulcuber/LogViewer/graphs/contributors
 
-[link-packagist]: https://packagist.org/packages/arcanedev/log-viewer
+[link-packagist]: https://packagist.org/packages/ulcuber/log-viewer
 
-[link-scrutinizer]: https://scrutinizer-ci.com/g/ARCANEDEV/LogViewer/?branch=master
+[link-scrutinizer]: https://scrutinizer-ci.com/g/ulcuber/LogViewer/?branch=master
 
 [link-insight]: https://insight.sensiolabs.com/projects/d6b4587a-e00d-4dac-98db-f979731fdc4d
