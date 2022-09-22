@@ -19,18 +19,6 @@ class RouteServiceProvider extends ServiceProvider
      */
 
     /**
-     * Get Route attributes
-     *
-     * @return array
-     */
-    public function routeAttributes()
-    {
-        return array_merge($this->config('attributes', []), [
-            'namespace' => 'Arcanedev\\LogViewer\\Http\\Controllers',
-        ]);
-    }
-
-    /**
      * Check if routes is enabled
      *
      * @return bool
@@ -48,11 +36,11 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Define the routes for the application.
      */
-    public function map(): void
+    public function boot(): void
     {
         if ($this->isEnabled()) {
-            $this->group($this->routeAttributes(), function () {
-                LogViewerRoute::register();
+            $this->routes(function () {
+                static::mapRouteClasses([LogViewerRoute::class]);
             });
         }
     }

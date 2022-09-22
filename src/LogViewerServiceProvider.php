@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer;
+<?php
+
+namespace Arcanedev\LogViewer;
 
 use Arcanedev\Support\Providers\PackageServiceProvider;
 
@@ -54,8 +56,48 @@ class LogViewerServiceProvider extends PackageServiceProvider
      */
     public function boot(): void
     {
-        $this->publishConfig();
-        $this->publishViews();
-        $this->publishTranslations();
+        $this->loadTranslations();
+        $this->loadViews();
+
+        if ($this->app->runningInConsole()) {
+            $this->publishConfig();
+            $this->publishTranslations();
+            $this->publishViews();
+        }
+    }
+
+    /**
+     * Publish the translations.
+     * Uses old tag name.
+     *
+     * @param  string|null  $path
+     */
+    protected function publishTranslations(?string $path = null): void
+    {
+        $this->publishes([
+            $this->getTranslationsPath() => $path ?: $this->getTranslationsDestinationPath(),
+        ], $this->getPublishedTags('lang'));
+    }
+
+    /**
+     * Get the translations path.
+     * Uses old translations path.
+     *
+     * @return string
+     */
+    protected function getTranslationsPath(): string
+    {
+        return $this->getBasePath() . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'lang';
+    }
+
+    /**
+     * Get the base views path.
+     * Uses old views path.
+     *
+     * @return string
+     */
+    protected function getViewsPath(): string
+    {
+        return $this->getBasePath() . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'views';
     }
 }

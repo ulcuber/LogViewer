@@ -63,9 +63,9 @@ class ClearCommandTest extends TestCase
         static::assertEquals(1, $this->logViewer->count());
 
         $this->artisan('log-viewer:clear')
-             ->expectsQuestion('This will delete all the log files, Do you wish to continue?', 'yes')
-             ->expectsOutput('Successfully cleared the logs!')
-             ->assertExitCode(0);
+            ->expectsQuestion('This will delete all the log files, Do you wish to continue?', 'yes')
+            ->expectsOutput('Successfully cleared the logs!')
+            ->assertExitCode(0);
 
         $this->logViewer->clearCache();
         static::assertEquals(0, $this->logViewer->count());
@@ -81,11 +81,22 @@ class ClearCommandTest extends TestCase
      */
     private function setupForTests()
     {
-        if (! file_exists($this->path)) {
-            mkdir($this->path, 0777, true);
+        if (file_exists($this->path)) {
+            static::rmDirRecursive($this->path);
         }
+
+        mkdir($this->path, 0777, true);
 
         $this->logViewer->setPath($this->path);
         $this->app['config']->set(['log-viewer.storage-path' => $this->path]);
+    }
+
+    public static function rmDirRecursive(string $dir)
+    {
+        $files = array_diff(scandir($dir), array('.', '..'));
+        foreach ($files as $file) {
+            (is_dir("$dir/$file")) ? static::rmDirRecursive("$dir/$file") : unlink("$dir/$file");
+        }
+        return rmdir($dir);
     }
 }
