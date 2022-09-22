@@ -38,13 +38,15 @@ class LogViewerServiceProvider extends PackageServiceProvider
 
         $this->registerProvider(Providers\RouteServiceProvider::class);
 
-        $this->registerCommands([
-            Commands\PublishCommand::class,
-            Commands\StatsCommand::class,
-            Commands\CheckCommand::class,
-            Commands\ClearCommand::class,
-            Commands\LatestCommand::class,
-        ]);
+        if ($this->app->runningInConsole()) {
+            $this->registerCommands([
+                Commands\PublishCommand::class,
+                Commands\StatsCommand::class,
+                Commands\CheckCommand::class,
+                Commands\ClearCommand::class,
+                Commands\LatestCommand::class,
+            ]);
+        }
     }
 
     /**
