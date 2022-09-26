@@ -358,7 +358,17 @@ class Filesystem implements FilesystemContract
             GLOB_BRACE
         );
 
-        return array_filter(array_map('realpath', $files));
+        $maxSize = config('log-viewer.max_log_size');
+        return array_filter(array_map('realpath', $files), function ($file) use ($maxSize) {
+            if (!$file) {
+                return false;
+            }
+            $size = $this->filesystem->size($file);
+            if ($size && $size > $maxSize) {
+                return false;
+            }
+            return true;
+        });
     }
 
     /**
