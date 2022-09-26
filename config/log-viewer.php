@@ -171,4 +171,13 @@ return [
 
     'similarity' => env('ARCANEDEV_LOGVIEWER_SIMILARITY', 76),
 
+    /* -----------------------------------------------------------------
+     |  Max log file size
+     | -----------------------------------------------------------------
+     | Prevents `Allowed memory size of n bytes exhausted`
+     | In bytes
+     */
+
+    'max_log_size' => env('ARCANEDEV_LOGVIEWER_MAX_SIZE', 1024 * 1024 * 5),
+
 ];
