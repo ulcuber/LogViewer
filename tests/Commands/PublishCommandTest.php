@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests\Commands;
+<?php
+
+namespace Arcanedev\LogViewer\Tests\Commands;
 
 use Arcanedev\LogViewer\Tests\TestCase;
 
@@ -32,7 +34,7 @@ class PublishCommandTest extends TestCase
     public function it_can_publish_all()
     {
         $this->artisan('log-viewer:publish')
-             ->assertExitCode(0);
+            ->assertExitCode(0);
 
         static::assertHasConfigFile();
         static::assertHasLocalizationFiles();
@@ -43,7 +45,7 @@ class PublishCommandTest extends TestCase
     public function it_can_publish_all_with_force()
     {
         $this->artisan('log-viewer:publish', ['--force'   => true])
-             ->assertExitCode(0);
+            ->assertExitCode(0);
 
         static::assertHasConfigFile();
         static::assertHasLocalizationFiles();
@@ -54,7 +56,7 @@ class PublishCommandTest extends TestCase
     public function it_can_publish_only_config()
     {
         $this->artisan('log-viewer:publish', ['--tag' => 'config'])
-             ->assertExitCode(0);
+            ->assertExitCode(0);
 
         static::assertHasConfigFile();
         static::assertHasNotLocalizationFiles();
@@ -65,7 +67,7 @@ class PublishCommandTest extends TestCase
     public function it_can_publish_only_translations()
     {
         $this->artisan('log-viewer:publish', ['--tag' => 'lang'])
-             ->assertExitCode(0);
+            ->assertExitCode(0);
 
         static::assertHasNotConfigFile();
         static::assertHasLocalizationFiles();
@@ -106,7 +108,8 @@ class PublishCommandTest extends TestCase
 
         static::assertEmpty(
             $missing = array_diff($locales, self::$locales),
-            'The locales ['.implode(', ', $missing).'] are missing in the Arcanedev\\LogViewer\\Tests\\TestCase::$locales (line 29) for tests purposes.'
+            'The locales [' . implode(', ', $missing)
+                . '] are missing in the Arcanedev\\LogViewer\\Tests\\TestCase::$locales (line 29) for tests purposes.'
         );
 
         foreach ($directories as $directory) {
@@ -155,7 +158,7 @@ class PublishCommandTest extends TestCase
      */
     private function getConfigFilePath()
     {
-        return $this->getConfigPath().'/log-viewer.php';
+        return $this->getConfigPath() . '/log-viewer.php';
     }
 
     /**
@@ -165,7 +168,7 @@ class PublishCommandTest extends TestCase
      */
     private function getLocalizationFolder()
     {
-        return realpath(base_path().'/resources/lang/vendor/log-viewer');
+        return realpath(lang_path('vendor/log-viewer'));
     }
 
     /**

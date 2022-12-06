@@ -57,7 +57,7 @@ class ClearCommandTest extends TestCase
     {
         static::assertEquals(0, $this->logViewer->count());
 
-        static::createDummyLog(date('Y-m-d'), 'logs-to-clear');
+        static::createDummyLog(date('Y-m-d'), storage_path('logs-to-clear'));
 
         $this->logViewer->clearCache();
         static::assertEquals(1, $this->logViewer->count());

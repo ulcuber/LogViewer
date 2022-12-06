@@ -4,6 +4,7 @@ namespace Arcanedev\LogViewer\Tests;
 
 use Arcanedev\LogViewer\Entities\Log;
 use Arcanedev\LogViewer\LogViewer;
+use Illuminate\Support\Facades\File;
 
 /**
  * Class     LogViewerTest
@@ -140,7 +141,11 @@ class LogViewerTest extends TestCase
     {
         $prefix = 'laravel';
 
-        static::createDummyLog($date = date('Y-m-d'));
+        $path = storage_path('logs-to-clear');
+
+        $this->setupLogViewerPath($path);
+
+        static::createDummyLog($date = date('Y-m-d'), $path);
 
         // Assert log exists
         $entries = $this->logViewer->get($prefix, $date);
@@ -316,7 +321,9 @@ class LogViewerTest extends TestCase
     /** @test */
     public function it_can_set_custom_storage_path()
     {
-        $this->logViewer->setPath(storage_path('custom-path-logs'));
+        $this->setupLogViewerPath(
+            static::fixturePath('custom-path-logs')
+        );
 
         $paths = $this->logViewer->paths();
 
@@ -378,5 +385,17 @@ class LogViewerTest extends TestCase
             'laravel-[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].log',
             $this->logViewer->getPattern()
         );
+    }
+
+    /**
+     * Sets the log storage path temporarily to a new directory
+     */
+    protected function setupLogViewerPath(string $path): void
+    {
+        File::ensureDirectoryExists($path);
+
+        $this->logViewer->setPath($path);
+
+        $this->app['config']->set(['log-viewer.storage-path' => $path]);
     }
 }

@@ -134,7 +134,7 @@ class FactoryTest extends TestCase
         $prefix = 'laravel';
         $date = '2015-01-03';
 
-        $this->logFactory->setPath(storage_path('custom-path-logs'));
+        $this->logFactory->setPath(static::fixturePath('custom-path-logs'));
 
         static::assertSame(1, $this->logFactory->count());
 

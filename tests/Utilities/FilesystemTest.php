@@ -104,9 +104,13 @@ class FilesystemTest extends TestCase
     public function it_can_delete_file()
     {
         $prefix = 'laravel';
-        $date = date('Y-m-d');
 
-        static::createDummyLog($date);
+        static::createDummyLog(
+            $date = date('Y-m-d'),
+            $path = storage_path('logs')
+        );
+
+        $this->filesystem->setPath($path);
 
         // Assert log exists
         $file = $this->filesystem->read($prefix, $date);
@@ -140,7 +144,7 @@ class FilesystemTest extends TestCase
     /** @test */
     public function it_can_set_a_custom_path()
     {
-        $this->filesystem->setPath(storage_path('custom-path-logs'));
+        $this->filesystem->setPath(static::fixturePath('custom-path-logs'));
 
         $files = $this->filesystem->logs();
 

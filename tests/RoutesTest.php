@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests;
+<?php
+
+namespace Arcanedev\LogViewer\Tests;
 
 /**
  * Class     RoutesTest
@@ -194,7 +196,8 @@ class RoutesTest extends TestCase
         $base = $response->baseResponse;
 
         static::assertInstanceOf(
-            \Symfony\Component\HttpFoundation\BinaryFileResponse::class, $base
+            \Symfony\Component\HttpFoundation\BinaryFileResponse::class,
+            $base
         );
         static::assertEquals("laravel-$date.log", $base->getFile()->getFilename());
     }
@@ -204,11 +207,17 @@ class RoutesTest extends TestCase
     {
         $prefix = 'laravel';
         static::createDummyLog(
-            $date = date('Y-m-d')
+            $date = date('Y-m-d'),
+            $path = storage_path('logs')
         );
 
-        $response = $this->call('DELETE', route('log-viewer::logs.delete', compact('prefix', 'date')), [], [], [], ['HTTP_X-Requested-With' => 'XMLHttpRequest']);
-        $response->assertExactJson(['result' => 'success']);
+        $this->app['config']->set(['log-viewer.storage-path' => $path]);
+
+        $response = $this->call('DELETE', route('log-viewer::logs.delete', compact('prefix', 'date')), [], [], [], [
+            'HTTP_X-Requested-With' => 'XMLHttpRequest'
+        ])
+            ->assertSuccessful()
+            ->assertExactJson(['result' => 'success']);
     }
 
     /** @test */
@@ -229,10 +238,12 @@ class RoutesTest extends TestCase
     /** @test */
     public function it_must_throw_validation_exception_on_delete()
     {
-        $response = $this->call('DELETE', route('log-viewer::logs.delete', []), [], [], [], ['HTTP_X-Requested-With' => 'XMLHttpRequest']);
+        $response = $this->call('DELETE', route('log-viewer::logs.delete', []), [], [], [], [
+            'HTTP_X-Requested-With' => 'XMLHttpRequest'
+        ]);
 
         static::assertInstanceOf(\Illuminate\Validation\ValidationException::class, $response->exception);
-        static::assertSame('The given data was invalid.', $response->exception->getMessage());
+        static::assertSame('The prefix field is required. (and 1 more error)', $response->exception->getMessage());
     }
 
     /** @test */

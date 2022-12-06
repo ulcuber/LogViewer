@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests;
+<?php
+
+namespace Arcanedev\LogViewer\Tests;
 
 use Arcanedev\LogViewer\Entities\Log;
 use Arcanedev\LogViewer\Entities\LogEntry;
@@ -50,6 +52,13 @@ abstract class TestCase extends BaseTestCase
         static::$logLevels = [];
     }
 
+    protected static function fixturePath(?string $path = null): string
+    {
+        return is_null($path)
+            ? __DIR__ . '/fixtures'
+            : __DIR__ . '/fixtures/' . $path;
+    }
+
     /**
      * Get package providers.
      *
@@ -72,7 +81,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['path.storage'] = realpath(__DIR__.'/fixtures');
+        $app['path.storage'] = realpath(__DIR__ . '/fixtures');
 
         /** @var \Illuminate\Config\Repository $config */
         $config = $app['config'];
@@ -216,7 +225,7 @@ abstract class TestCase extends BaseTestCase
      */
     public static function assertDate($date, $message = '')
     {
-        self::assertMatchesRegularExpression('/'.REGEX_DATE_PATTERN.'/', $date, $message);
+        self::assertMatchesRegularExpression('/' . REGEX_DATE_PATTERN . '/', $date, $message);
     }
 
     /**
@@ -237,8 +246,7 @@ abstract class TestCase extends BaseTestCase
         if ($withIcons) {
             self::assertArrayHasKey('icon', $item);
             self::assertStringStartsWith('fa fa-fw fa-', $item['icon']);
-        }
-        else {
+        } else {
             self::assertArrayNotHasKey('icon', $item);
         }
     }
@@ -386,11 +394,11 @@ abstract class TestCase extends BaseTestCase
      *
      * @return bool
      */
-    protected static function createDummyLog($date, $path = 'logs')
+    protected static function createDummyLog(string $date, string $path = 'logs'): bool
     {
         return copy(
-            storage_path('dummy.log'),                // Source
-            storage_path("{$path}/laravel-{$date}.log") // Destination
+            static::fixturePath('dummy.log'), // Source
+            "{$path}/laravel-{$date}.log"     // Destination
         );
     }
 
