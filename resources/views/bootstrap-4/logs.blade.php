@@ -17,7 +17,7 @@
                             <span class="badge badge-info">{{ $header }}</span>
                         @else
                             <span class="badge badge-level-{{ $key }}">
-                                {{ log_styler()->icon($key) }} {{ $header }}
+                                {{ log_styler()->icon($key) }}<br>{{ $header }}
                             </span>
                         @endif
                     </th>
@@ -46,13 +46,13 @@
                             @endforeach
                             <td class="text-right">
                                 <a href="{{ route('log-viewer::logs.show', [$prefix, $date]) }}" class="btn btn-sm btn-info">
-                                    <i class="fa fa-search"></i>
+                                    <i class="bi bi-search"></i>
                                 </a>
                                 <a href="{{ route('log-viewer::logs.download', [$prefix, $date]) }}" class="btn btn-sm btn-success">
-                                    <i class="fa fa-download"></i>
+                                    <i class="bi bi-download"></i>
                                 </a>
                                 <a href="#delete-log-modal" class="btn btn-sm btn-danger" data-log-prefix="{{ $prefix }}" data-log-date="{{ $date }}">
-                                    <i class="fa fa-trash-o"></i>
+                                    <i class="bi bi-trash"></i>
                                 </a>
                             </td>
                         </tr>

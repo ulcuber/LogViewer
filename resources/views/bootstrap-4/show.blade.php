@@ -17,7 +17,7 @@
         <aside class="col-lg-2">
             {{-- Log Menu --}}
             <div class="card mb-4">
-                <div class="card-header"><i class="fa fa-fw fa-flag"></i> {{ trans('log-viewer::general.levels') }}<span class="btn btn-light ml-3 aside-hide">&lt;&lt;</span></div>
+                <div class="card-header"><i class="bi bi-flag"></i> {{ trans('log-viewer::general.levels') }}<span class="btn btn-light ml-3 aside-hide">&lt;&lt;</span></div>
                 <div class="list-group list-group-flush log-menu">
                     @foreach($log->menu() as $levelKey => $item)
                         @if ($item['count'] === 0)
@@ -42,10 +42,10 @@
                     {{ trans('log-viewer::general.log-info') }}
                     <div class="group-btns pull-right">
                         <a href="{{ route('log-viewer::logs.download', [$log->prefix, $log->date]) }}" class="btn btn-sm btn-success mb-1 mb-sm-0">
-                            <i class="fa fa-download"></i> {{ trans('log-viewer::general.download') }}
+                            <i class="bi bi-download"></i> {{ trans('log-viewer::general.download') }}
                         </a>
                         <a href="#delete-log-modal" class="btn btn-sm btn-danger mb-1 mb-sm-0" data-toggle="modal">
-                            <i class="fa fa-trash-o"></i> {{ trans('log-viewer::general.delete') }}
+                            <i class="bi bi-trash"></i> {{ trans('log-viewer::general.delete') }}
                         </a>
                     </div>
                 </div>
@@ -86,11 +86,11 @@
                                 <div class="input-group-append">
                                     @unless (is_null($query))
                                         <a href="{{ route('log-viewer::logs.show', [$log->prefix, $log->date]) }}" class="btn btn-secondary">
-                                            ({{ $entries->count() }} {{ trans('log-viewer::general.of-results') }}) <i class="fa fa-fw fa-times"></i>
+                                            ({{ $entries->count() }} {{ trans('log-viewer::general.of-results') }}) <i class="bi bi-x-circle"></i>
                                         </a>
                                     @endunless
                                     <button id="search-btn" class="btn btn-primary">
-                                        <span class="fa fa-fw fa-search"></span>
+                                        <span class="bi bi-search"></span>
                                     </button>
                                 </div>
                             </div>
@@ -166,14 +166,14 @@
                                         @if ($entry->hasContext())
                                             <a class="btn btn-sm btn-light" role="button" data-toggle="collapse"
                                             href="#log-context-{{ $key }}" aria-expanded="false" aria-controls="log-context-{{ $key }}">
-                                                <i class="fa fa-toggle-on"></i> Context
+                                                <i class="bi bi-toggle-on"></i> Context
                                             </a>
                                         @endif
 
                                         @if ($entry->hasStack())
                                             <a class="btn btn-sm btn-light" role="button" data-toggle="collapse"
                                             href="#log-stack-{{ $key }}" aria-expanded="false" aria-controls="log-stack-{{ $key }}">
-                                                <i class="fa fa-toggle-on"></i> Stack
+                                                <i class="bi bi-toggle-on"></i> Stack
                                             </a>
                                         @endif
                                     </td>

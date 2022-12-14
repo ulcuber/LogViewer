@@ -236,9 +236,8 @@ abstract class TestCase extends BaseTestCase
 
         if ($withIcons) {
             self::assertArrayHasKey('icon', $item);
-            self::assertStringStartsWith('fa fa-fw fa-', $item['icon']);
-        }
-        else {
+            self::assertStringStartsWith('bi bi-', $item['icon']);
+        } else {
             self::assertArrayNotHasKey('icon', $item);
         }
     }
