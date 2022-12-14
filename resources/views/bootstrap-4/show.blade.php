@@ -209,7 +209,7 @@
                 </div>
             </div>
 
-            {!! $entries->appends(compact('query'))->render() !!}
+            {!! $entries->appends(compact('query'))->render('pagination::bootstrap-4') !!}
         </section>
     </div>
 @endsection
