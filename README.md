@@ -31,7 +31,7 @@ Feel free to check out the [releases](https://github.com/ARCANEDEV/LogViewer/rel
 -   Localized log levels.
 -   Logs menu/tree generator.
 -   Grouped logs by dates and levels.
--   Customized log levels icons (font awesome by default).
+-   Customized log levels icons (bootstrap icons by default).
 -   Works great with big logs !!
 -   Well documented package (IDE Friendly).
 -   Well tested (100% code coverage with maximum code quality).

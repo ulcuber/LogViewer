@@ -55,7 +55,7 @@ class LogStylerTest extends TestCase
     {
         foreach (self::$logLevels as $level) {
             static::assertMatchesRegularExpression(
-                '/^<i class="fa fa-fw fa-(.*)"><\/i>$/',
+                '/^<i class="bi bi-(.*)"><\/i>$/',
                 $this->styler->icon($level)
             );
         }
@@ -64,7 +64,7 @@ class LogStylerTest extends TestCase
     /** @test */
     public function it_can_get_default_when_icon_not_found()
     {
-        $icon = $this->styler->icon('danger', $default = 'fa fa-fw fa-danger');
+        $icon = $this->styler->icon('danger', $default = 'bi bi-danger');
 
         static::assertInstanceOf(HtmlString::class, $icon);
         static::assertSame('<i class="'.$default.'"></i>', $icon->toHtml());
@@ -92,7 +92,7 @@ class LogStylerTest extends TestCase
     {
         foreach (self::$logLevels as $level) {
             static::assertMatchesRegularExpression(
-                '/^<i class="fa fa-fw fa-(.*)"><\/i>$/',
+                '/^<i class="bi bi-(.*)"><\/i>$/',
                 log_styler()->icon($level)
             );
         }
