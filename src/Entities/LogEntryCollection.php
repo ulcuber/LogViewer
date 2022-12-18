@@ -4,6 +4,7 @@ namespace Arcanedev\LogViewer\Entities;
 
 use Arcanedev\LogViewer\Helpers\LogParser;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\LazyCollection;
 
 /**
@@ -14,6 +15,8 @@ use Illuminate\Support\LazyCollection;
  */
 class LogEntryCollection extends LazyCollection
 {
+    public static $lastCount = null;
+
     /* -----------------------------------------------------------------
      |  Main Methods
      | -----------------------------------------------------------------
@@ -28,7 +31,7 @@ class LogEntryCollection extends LazyCollection
      */
     public static function load($raw)
     {
-        return new static(function () use ($raw) {
+        return new static(function () use (&$raw) {
             foreach (LogParser::parse($raw) as $entry) {
                 list($header, $stack) = $entry;
 
@@ -42,7 +45,7 @@ class LogEntryCollection extends LazyCollection
      *
      * @param  int  $perPage
      *
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return Paginator|LengthAwarePaginator
      */
     public function paginate($perPage = 20)
     {
@@ -50,23 +53,28 @@ class LogEntryCollection extends LazyCollection
         $page = $request->get('page', 1);
         $path = $request->url();
 
-        /**
-         * NOTE: count iterates through all
-         * and forPage skips offset then takes perPage items
-         * so just taking all items to iterate only once
-        */
-        $items = $this->all();
-        $total = count($items);
-        $offset = max(0, ($page - 1) * $perPage);
-        $items = array_slice($items, $offset, $perPage, true);
+        if (static::$lastCount === null) {
+            $offset = max(0, ($page - 1) * $perPage);
+            // NOTE: + 1 for hasMore
+            $items = $this->slice($offset, $perPage + 1);
 
-        $paginator = new LengthAwarePaginator(
-            $items,
-            $total,
-            $perPage,
-            $page,
-            compact('path')
-        );
+            // No LengthAwarePaginator else it will iterate twice for count
+            $paginator = new Paginator(
+                $items,
+                $perPage,
+                $page,
+                compact('path')
+            );
+        } else {
+            $paginator = new LengthAwarePaginator(
+                $this->forPage($page, $perPage),
+                static::$lastCount,
+                $perPage,
+                $page,
+                compact('path')
+            );
+        }
+
         $paginator->appends($request->all());
 
         return $paginator;
@@ -108,11 +116,12 @@ class LogEntryCollection extends LazyCollection
      */
     public function stats(): array
     {
-        $counters = $this->initStats();
+        $counters = LogParser::initStats();
 
-        foreach ($this->groupBy('level') as $level => $entries) {
-            $counters[$level] = $count = count($entries);
-            $counters['all'] += $count;
+        /** @var LogEntry $entry */
+        foreach ($this as $entry) {
+            $counters[$entry->level]++;
+            $counters['all']++;
         }
 
         return $counters;
@@ -139,25 +148,9 @@ class LogEntryCollection extends LazyCollection
         return $tree;
     }
 
-    /* -----------------------------------------------------------------
-     |  Other Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Init stats counters.
-     *
-     * @return array
-     */
-    protected function initStats(): array
+    public function filter(callable $callback = null)
     {
-        $levels = array_merge_recursive(
-            ['all'],
-            array_keys(log_viewer()->levels(true))
-        );
-
-        return array_map(function () {
-            return 0;
-        }, array_flip($levels));
+        static::$lastCount = null;
+        return parent::filter($callback);
     }
 }

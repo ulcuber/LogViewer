@@ -59,7 +59,7 @@
                             <tr>
                                 <td>{{ trans('log-viewer::general.log-entries') }}</td>
                                 <td>
-                                    <span class="badge badge-primary">{{ $entries->total() }}</span>
+                                    <span class="badge badge-primary">{{ method_exists($entries, 'total') ? $entries->total() : 'N' }}</span>
                                 </td>
                                 <td>{{ trans('log-viewer::general.size') }}</td>
                                 <td>
@@ -123,7 +123,7 @@
                 @if ($entries->hasPages())
                     <div class="card-header">
                         <span class="badge badge-info float-right">
-                            {{ trans('log-viewer::general.page') }} {{ $entries->currentPage() }} {{ trans('log-viewer::general.of') }} {{ $entries->lastPage() }}
+                            {{ trans('log-viewer::general.page') }} {{ $entries->currentPage() }} {{ trans('log-viewer::general.of') }} {{ method_exists($entries, 'lastPage') ? $entries->lastPage() : 'N' }}
                         </span>
                     </div>
                 @endif
@@ -210,7 +210,7 @@
                 </div>
             </div>
 
-            {!! $entries->appends(compact('query'))->render('pagination::bootstrap-4') !!}
+            {!! $entries->appends(compact('query'))->render(method_exists($entries, 'total') ? 'pagination::bootstrap-4' : 'pagination::simple-bootstrap-4') !!}
         </section>
     </div>
 @endsection

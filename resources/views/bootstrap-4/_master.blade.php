@@ -54,9 +54,12 @@
 
     {{-- Footer --}}
     <footer class="main-footer">
-        <div class="container-fluid d-flex justify-content-between">
+        <div class="container-fluid d-flex flex-wrap justify-content-between">
             <p class="text-muted">
                 LogViewer - <span class="badge badge-info">version {{ log_viewer()->version() }}</span>
+            </p>
+            <p class="text-muted">
+                {{ log_viewer()->memoryString() }}
             </p>
             <p class="text-muted">
                 Created with <i class="bi bi-heart" style="color: red;"></i> by <a href="https://github.com/ARCANEDEV">ARCANEDEV</a> <sup>&copy;</sup> adopted by <a href="https://github.com/ulcuber/">&#64;ulcuber</a>

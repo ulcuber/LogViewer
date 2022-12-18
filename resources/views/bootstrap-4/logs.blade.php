@@ -12,12 +12,12 @@
             <thead>
                 <tr>
                     @foreach($headers as $key => $header)
-                    <th scope="col" class="{{ $key == 'date' ? 'text-left' : 'text-center' }}">
+                    <th scope="col" class="text-center">
                         @if ($key == 'date' || $key == 'prefix')
                             <span class="badge badge-info">{{ $header }}</span>
                         @else
                             <span class="badge badge-level-{{ $key }}">
-                                {{ log_styler()->icon($key) }}<br>{{ $header }}
+                                {{ log_styler()->icon($key) }}
                             </span>
                         @endif
                     </th>

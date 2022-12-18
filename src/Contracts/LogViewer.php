@@ -233,4 +233,22 @@ interface LogViewer extends Patternable
      * @return string
      */
     public function version(): string;
+
+    /**
+     * Get used memory values in human readable format
+     * memory_limit, memory_get_usage, memory_get_peak_usage
+     *
+     * @return array
+     */
+    public function memory(): array;
+
+    /**
+     * Get used memory string in human readable format
+     * memory_get_peak_usage / memory_limit
+     *
+     * example: `7M / 128M`
+     *
+     * @return string
+     */
+    public function memoryString(): string;
 }

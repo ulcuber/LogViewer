@@ -2,9 +2,11 @@
 
 namespace Arcanedev\LogViewer\Entities;
 
+use Arcanedev\LogViewer\Helpers\LogParser;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\LazyCollection;
 use JsonSerializable;
 use SplFileInfo;
 
@@ -30,6 +32,9 @@ class Log implements Arrayable, Jsonable, JsonSerializable
     /** @var string */
     protected $path;
 
+    /** @var array|null */
+    protected $stats;
+
     /** @var \Arcanedev\LogViewer\Entities\LogEntryCollection */
     protected $entries;
 
@@ -47,15 +52,25 @@ class Log implements Arrayable, Jsonable, JsonSerializable
      * @param  string  $prefix
      * @param  string  $date
      * @param  string  $path
-     * @param  string  $raw
+     * @param  string|LazyCollection  $raw
+     * @param  bool  $stats
      */
-    public function __construct(string $prefix, string $date, string $path, string $raw)
+    public function __construct(string $prefix, string $date, string $path, $raw, bool $stats = false)
     {
         $this->prefix    = $prefix;
         $this->date    = $date;
         $this->path    = $path;
         $this->file    = new SplFileInfo($path);
+
         $this->entries = LogEntryCollection::load($raw);
+
+        if ($stats) {
+            $this->stats = function () use ($raw) {
+                return LogParser::stats($raw);
+            };
+        } else {
+            LogEntryCollection::$lastCount = LogParser::count($raw);
+        }
     }
 
     /* -----------------------------------------------------------------
@@ -124,13 +139,13 @@ class Log implements Arrayable, Jsonable, JsonSerializable
      * @param  string  $prefix
      * @param  string  $date
      * @param  string  $path
-     * @param  string  $raw
+     * @param  string|LazyCollection  $raw
      *
      * @return self
      */
-    public static function make(string $prefix, string $date, string $path, string $raw)
+    public static function make(string $prefix, string $date, string $path, $raw, bool $stats = false)
     {
-        return new self($prefix, $date, $path, $raw);
+        return new self($prefix, $date, $path, $raw, $stats);
     }
 
     /**
@@ -179,6 +194,14 @@ class Log implements Arrayable, Jsonable, JsonSerializable
      */
     public function stats(): array
     {
+        if (is_callable($this->stats)) {
+            $this->stats = ($this->stats)();
+        }
+
+        if ($this->stats) {
+            return $this->stats;
+        }
+
         return $this->entries->stats();
     }
 

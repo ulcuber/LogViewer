@@ -26,7 +26,7 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      *
      * @var string
      */
-    protected static $regex = '/(?:\[([^\[\]]*?)\])?(?:\[([^\[\]]*?)\])? ([a-z]+)\.([A-Z]+): (.*)/';
+    public static $regex = '/(?:\[([^\[\]]*?)\])?(?:\[([^\[\]]*?)\])? ([a-z]+)\.([A-Z]+): (.*)/';
 
     /**
      * Group numbers matched to its setter methods
@@ -86,6 +86,11 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
             static::$propertyGroups[$group] = 'set' . ucfirst($property);
         }
         static::$extraGroups = config('log-viewer.parser.extra_groups');
+    }
+
+    public static function levelGroup(): int
+    {
+        return array_flip(static::$propertyGroups)['setLevel'];
     }
 
     /* -----------------------------------------------------------------
@@ -207,19 +212,17 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
         $this->setDatetime(...$this->extractDatetime($header));
 
         $reminder = array_pop($header);
-        preg_match_all(static::$regex, $reminder, $matches);
+        preg_match(static::$regex, $reminder, $matches);
         foreach ($matches as $index => $value) {
-            if (!empty($value)) {
-                if (isset(static::$propertyGroups[$index])) {
-                    call_user_func([$this, static::$propertyGroups[$index]], $value[0]);
-                }
-                if (isset(static::$extraGroups[$index]) && $value[0]) {
-                    $this->extra[static::$extraGroups[$index]] = $value[0];
-                }
+            if (isset(static::$propertyGroups[$index])) {
+                call_user_func([$this, static::$propertyGroups[$index]], $value);
+            }
+            if (isset(static::$extraGroups[$index]) && $value) {
+                $this->extra[static::$extraGroups[$index]] = $value;
             }
         }
 
-        $reminder = array_pop($matches)[0];
+        $reminder = array_pop($matches);
 
         $regex = '/{(?:[^{}]|(?R))*}/xm';
         $reminder = preg_replace_callback($regex, function ($replacable) {
@@ -433,11 +436,11 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      */
     protected function extractDatetime(array &$header): array
     {
-        $separator = ($header[2] ?? null) === 'T' ? '\T' : ' ';
-        $ms = ($header[3] ?? null) ? '.u' : '';
-        $tz = ($header[4] ?? null) ? 'P' : '';
+        $separator = ($header[1] ?? null) === 'T' ? '\T' : ' ';
+        $ms = ($header[2] ?? null) ? '.u' : '';
+        $tz = ($header[3] ?? null) ? 'P' : '';
         $format = "Y-m-d{$separator}H:i:s{$ms}{$tz}";
-        $datetime = $header[1];
+        $datetime = $header[0];
 
         return [$format, $datetime];
     }
