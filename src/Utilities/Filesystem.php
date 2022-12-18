@@ -5,6 +5,7 @@ namespace Arcanedev\LogViewer\Utilities;
 use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
 use Arcanedev\LogViewer\Exceptions\FilesystemException;
 use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
+use Illuminate\Support\LazyCollection;
 
 /**
  * Class     Filesystem
@@ -233,9 +234,9 @@ class Filesystem implements FilesystemContract
             $dict = [];
             foreach ($paths as $path) {
                 $filename = basename($path);
-                preg_match_all($this->regex, $filename, $matches);
-                $prefix = $matches[1][0];
-                $date = $matches[2][0];
+                preg_match($this->regex, $filename, $matches);
+                $prefix = $matches[1];
+                $date = $matches[2];
                 $dict[$prefix][$date] = $path;
             }
 
@@ -251,21 +252,23 @@ class Filesystem implements FilesystemContract
      * @param  string  $prefix
      * @param  string  $date
      *
-     * @return string
+     * @return string|LazyCollection
      *
      * @throws \Arcanedev\LogViewer\Exceptions\FilesystemException
      */
     public function read(string $prefix, string $date)
     {
         try {
-            $log = $this->filesystem->get(
-                $this->path($prefix, $date)
-            );
+            $path = $this->path($prefix, $date);
+            $maxSize = config('log-viewer.chunked_size_threshold');
+            $size = $this->filesystem->size($path);
+            if ($size && $size > $maxSize) {
+                return $this->filesystem->lines($path);
+            }
+            return $this->filesystem->get($path);
         } catch (\Exception $e) {
             throw new FilesystemException($e->getMessage());
         }
-
-        return $log;
     }
 
     /**
@@ -273,21 +276,22 @@ class Filesystem implements FilesystemContract
      *
      * @param  string  $path
      *
-     * @return string
+     * @return string|LazyCollection
      *
      * @throws \Arcanedev\LogViewer\Exceptions\FilesystemException
      */
     public function readPath(string $path)
     {
         try {
-            $log = $this->filesystem->get(
-                $path
-            );
+            $maxSize = config('log-viewer.chunked_size_threshold');
+            $size = $this->filesystem->size($path);
+            if ($size && $size > $maxSize) {
+                return $this->filesystem->lines($path);
+            }
+            return $this->filesystem->get($path);
         } catch (\Exception $e) {
-            throw new FilesystemException($e->getMessage());
+            throw new FilesystemException($e->getMessage(), $e->getCode(), $e);
         }
-
-        return $log;
     }
 
     /**

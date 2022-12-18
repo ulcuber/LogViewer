@@ -2,6 +2,9 @@
 
 namespace Arcanedev\LogViewer\Helpers;
 
+use Arcanedev\LogViewer\Entities\LogEntry;
+use Illuminate\Support\LazyCollection;
+
 /**
  * Class     LogParser
  *
@@ -30,58 +33,154 @@ class LogParser
     /**
      * Parse file content.
      *
-     * @param  string  $raw
+     * @param  string|LazyCollection  $raw
      *
-     * @return array
+     * @return array|LazyCollection
      */
-    public static function parse($raw)
+    public static function parse(&$raw)
     {
-        static::$parsed          = [];
-        list($headings, $data) = self::parseRawData($raw);
+        static::$parsed = [];
 
-        // @codeCoverageIgnoreStart
-        if (! is_array($headings)) {
-            return self::$parsed;
-        }
-        // @codeCoverageIgnoreEnd
+        if ($raw instanceof LazyCollection) {
+            $pattern = '/^' . REGEX_DATE_PATTERN . REGEX_DATETIME_SEPARATOR
+                . REGEX_TIME_PATTERN . REGEX_MS_PATTERN . REGEX_TIMEZONE_PATTERN . '/';
 
-        foreach ($data as $index => $stack) {
-            static::$parsed[$index][1] = $stack;
-        }
-        foreach ($headings as $groupIndex => $heading) {
-            foreach ($heading as $matchIndex => $match) {
-                static::$parsed[$matchIndex][0][$groupIndex] = $match;
+            return LazyCollection::make(function () use (&$pattern, &$raw) {
+                $stack = '';
+                $prevHeader = null;
+                foreach ($raw as $lines) {
+                    foreach (explode("\n", $lines) as $line) {
+                        /**
+                         * explode string before preg_match
+                         * because preg_match is memory consuming
+                         * and there is nothing to match yet in header reminder
+                         */
+                        $headings = explode(']', $line, 2);
+                        if (
+                            count($headings) === 2 &&
+                            preg_match($pattern, mb_strcut($headings[0], 1), $header)
+                        ) {
+                            array_push($header, $headings[1]);
+                            if ($stack) {
+                                yield [$prevHeader, $stack];
+                            }
+                            $prevHeader = $header;
+                            $stack = '';
+                        } else {
+                            $stack .= $line . PHP_EOL;
+                        }
+                        unset($headings);
+                    }
+                }
+                if ($stack) {
+                    yield [$prevHeader, $stack];
+                }
+            });
+        } else {
+            $pattern = '/' . REGEX_DATETIME_PATTERN . '/';
+
+            preg_match_all($pattern, $raw, $headings);
+            // shift whole match
+            array_shift($headings);
+            foreach ($headings as $groupIndex => &$heading) {
+                foreach ($heading as $matchIndex => &$match) {
+                    static::$parsed[$matchIndex][0][$groupIndex] = $match;
+                }
             }
-        }
+            unset($headings);
 
-        unset($headings, $data);
+            $data = preg_split($pattern, $raw);
+            if ($data[0] < 1) {
+                $trash = array_shift($data);
+                unset($trash);
+            }
+            foreach ($data as $index => &$stack) {
+                static::$parsed[$index][1] = $stack;
+            }
+            unset($data);
+        }
 
         return config('log-viewer.reversed_order') ? array_reverse(static::$parsed) : static::$parsed;
     }
 
-    /* -----------------------------------------------------------------
-     |  Other Methods
-     | -----------------------------------------------------------------
-     */
+    public static function count($raw): int
+    {
+        if ($raw instanceof LazyCollection) {
+            $pattern = '/^' . REGEX_DATE_PATTERN . REGEX_DATETIME_SEPARATOR
+                . REGEX_TIME_PATTERN . REGEX_MS_PATTERN . REGEX_TIMEZONE_PATTERN . '/';
+            $count = 0;
+            foreach ($raw as $lines) {
+                foreach (explode("\n", $lines) as $line) {
+                    if (
+                        ($pos = mb_strpos($line, ']')) &&
+                        preg_match($pattern, mb_strcut($line, 1, $pos), $header)
+                    ) {
+                        $count++;
+                    }
+                }
+            }
+            return $count;
+        } else {
+            $pattern = '/' . REGEX_DATETIME_PATTERN . '/';
+            return preg_match_all($pattern, $raw, $headings) ?: 0;
+        }
+    }
+
+    public static function stats($raw): array
+    {
+        $counters = static::initStats();
+
+        $entryRegex = LogEntry::$regex;
+        $levelGroup = LogEntry::levelGroup();
+
+        if ($raw instanceof LazyCollection) {
+            $pattern = '/^' . REGEX_DATE_PATTERN . REGEX_DATETIME_SEPARATOR
+                . REGEX_TIME_PATTERN . REGEX_MS_PATTERN . REGEX_TIMEZONE_PATTERN . '/';
+            foreach ($raw as $lines) {
+                foreach (explode("\n", $lines) as $line) {
+                    $headings = explode(']', $line, 2);
+                    if (
+                        count($headings) === 2 &&
+                        preg_match($pattern, mb_strcut($headings[0], 1), $header)
+                    ) {
+                        preg_match($entryRegex, $headings[1], $matches);
+                        $level = strtolower($matches[$levelGroup]);
+                        $counters[$level]++;
+                        $counters['all']++;
+                    }
+                }
+            }
+        } else {
+            $pattern = '/' . REGEX_DATETIME_PATTERN . '/';
+            preg_match_all($pattern, $raw, $headings);
+            // shift whole match
+            array_shift($headings);
+            $heading = array_pop($headings);
+            foreach ($heading as $match) {
+                preg_match($entryRegex, $match, $matches);
+                $level = strtolower($matches[$levelGroup]);
+                $counters[$level]++;
+                $counters['all']++;
+            }
+        }
+
+        return $counters;
+    }
 
     /**
-     * Parse raw data.
-     *
-     * @param  string  $raw
+     * Init stats counters.
      *
      * @return array
      */
-    private static function parseRawData($raw)
+    public static function initStats(): array
     {
-        $pattern = '/' . REGEX_DATETIME_PATTERN . '/';
-        preg_match_all($pattern, $raw, $headings);
-        $data    = preg_split($pattern, $raw);
+        $levels = array_merge_recursive(
+            ['all'],
+            array_keys(log_viewer()->levels(true))
+        );
 
-        if ($data[0] < 1) {
-            $trash = array_shift($data);
-            unset($trash);
-        }
-
-        return [$headings, $data];
+        return array_map(function () {
+            return 0;
+        }, array_flip($levels));
     }
 }

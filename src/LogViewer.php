@@ -416,4 +416,30 @@ class LogViewer implements LogViewerContract
             return self::VERSION;
         }
     }
+
+    public function memory(): array
+    {
+        $human = function (int $value): string {
+            $index = 0;
+            $prefixes = ['bytes', 'K', 'M', 'G', 'T'];
+            while ($value > 1024) {
+                $value /= 1024;
+                $index++;
+            }
+            return round($value) . ($prefixes[$index] ?? '');
+        };
+        $memory = [
+            'memory_limit' => ini_get('memory_limit'),
+            'memory_get_usage' => $human(memory_get_usage()),
+            'memory_get_peak_usage' => $human(memory_get_peak_usage()),
+        ];
+
+        return $memory;
+    }
+
+    public function memoryString(): string
+    {
+        $memory = $this->memory();
+        return $memory['memory_get_peak_usage'] . ' / ' . $memory['memory_limit'];
+    }
 }

@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Tests\Utilities;
 
 use Arcanedev\LogViewer\Tests\TestCase;
 use Arcanedev\LogViewer\Utilities\LogStyler;
@@ -67,7 +69,7 @@ class LogStylerTest extends TestCase
         $icon = $this->styler->icon('danger', $default = 'bi bi-danger');
 
         static::assertInstanceOf(HtmlString::class, $icon);
-        static::assertSame('<i class="'.$default.'"></i>', $icon->toHtml());
+        static::assertSame('<i class="' . $default . '"></i>', $icon->toHtml());
     }
 
     /** @test */
@@ -112,6 +114,8 @@ class LogStylerTest extends TestCase
         $expected = [
             '^#\d+',
             '^Stack trace:',
+            '^\[stacktrace\]',
+            'app\/',
         ];
 
         static::assertSame($expected, $this->styler->toHighlight());

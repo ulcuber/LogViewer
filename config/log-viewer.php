@@ -78,7 +78,8 @@ return [
         'attributes' => [
             'prefix'     => 'log-viewer',
 
-            'middleware' => env('ARCANEDEV_LOGVIEWER_MIDDLEWARE') ? explode(',', env('ARCANEDEV_LOGVIEWER_MIDDLEWARE')) : null,
+            'middleware' => env('ARCANEDEV_LOGVIEWER_MIDDLEWARE')
+                ? explode(',', env('ARCANEDEV_LOGVIEWER_MIDDLEWARE')) : null,
         ],
     ],
 
@@ -161,6 +162,8 @@ return [
     'highlight' => [
         '^#\d+',
         '^Stack trace:',
+        '^\[stacktrace\]',
+        'app\/',
     ],
 
     /* -----------------------------------------------------------------
@@ -173,10 +176,25 @@ return [
     /* -----------------------------------------------------------------
      |  Max log file size
      | -----------------------------------------------------------------
-     | Prevents `Allowed memory size of n bytes exhausted`
+     | Filters out large files
      | In bytes
      */
 
-    'max_log_size' => env('ARCANEDEV_LOGVIEWER_MAX_SIZE', 1024 * 1024 * 5),
+    'max_log_size' => env('ARCANEDEV_LOGVIEWER_MAX_SIZE', 1024 * 1024 * 500),
+
+    /* -----------------------------------------------------------------
+     |  Min log file size to process line by line
+     | -----------------------------------------------------------------
+     | Prevents `Allowed memory size of n bytes exhausted`
+     |
+     | Used to find balance between preg_match_all memory consumption
+     | and frequent SplFileObject::fgets calls
+     |
+     | Could be increased with php.ini memory_limit too optimize CPU usage
+     |
+     | In bytes
+     */
+
+    'chunked_size_threshold' => env('ARCANEDEV_LOGVIEWER_THRESHOLD', 1024 * 1024 * 5),
 
 ];

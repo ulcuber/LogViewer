@@ -41,7 +41,7 @@ class LogCollection extends LazyCollection
             $source = function () {
                 foreach ($this->filesystem->paths(true) as $prefix => $paths) {
                     foreach ($paths as $date => $path) {
-                        yield $path => Log::make($prefix, $date, $path, $this->filesystem->readPath($path));
+                        yield $path => Log::make($prefix, $date, $path, $this->filesystem->readPath($path), true);
                     }
                 }
             };
@@ -157,7 +157,7 @@ class LogCollection extends LazyCollection
     {
         $stats = [];
 
-        foreach ($this->all() as $log) {
+        foreach ($this as $log) {
             /** @var \Arcanedev\LogViewer\Entities\Log $log */
             $stats[$log->prefix][$log->date] = $log->stats();
         }
@@ -223,7 +223,7 @@ class LogCollection extends LazyCollection
     {
         $tree = [];
 
-        foreach ($this->all() as $log) {
+        foreach ($this as $log) {
             /** @var \Arcanedev\LogViewer\Entities\Log $log */
             $tree[$log->prefix][$log->date] = $log->tree($trans);
         }
@@ -242,7 +242,7 @@ class LogCollection extends LazyCollection
     {
         $menu = [];
 
-        foreach ($this->all() as $path => $log) {
+        foreach ($this as $path => $log) {
             /** @var \Arcanedev\LogViewer\Entities\Log $log */
             $menu[$path] = $log->menu($trans);
         }

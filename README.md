@@ -1,17 +1,8 @@
-forked by @ulcuber
-
-See Fork Features
-
 # LogViewer [![For Laravel][badge_laravel]][link-github-repo] [![Github Workflow Status][badge_build]][link-github-status] [![Github Issues][badge_issues]][link-github-issues]
-<!-- [![Coverage Status][badge_coverage]][link-scrutinizer] -->
-<!-- [![Scrutinizer Code Quality][badge_quality]][link-scrutinizer] -->
-<!-- [![SensioLabs Insight][badge_insight]][link-insight] -->
-
-<!-- [![Packagist][badge_package]][link-packagist] -->
-<!-- [![Packagist Release][badge_release]][link-packagist] -->
-<!-- [![Packagist Downloads][badge_downloads]][link-packagist] -->
 
 _By [ARCANEDEV©](http://www.arcanedev.net/)_
+
+_forked by @ulcuber_
 
 This package allows you to manage and keep track of each one of your log files.
 
@@ -19,30 +10,29 @@ This package allows you to manage and keep track of each one of your log files.
 
 Official documentation for LogViewer can be found at the [\_docs folder](_docs/0.Home.md).
 
-Feel free to check out the [releases](https://github.com/ARCANEDEV/LogViewer/releases), [license](LICENSE.md), and [contribution guidelines](CONTRIBUTING.md).
+Feel free to check out the [releases](https://github.com/ulcuber/LogViewer/releases), [license](LICENSE.md), and [contribution guidelines](CONTRIBUTING.md).
 
 ## Features
 
 -   A great Log viewer API.
 -   Laravel `9.x` is supported. For other versions of laravel see other branches
--   Ready to use (Views, Routes, controllers … Out of the box) [Note: No need to publish assets]
+-   Ready to use (Views, Routes, controllers … Out of the box)
+    -   Note: No need to publish assets
 -   View, paginate, filter, download and delete logs.
 -   Load a custom logs storage path.
 -   Localized log levels.
 -   Logs menu/tree generator.
 -   Grouped logs by dates and levels.
 -   Customized log levels icons (bootstrap icons by default).
--   Works great with big logs !!
+-   Works great with big logs
 -   Well documented package (IDE Friendly).
--   Well tested (100% code coverage with maximum code quality).
-
-## Fork Features
-
+-   Well tested
 -   Any date format
--   Custom regex
--   Optimization
--   Filters
--   Search similar
+-   Custom regex to parse extra params
+-   Well optimized
+-   Could be balanced between Memory/CPU consumption
+-   Filters for any parsed params
+-   Search for similar log entries
 
 ## Table of contents
 
@@ -55,34 +45,10 @@ Feel free to check out the [releases](https://github.com/ARCANEDEV/LogViewer/rel
 
 > Dear artisans, i'm counting on you to help me out to add more translations ( ^\_^)b
 
-| Local   | Language              |
-| ------- | --------------------- |
-| `ar`    | Arabic                |
-| `bg`    | Bulgarian             |
-| `de`    | German                |
-| `en`    | English               |
-| `es`    | Spanish               |
-| `et`    | Estonian              |
-| `fa`    | Farsi                 |
-| `fr`    | French                |
-| `hu`    | Hungarian             |
-| `hy`    | Armenian              |
-| `id`    | Indonesian            |
-| `it`    | Italian               |
-| `ja`    | Japanese              |
-| `ko`    | Korean                |
-| `ms`    | Malay                 |
-| `nl`    | Dutch                 |
-| `pl`    | Polish                |
-| `pt-BR` | Brazilian Portuguese  |
-| `ro`    | Romanian              |
-| `ru`    | Russian               |
-| `sv`    | Swedish               |
-| `th`    | Thai                  |
-| `tr`    | Turkish               |
-| `uk`    | Ukrainian             |
-| `zh`    | Chinese (Simplified)  |
-| `zh-TW` | Chinese (Traditional) |
+| Local | Language |
+| ----- | -------- |
+| `en`  | English  |
+| `ru`  | Russian  |
 
 ## Contribution
 
@@ -90,40 +56,29 @@ Any ideas are welcome. Feel free to submit any issues or pull requests, please c
 
 ## Security
 
-If you discover any security related issues, please email arcanedev.maroc@gmail.com instead of using the issue tracker.
+If you discover any security related issues, please email ulcuber.victor17011998@yandex.ru instead of using the issue tracker.
 
 ## Credits
 
 -   [ARCANEDEV][link-author]
+-   [ulcuber][link-fork-author]
 -   [All Contributors][link-contributors]
 
 ## PREVIEW
 
-![Dashboard](https://raw.githubusercontent.com/ulcuber/LogViewer/v8.x/_screenshots/1-dashboard.jpg)
-![Logs list](https://raw.githubusercontent.com/ulcuber/LogViewer/v8.x/_screenshots/2-logs-list.jpg)
-![Single log](https://raw.githubusercontent.com/ulcuber/LogViewer/v8.x/_screenshots/3-single-log.jpg)
+![Dashboard](https://raw.githubusercontent.com/ulcuber/LogViewer/v9.x/_screenshots/1-dashboard.jpg)
+![Logs list](https://raw.githubusercontent.com/ulcuber/LogViewer/v9.x/_screenshots/2-logs-list.jpg)
+![Single log](https://raw.githubusercontent.com/ulcuber/LogViewer/v9.x/_screenshots/3-single-log.jpg)
 
-[badge_laravel]: https://img.shields.io/badge/Laravel-8.x-orange.svg?style=flat-square
-
-[badge_license]: https://img.shields.io/packagist/l/ulcuber/log-viewer.svg?style=flat-square
+[badge_laravel]: https://img.shields.io/badge/Laravel-9.x-orange.svg?style=flat-square
 
 [badge_build]: https://img.shields.io/github/workflow/status/ulcuber/LogViewer/run-tests?style=flat-square
 
-[badge_coverage]: https://img.shields.io/scrutinizer/coverage/g/ulcuber/LogViewer.svg?style=flat-square
-
-[badge_quality]: https://img.shields.io/scrutinizer/g/ulcuber/LogViewer.svg?style=flat-square
-
-[badge_insight]: https://img.shields.io/sensiolabs/i/d6b4587a-e00d-4dac-98db-f979731fdc4d.svg?style=flat-square
-
 [badge_issues]: https://img.shields.io/github/issues/ulcuber/LogViewer.svg?style=flat-square
 
-[badge_package]: https://img.shields.io/badge/package-ulcuber/log--viewer-blue.svg?style=flat-square
-
-[badge_release]: https://img.shields.io/packagist/v/ulcuber/log-viewer.svg?style=flat-square
-
-[badge_downloads]: https://img.shields.io/packagist/dt/ulcuber/log-viewer.svg?style=flat-square
-
 [link-author]: https://github.com/arcanedev-maroc
+
+[link-fork-author]: https://github.com/ulcuber
 
 [link-github-status]: https://github.com/ulcuber/LogViewer/actions
 
@@ -132,9 +87,3 @@ If you discover any security related issues, please email arcanedev.maroc@gmail.
 [link-github-issues]: https://github.com/ulcuber/LogViewer/issues
 
 [link-contributors]: https://github.com/ulcuber/LogViewer/graphs/contributors
-
-[link-packagist]: https://packagist.org/packages/ulcuber/log-viewer
-
-[link-scrutinizer]: https://scrutinizer-ci.com/g/ulcuber/LogViewer/?branch=master
-
-[link-insight]: https://insight.sensiolabs.com/projects/d6b4587a-e00d-4dac-98db-f979731fdc4d
