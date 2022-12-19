@@ -1,0 +1,10 @@
+#!/bin/bash
+
+date=$(date +'%F')
+
+# datetime=$(date +'%FT%T.%N%:z')
+datetime=$(date --iso-8601=ns)
+
+for ((i = 1; i <= 1000000; i++)); do
+    echo "[$datetime][013c2fdf-d1ba-4474-a204-7254794c7c5a][] local.INFO: $i" >> "$1/laravel-$date.log"
+done

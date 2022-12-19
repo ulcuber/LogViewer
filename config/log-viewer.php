@@ -183,12 +183,12 @@ return [
     'max_log_size' => env('ARCANEDEV_LOGVIEWER_MAX_SIZE', 1024 * 1024 * 500),
 
     /* -----------------------------------------------------------------
-     |  Min log file size to process line by line
+     |  Min log file size to process by chunks
      | -----------------------------------------------------------------
      | Prevents `Allowed memory size of n bytes exhausted`
      |
      | Used to find balance between preg_match_all memory consumption
-     | and frequent SplFileObject::fgets calls
+     | and frequent SplFileObject::fread calls
      |
      | Could be increased with php.ini memory_limit too optimize CPU usage
      |
@@ -196,5 +196,17 @@ return [
      */
 
     'chunked_size_threshold' => env('ARCANEDEV_LOGVIEWER_THRESHOLD', 1024 * 1024 * 5),
+
+    /* -----------------------------------------------------------------
+     |  Chunk size when processing file by chunks
+     | -----------------------------------------------------------------
+     |
+     | Controls SplFileObject::fread chunk size
+     | to adjust between fread frequency / peak memory usage
+     |
+     | In bytes
+     */
+
+    'chunk_size' => env('ARCANEDEV_LOGVIEWER_CHUNK_SIZE', 1024 * 1024),
 
 ];

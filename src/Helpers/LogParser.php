@@ -48,8 +48,11 @@ class LogParser
             return LazyCollection::make(function () use (&$pattern, &$raw) {
                 $stack = '';
                 $prevHeader = null;
-                foreach ($raw as $lines) {
-                    foreach (explode("\n", $lines) as $line) {
+                $reminder = '';
+                foreach ($raw as $chunk) {
+                    $lines = explode("\n", $reminder . $chunk);
+                    $reminder = array_pop($lines);
+                    foreach ($lines as $line) {
                         /**
                          * explode string before preg_match
                          * because preg_match is memory consuming
@@ -60,6 +63,8 @@ class LogParser
                             count($headings) === 2 &&
                             preg_match($pattern, mb_strcut($headings[0], 1), $header)
                         ) {
+                            // shift whole match
+                            array_shift($header);
                             array_push($header, $headings[1]);
                             if ($stack) {
                                 yield [$prevHeader, $stack];
@@ -77,7 +82,7 @@ class LogParser
                 }
             });
         } else {
-            $pattern = '/' . REGEX_DATETIME_PATTERN . '/';
+            $pattern = '/(?:\r?\n|^)' . REGEX_DATETIME_PATTERN . '/';
 
             preg_match_all($pattern, $raw, $headings);
             // shift whole match
@@ -109,8 +114,11 @@ class LogParser
             $pattern = '/^' . REGEX_DATE_PATTERN . REGEX_DATETIME_SEPARATOR
                 . REGEX_TIME_PATTERN . REGEX_MS_PATTERN . REGEX_TIMEZONE_PATTERN . '/';
             $count = 0;
-            foreach ($raw as $lines) {
-                foreach (explode("\n", $lines) as $line) {
+            $reminder = '';
+            foreach ($raw as $chunk) {
+                $lines = explode("\n", $reminder . $chunk);
+                $reminder = array_pop($lines);
+                foreach ($lines as $line) {
                     if (
                         ($pos = mb_strpos($line, ']')) &&
                         preg_match($pattern, mb_strcut($line, 1, $pos), $header)
@@ -121,7 +129,7 @@ class LogParser
             }
             return $count;
         } else {
-            $pattern = '/' . REGEX_DATETIME_PATTERN . '/';
+            $pattern = '/(?:\r?\n|^)' . REGEX_DATETIME_PATTERN . '/';
             return preg_match_all($pattern, $raw, $headings) ?: 0;
         }
     }
@@ -136,8 +144,11 @@ class LogParser
         if ($raw instanceof LazyCollection) {
             $pattern = '/^' . REGEX_DATE_PATTERN . REGEX_DATETIME_SEPARATOR
                 . REGEX_TIME_PATTERN . REGEX_MS_PATTERN . REGEX_TIMEZONE_PATTERN . '/';
-            foreach ($raw as $lines) {
-                foreach (explode("\n", $lines) as $line) {
+            $reminder = '';
+            foreach ($raw as $chunk) {
+                $lines = explode("\n", $reminder . $chunk);
+                $reminder = array_pop($lines);
+                foreach ($lines as $line) {
                     $headings = explode(']', $line, 2);
                     if (
                         count($headings) === 2 &&
@@ -151,7 +162,7 @@ class LogParser
                 }
             }
         } else {
-            $pattern = '/' . REGEX_DATETIME_PATTERN . '/';
+            $pattern = '/(?:\r?\n|^)' . REGEX_DATETIME_PATTERN . '/';
             preg_match_all($pattern, $raw, $headings);
             // shift whole match
             array_shift($headings);

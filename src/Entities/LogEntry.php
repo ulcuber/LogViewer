@@ -3,6 +3,7 @@
 namespace Arcanedev\LogViewer\Entities;
 
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\HtmlString;
@@ -194,7 +195,11 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     {
         // defer Carbon instances as they are too heavy
         $this->datetime = function () use ($format, $datetime) {
-            return Carbon::createFromFormat($format, $datetime);
+            try {
+                return Carbon::createFromFormat($format, $datetime);
+            } catch (\Throwable $th) {
+                throw new Exception($th->getMessage() . ": ([$datetime] -> [$format]) ", $th->getCode(), $th);
+            }
         };
 
         return $this;
@@ -209,9 +214,10 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      */
     protected function setHeader(array $header)
     {
+        $reminder = array_pop($header);
+
         $this->setDatetime(...$this->extractDatetime($header));
 
-        $reminder = array_pop($header);
         preg_match(static::$regex, $reminder, $matches);
         foreach ($matches as $index => $value) {
             if (isset(static::$propertyGroups[$index])) {
@@ -436,11 +442,12 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      */
     protected function extractDatetime(array &$header): array
     {
-        $separator = ($header[1] ?? null) === 'T' ? '\T' : ' ';
         $ms = ($header[2] ?? null) ? '.u' : '';
         $tz = ($header[3] ?? null) ? 'P' : '';
-        $format = "Y-m-d{$separator}H:i:s{$ms}{$tz}";
-        $datetime = $header[0];
+        $format = "Y-m-d\TH:i:s{$ms}{$tz}";
+        $datetime = $header[0] . 'T' . $header[2]
+            . (($header[3] ?? null) ? '.' . mb_strcut($header[3], 1, 6) : '')
+            . ($header[4] ?? '');
 
         return [$format, $datetime];
     }
