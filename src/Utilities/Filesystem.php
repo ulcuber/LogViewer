@@ -4,8 +4,10 @@ namespace Arcanedev\LogViewer\Utilities;
 
 use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
 use Arcanedev\LogViewer\Exceptions\FilesystemException;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem as IlluminateFilesystem;
 use Illuminate\Support\LazyCollection;
+use SplFileObject;
 
 /**
  * Class     Filesystem
@@ -263,7 +265,7 @@ class Filesystem implements FilesystemContract
             $maxSize = config('log-viewer.chunked_size_threshold');
             $size = $this->filesystem->size($path);
             if ($size && $size > $maxSize) {
-                return $this->filesystem->lines($path);
+                return $this->chunks($path);
             }
             return $this->filesystem->get($path);
         } catch (\Exception $e) {
@@ -286,7 +288,7 @@ class Filesystem implements FilesystemContract
             $maxSize = config('log-viewer.chunked_size_threshold');
             $size = $this->filesystem->size($path);
             if ($size && $size > $maxSize) {
-                return $this->filesystem->lines($path);
+                return $this->chunks($path);
             }
             return $this->filesystem->get($path);
         } catch (\Exception $e) {
@@ -383,5 +385,25 @@ class Filesystem implements FilesystemContract
     public function clearCache(): void
     {
         $this->logsCache = null;
+    }
+
+    protected function chunks($path): LazyCollection
+    {
+        if (! $this->filesystem->isFile($path)) {
+            throw new FileNotFoundException(
+                "File does not exist at path {$path}."
+            );
+        }
+
+        return LazyCollection::make(function () use ($path) {
+            $file = new SplFileObject($path);
+
+            $file->setFlags(SplFileObject::DROP_NEW_LINE);
+            $chunkSize = config('log-viewer.chunk_size', 8192);
+
+            while (! $file->eof()) {
+                yield $file->fread($chunkSize);
+            }
+        });
     }
 }
