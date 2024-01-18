@@ -31,7 +31,7 @@ class LogCollectionTest extends TestCase
     {
         parent::setUp();
 
-        $this->logs = new LogCollection;
+        $this->logs = new LogCollection();
     }
 
     protected function tearDown(): void

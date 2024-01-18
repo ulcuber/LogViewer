@@ -397,8 +397,8 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      */
     protected function extractDatetime(array &$header): array
     {
-        $ms = ($header[2] ?? null) ? '.u' : '';
-        $tz = ($header[3] ?? null) ? 'P' : '';
+        $ms = ($header[3] ?? null) ? '.u' : '';
+        $tz = ($header[4] ?? null) ? 'P' : '';
         $format = "Y-m-d\TH:i:s{$ms}{$tz}";
         $datetime = $header[0].'T'.$header[2]
             .(($header[3] ?? null) ? '.'.mb_strcut($header[3], 1, 6) : '')
