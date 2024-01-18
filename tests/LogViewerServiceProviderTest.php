@@ -1,11 +1,12 @@
-<?php namespace Arcanedev\LogViewer\Tests;
+<?php
+
+namespace Arcanedev\LogViewer\Tests;
 
 use Arcanedev\LogViewer\LogViewerServiceProvider;
 
 /**
  * Class     LogViewerServiceProviderTest
  *
- * @package  Arcanedev\LogViewer\Tests
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogViewerServiceProviderTest extends TestCase
@@ -15,7 +16,7 @@ class LogViewerServiceProviderTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  LogViewerServiceProvider */
+    /** @var LogViewerServiceProvider */
     private $provider;
 
     /* -----------------------------------------------------------------

@@ -2,10 +2,10 @@
 
 namespace Arcanedev\LogViewer;
 
-use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
-use Arcanedev\LogViewer\Contracts\Utilities\Factory as FactoryContract;
-use Arcanedev\LogViewer\Contracts\Utilities\LogLevels as LogLevelsContract;
 use Arcanedev\LogViewer\Contracts\LogViewer as LogViewerContract;
+use Arcanedev\LogViewer\Contracts\Utilities\Factory as FactoryContract;
+use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
+use Arcanedev\LogViewer\Contracts\Utilities\LogLevels as LogLevelsContract;
 use Arcanedev\LogViewer\Entities\LogCollection;
 use Arcanedev\LogViewer\Entities\LogEntry;
 use Arcanedev\LogViewer\Entities\LogEntryCollection;
@@ -15,7 +15,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginator
 /**
  * Class     LogViewer
  *
- * @package  Arcanedev\LogViewer
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogViewer implements LogViewerContract
@@ -63,10 +62,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Create a new instance.
-     *
-     * @param \Arcanedev\LogViewer\Contracts\Utilities\Factory $factory
-     * @param \Arcanedev\LogViewer\Contracts\Utilities\Filesystem $filesystem
-     * @param \Arcanedev\LogViewer\Contracts\Utilities\LogLevels $levels
      */
     public function __construct(
         FactoryContract $factory,
@@ -87,10 +82,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get the log levels.
-     *
-     * @param bool $flip
-     *
-     * @return array
      */
     public function levels(bool $flip = false): array
     {
@@ -99,10 +90,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get the translated log levels.
-     *
-     * @param string|null $locale
-     *
-     * @return array
      */
     public function levelsNames(?string $locale = null): array
     {
@@ -112,7 +99,6 @@ class LogViewer implements LogViewerContract
     /**
      * Set the log storage path.
      *
-     * @param string $path
      *
      * @return self
      */
@@ -125,8 +111,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get the log pattern.
-     *
-     * @return string
      */
     public function getPattern(): string
     {
@@ -136,10 +120,9 @@ class LogViewer implements LogViewerContract
     /**
      * Set the log pattern.
      *
-     * @param string $prefix
-     * @param string $date
-     * @param string $extension
-     *
+     * @param  string  $prefix
+     * @param  string  $date
+     * @param  string  $extension
      * @return self
      */
     public function setPattern(
@@ -159,8 +142,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get all logs.
-     *
-     * @return \Arcanedev\LogViewer\Entities\LogCollection
      */
     public function all(): LogCollection
     {
@@ -170,8 +151,7 @@ class LogViewer implements LogViewerContract
     /**
      * Paginate all logs.
      *
-     * @param int $perPage
-     *
+     * @param  int  $perPage
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = 30): LengthAwarePaginatorContract
@@ -182,8 +162,6 @@ class LogViewer implements LogViewerContract
     /**
      * Get a log.
      *
-     * @param string $prefix
-     * @param string $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
@@ -194,12 +172,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get the log entries.
-     *
-     * @param string $prefix
-     * @param string $date
-     * @param string $level
-     *
-     * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
      */
     public function entries(string $prefix, string $date, string $level = 'all'): LogEntryCollection
     {
@@ -209,9 +181,6 @@ class LogViewer implements LogViewerContract
     /**
      * Download a log file.
      *
-     * @param string $date
-     * @param string|null $filename
-     * @param array $headers
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
@@ -228,8 +197,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get logs statistics.
-     *
-     * @return array
      */
     public function stats(): array
     {
@@ -238,10 +205,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get logs statistics table.
-     *
-     * @param string|null $locale
-     *
-     * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
     public function statsTable(?string $locale = null): StatsTable
     {
@@ -250,11 +213,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get logs statistics table for stats.
-     *
-     * @param array $stats
-     * @param string|null $locale
-     *
-     * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
     public function statsTableFor(array $stats, ?string $locale = null): StatsTable
     {
@@ -263,11 +221,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get logs statistics table for date.
-     *
-     * @param string $date
-     * @param string|null $locale
-     *
-     * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
     public function statsTableForDate(string $date, ?string $locale = null): StatsTable
     {
@@ -276,11 +229,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Delete the log.
-     *
-     * @param string $prefix
-     * @param string $date
-     *
-     * @return bool
      */
     public function delete(string $prefix, string $date): bool
     {
@@ -289,8 +237,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Clear the log files.
-     *
-     * @return bool
      */
     public function clear(): bool
     {
@@ -299,8 +245,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Clear path cache.
-     *
-     * @return void
      */
     public function clearCache(): void
     {
@@ -309,8 +253,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get all valid log files.
-     *
-     * @return array
      */
     public function files(): array
     {
@@ -319,8 +261,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get all logs.
-     *
-     * @return LogCollection
      */
     public function logs(): LogCollection
     {
@@ -329,8 +269,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * List the log files (only paths).
-     *
-     * @return array
      */
     public function paths(): array
     {
@@ -339,8 +277,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get logs count.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -349,10 +285,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get entries total from all logs.
-     *
-     * @param string $level
-     *
-     * @return int
      */
     public function total(string $level = 'all'): int
     {
@@ -361,10 +293,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get logs tree.
-     *
-     * @param bool $trans
-     *
-     * @return array
      */
     public function tree(bool $trans = false): array
     {
@@ -373,10 +301,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get logs menu.
-     *
-     * @param bool $trans
-     *
-     * @return array
      */
     public function menu(bool $trans = true): array
     {
@@ -390,8 +314,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Determine if the log folder is empty or not.
-     *
-     * @return bool
      */
     public function isEmpty(): bool
     {
@@ -405,8 +327,6 @@ class LogViewer implements LogViewerContract
 
     /**
      * Get the LogViewer version.
-     *
-     * @return string
      */
     public function version(): string
     {
@@ -426,7 +346,8 @@ class LogViewer implements LogViewerContract
                 $value /= 1024;
                 $index++;
             }
-            return round($value) . ($prefixes[$index] ?? '');
+
+            return round($value).($prefixes[$index] ?? '');
         };
         $memory = [
             'memory_limit' => ini_get('memory_limit'),
@@ -440,6 +361,7 @@ class LogViewer implements LogViewerContract
     public function memoryString(): string
     {
         $memory = $this->memory();
-        return $memory['memory_get_peak_usage'] . ' / ' . $memory['memory_limit'];
+
+        return $memory['memory_get_peak_usage'].' / '.$memory['memory_limit'];
     }
 }

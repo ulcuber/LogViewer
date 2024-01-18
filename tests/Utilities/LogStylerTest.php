@@ -9,7 +9,6 @@ use Illuminate\Support\HtmlString;
 /**
  * Class     LogStylerTest
  *
- * @package  Arcanedev\LogViewer\Tests\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogStylerTest extends TestCase
@@ -19,7 +18,7 @@ class LogStylerTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\Utilities\LogStyler */
+    /** @var \Arcanedev\LogViewer\Utilities\LogStyler */
     private $styler;
 
     /* -----------------------------------------------------------------
@@ -69,7 +68,7 @@ class LogStylerTest extends TestCase
         $icon = $this->styler->icon('danger', $default = 'bi bi-danger');
 
         static::assertInstanceOf(HtmlString::class, $icon);
-        static::assertSame('<i class="' . $default . '"></i>', $icon->toHtml());
+        static::assertSame('<i class="'.$default.'"></i>', $icon->toHtml());
     }
 
     /** @test */

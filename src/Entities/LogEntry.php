@@ -12,7 +12,6 @@ use JsonSerializable;
 /**
  * Class     LogEntry
  *
- * @package  Arcanedev\LogViewer\Entities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogEntry implements Arrayable, Jsonable, JsonSerializable
@@ -77,14 +76,12 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Configures cached config from `log-viewer` config
-     *
-     * @return void
      */
     public static function configure(): void
     {
-        static::$regex = '/' . config('log-viewer.parser.regex') . '/';
+        static::$regex = '/'.config('log-viewer.parser.regex').'/';
         foreach (config('log-viewer.parser.property_groups') as $group => $property) {
-            static::$propertyGroups[$group] = 'set' . ucfirst($property);
+            static::$propertyGroups[$group] = 'set'.ucfirst($property);
         }
         static::$extraGroups = config('log-viewer.parser.extra_groups');
     }
@@ -102,7 +99,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     /**
      * Construct the log entry instance.
      *
-     * @param  array       $header
      * @param  string|null  $stack
      */
     public function __construct(array $header, $stack = null)
@@ -118,9 +114,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Magic isset for extra parameters, configured via `parser.extra_groups`
-     *
-     * @param string $name
-     * @return boolean
      */
     public function __isset(string $name): bool
     {
@@ -129,9 +122,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Magic getter for extra parameters, configured via `parser.extra_groups`
-     *
-     * @param string $name
-     * @return string|null
      */
     public function __get(string $name): ?string
     {
@@ -142,7 +132,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      * Set entry environment.
      *
      * @param  string  $env
-     *
      * @return self
      */
     protected function setEnv($env)
@@ -156,7 +145,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      * Set the entry level.
      *
      * @param  string  $level
-     *
      * @return self
      */
     protected function setLevel($level)
@@ -171,8 +159,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      *
      * @param  string  $format
      * @param  string  $datetime
-     *
-     * @return \Carbon\Carbon
      */
     public function getDatetime(): Carbon
     {
@@ -188,7 +174,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      *
      * @param  string  $format
      * @param  string  $datetime
-     *
      * @return \Arcanedev\LogViewer\Entities\LogEntry
      */
     protected function setDatetime($format, $datetime)
@@ -198,7 +183,7 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
             try {
                 return Carbon::createFromFormat($format, $datetime);
             } catch (\Throwable $th) {
-                throw new Exception($th->getMessage() . ": ([$datetime] -> [$format]) ", $th->getCode(), $th);
+                throw new Exception($th->getMessage().": ([$datetime] -> [$format]) ", $th->getCode(), $th);
             }
         };
 
@@ -208,7 +193,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     /**
      * Set the entry header.
      *
-     * @param  array  $header
      *
      * @return self
      */
@@ -231,20 +215,24 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
         $reminder = array_pop($matches);
 
         $regex = '/{(?:[^{}]|(?R))*}/xm';
-        $reminder = preg_replace_callback($regex, function ($replacable) {
-            if (!is_null($context = json_decode($replacable[0], true))) {
+        $reminder = preg_replace_callback($regex, function ($replaceable) {
+            if (! is_null($context = json_decode($replaceable[0], true))) {
                 $this->setContext($context);
+
                 return '';
             }
-            return $replacable[0];
+
+            return $replaceable[0];
         }, $reminder);
-        if (!$this->context && !strpos($this->stack, '>>>>>>>>')) {
-            $this->stack = preg_replace_callback($regex, function ($replacable) {
-                if (!is_null($context = json_decode($replacable[0], true))) {
+        if (! $this->context && ! strpos($this->stack, '>>>>>>>>')) {
+            $this->stack = preg_replace_callback($regex, function ($replaceable) {
+                if (! is_null($context = json_decode($replaceable[0], true))) {
                     $this->setContext($context);
+
                     return '';
                 }
-                return $replacable[0];
+
+                return $replaceable[0];
             }, $this->stack);
         }
 
@@ -257,7 +245,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      * Set the entry stack.
      *
      * @param  string  $stack
-     *
      * @return self
      */
     protected function setStack($stack)
@@ -270,7 +257,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     /**
      * Set the context.
      *
-     * @param  array  $context
      *
      * @return $this
      */
@@ -283,18 +269,14 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get translated level name with icon.
-     *
-     * @return string
      */
     public function level(): string
     {
-        return $this->icon()->toHtml() . ' ' . $this->name();
+        return $this->icon()->toHtml().' '.$this->name();
     }
 
     /**
      * Get translated level name.
-     *
-     * @return string
      */
     public function name(): string
     {
@@ -303,8 +285,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get level icon.
-     *
-     * @return \Illuminate\Support\HtmlString
      */
     public function icon(): HtmlString
     {
@@ -313,8 +293,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the entry stack.
-     *
-     * @return string
      */
     public function stack(): string
     {
@@ -323,8 +301,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the entry context as json pretty print.
-     *
-     * @return string
      */
     public function context(): string
     {
@@ -338,17 +314,15 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Get the log entry as an array.
-     *
-     * @return array
      */
     public function toArray(): array
     {
         return [
-            'uuid'    => $this->uuid,
-            'level'    => $this->level,
+            'uuid' => $this->uuid,
+            'level' => $this->level,
             'datetime' => $this->getDatetime()->format('Y-m-d H:i:s'),
-            'header'   => $this->header,
-            'stack'    => $this->stack,
+            'header' => $this->header,
+            'stack' => $this->stack,
         ];
     }
 
@@ -356,8 +330,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
      * Convert the log entry to its JSON representation.
      *
      * @param  int  $options
-     *
-     * @return string
      */
     public function toJson($options = 0): string
     {
@@ -366,8 +338,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Serialize the log entry object to json data.
-     *
-     * @return array
      */
     public function jsonSerialize(): array
     {
@@ -381,30 +351,24 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Check if the entry has a stack.
-     *
-     * @return bool
      */
     public function hasStack(): bool
     {
-        return !is_null($this->stack) && $this->stack !== "\n";
+        return ! is_null($this->stack) && $this->stack !== "\n";
     }
 
     /**
      * Check if the entry has a context.
-     *
-     * @return bool
      */
     public function hasContext(): bool
     {
-        return !empty($this->context);
+        return ! empty($this->context);
     }
 
     /**
      * Check if same log level.
      *
      * @param  string  $level
-     *
-     * @return bool
      */
     public function isSameLevel($level): bool
     {
@@ -413,11 +377,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Check if similar to.
-     *
-     * @param  string  $text
-     * @param  float  $similarity
-     *
-     * @return bool
      */
     public function isSimilar(string $text, float $similarity): bool
     {
@@ -435,19 +394,15 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Extract datetime from the header.
-     *
-     * @param  array  $header
-     *
-     * @return array
      */
     protected function extractDatetime(array &$header): array
     {
         $ms = ($header[2] ?? null) ? '.u' : '';
         $tz = ($header[3] ?? null) ? 'P' : '';
         $format = "Y-m-d\TH:i:s{$ms}{$tz}";
-        $datetime = $header[0] . 'T' . $header[2]
-            . (($header[3] ?? null) ? '.' . mb_strcut($header[3], 1, 6) : '')
-            . ($header[4] ?? '');
+        $datetime = $header[0].'T'.$header[2]
+            .(($header[3] ?? null) ? '.'.mb_strcut($header[3], 1, 6) : '')
+            .($header[4] ?? '');
 
         return [$format, $datetime];
     }

@@ -10,7 +10,6 @@ use Illuminate\Support\LazyCollection;
 /**
  * Class     LogCollection
  *
- * @package  Arcanedev\LogViewer\Entities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogCollection extends LazyCollection
@@ -58,7 +57,6 @@ class LogCollection extends LazyCollection
     /**
      * Set the filesystem instance.
      *
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\Filesystem  $filesystem
      *
      * @return \Arcanedev\LogViewer\Entities\LogCollection
      */
@@ -77,9 +75,8 @@ class LogCollection extends LazyCollection
     /**
      * Get a log.
      *
-     * @param  string      $path
+     * @param  string  $path
      * @param  mixed|null  $default
-     *
      * @return \Arcanedev\LogViewer\Entities\Log
      *
      * @throws \Arcanedev\LogViewer\Exceptions\LogNotFoundException
@@ -98,7 +95,6 @@ class LogCollection extends LazyCollection
     /**
      * Paginate logs.
      *
-     * @param  int  $perPage
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
@@ -122,24 +118,18 @@ class LogCollection extends LazyCollection
      *
      * @see get()
      *
-     * @param  string  $prefix
-     * @param  string  $date
-     *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
     public function log(string $prefix, string $date)
     {
         $path = $this->filesystem->path($prefix, $date);
+
         return $this->get($path);
     }
-
 
     /**
      * Get log entries.
      *
-     * @param  string  $prefix
-     * @param  string  $date
-     * @param  string  $level
      *
      * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
      */
@@ -150,8 +140,6 @@ class LogCollection extends LazyCollection
 
     /**
      * Get logs statistics.
-     *
-     * @return array
      */
     public function stats(): array
     {
@@ -167,10 +155,6 @@ class LogCollection extends LazyCollection
 
     /**
      * Get logs statistics for date.
-     *
-     * @param string $date
-     *
-     * @return array
      */
     public function statsForDate(string $date): array
     {
@@ -201,7 +185,6 @@ class LogCollection extends LazyCollection
     /**
      * Get entries total.
      *
-     * @param  string  $level
      *
      * @return int
      */
@@ -215,7 +198,6 @@ class LogCollection extends LazyCollection
     /**
      * Get logs tree.
      *
-     * @param  bool  $trans
      *
      * @return array
      */
@@ -234,7 +216,6 @@ class LogCollection extends LazyCollection
     /**
      * Get logs menu.
      *
-     * @param  bool  $trans
      *
      * @return array
      */

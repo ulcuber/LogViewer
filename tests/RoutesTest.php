@@ -5,7 +5,6 @@ namespace Arcanedev\LogViewer\Tests;
 /**
  * Class     RoutesTest
  *
- * @package  Arcanedev\LogViewer\Tests
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  *
  * @todo:    Find a way to test the route Classes with testbench (Find another tool if it's impossible).
@@ -62,8 +61,8 @@ class RoutesTest extends TestCase
     public function it_can_see_a_filtered_log_entries_page()
     {
         $prefix = 'laravel';
-        $date     = '2015-01-01';
-        $level    = 'error';
+        $date = '2015-01-01';
+        $level = 'error';
 
         $response = $this->get(route('log-viewer::logs.filter', [$prefix, $date, $level]));
         $response->assertSuccessful();
@@ -79,9 +78,9 @@ class RoutesTest extends TestCase
     public function it_can_search_if_log_entries_contains_same_header_page()
     {
         $prefix = 'laravel';
-        $date     = '2015-01-01';
-        $level    = 'all';
-        $query    = 'This is an error log.';
+        $date = '2015-01-01';
+        $level = 'all';
+        $query = 'This is an error log.';
 
         $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
         $response->assertSuccessful();
@@ -91,7 +90,7 @@ class RoutesTest extends TestCase
 
         static::assertArrayHasKey('entries', $view->getData());
 
-        /** @var  \Illuminate\Pagination\LengthAwarePaginator  $entries */
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $entries */
         $entries = $view->getData()['entries'];
 
         static::assertCount(1, $entries);
@@ -101,11 +100,11 @@ class RoutesTest extends TestCase
     public function it_can_search_using_shuffled_query()
     {
         $prefix = 'laravel';
-        $date     = '2015-01-01';
-        $level    = 'all';
-        $query    = explode(' ', 'This is a error log');
+        $date = '2015-01-01';
+        $level = 'all';
+        $query = explode(' ', 'This is a error log');
         shuffle($query);
-        $query    = implode(' ', $query);
+        $query = implode(' ', $query);
 
         $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
         $response->assertSuccessful();
@@ -115,7 +114,7 @@ class RoutesTest extends TestCase
 
         static::assertArrayHasKey('entries', $view->getData());
 
-        /** @var  \Illuminate\Pagination\LengthAwarePaginator  $entries */
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $entries */
         $entries = $view->getData()['entries'];
 
         static::assertCount(1, $entries);
@@ -125,11 +124,11 @@ class RoutesTest extends TestCase
     public function it_can_search_using_case_insensitive_query()
     {
         $prefix = 'laravel';
-        $date     = '2015-01-01';
-        $level    = 'all';
-        $query    = explode(' ', 'ThiS Is A ErROr loG');
+        $date = '2015-01-01';
+        $level = 'all';
+        $query = explode(' ', 'ThiS Is A ErROr loG');
         shuffle($query);
-        $query    = implode(' ', $query);
+        $query = implode(' ', $query);
 
         $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
         $response->assertSuccessful();
@@ -139,7 +138,7 @@ class RoutesTest extends TestCase
 
         static::assertArrayHasKey('entries', $view->getData());
 
-        /** @var  \Illuminate\Pagination\LengthAwarePaginator  $entries */
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $entries */
         $entries = $view->getData()['entries'];
 
         static::assertCount(1, $entries);
@@ -149,11 +148,11 @@ class RoutesTest extends TestCase
     public function it_can_still_search_if_extra_spacing_is_in_query()
     {
         $prefix = 'laravel';
-        $date     = '2015-01-01';
-        $level    = 'all';
-        $query    = explode(' ', 'ThiS  Is  A  ErROr  loG');
+        $date = '2015-01-01';
+        $level = 'all';
+        $query = explode(' ', 'ThiS  Is  A  ErROr  loG');
         shuffle($query);
-        $query    = implode(' ', $query);
+        $query = implode(' ', $query);
 
         $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
         $response->assertSuccessful();
@@ -163,7 +162,7 @@ class RoutesTest extends TestCase
 
         static::assertArrayHasKey('entries', $view->getData());
 
-        /** @var  \Illuminate\Pagination\LengthAwarePaginator  $entries */
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $entries */
         $entries = $view->getData()['entries'];
 
         static::assertCount(1, $entries);
@@ -173,8 +172,8 @@ class RoutesTest extends TestCase
     public function it_must_redirect_on_all_level()
     {
         $prefix = 'laravel';
-        $date     = '2015-01-01';
-        $level    = 'all';
+        $date = '2015-01-01';
+        $level = 'all';
 
         $response = $this->get(route('log-viewer::logs.filter', [$prefix, $date, $level]));
 
@@ -192,7 +191,7 @@ class RoutesTest extends TestCase
         $response = $this->get(route('log-viewer::logs.download', [$prefix, $date]));
         $response->assertSuccessful();
 
-        /** @var  \Symfony\Component\HttpFoundation\BinaryFileResponse  $base */
+        /** @var \Symfony\Component\HttpFoundation\BinaryFileResponse $base */
         $base = $response->baseResponse;
 
         static::assertInstanceOf(
@@ -214,7 +213,7 @@ class RoutesTest extends TestCase
         $this->app['config']->set(['log-viewer.storage-path' => $path]);
 
         $response = $this->call('DELETE', route('log-viewer::logs.delete', compact('prefix', 'date')), [], [], [], [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest'
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
         ])
             ->assertSuccessful()
             ->assertExactJson(['result' => 'success']);
@@ -239,7 +238,7 @@ class RoutesTest extends TestCase
     public function it_must_throw_validation_exception_on_delete()
     {
         $response = $this->call('DELETE', route('log-viewer::logs.delete', []), [], [], [], [
-            'HTTP_X-Requested-With' => 'XMLHttpRequest'
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
         ]);
 
         static::assertInstanceOf(\Illuminate\Validation\ValidationException::class, $response->exception);

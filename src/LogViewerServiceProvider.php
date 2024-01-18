@@ -7,7 +7,6 @@ use Arcanedev\Support\Providers\PackageServiceProvider;
 /**
  * Class     LogViewerServiceProvider
  *
- * @package  Arcanedev\LogViewer
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogViewerServiceProvider extends PackageServiceProvider
@@ -69,8 +68,6 @@ class LogViewerServiceProvider extends PackageServiceProvider
     /**
      * Publish the translations.
      * Uses old tag name.
-     *
-     * @param  string|null  $path
      */
     protected function publishTranslations(?string $path = null): void
     {
@@ -82,22 +79,18 @@ class LogViewerServiceProvider extends PackageServiceProvider
     /**
      * Get the translations path.
      * Uses old translations path.
-     *
-     * @return string
      */
     protected function getTranslationsPath(): string
     {
-        return $this->getBasePath() . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'lang';
+        return $this->getBasePath().DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'lang';
     }
 
     /**
      * Get the base views path.
      * Uses old views path.
-     *
-     * @return string
      */
     protected function getViewsPath(): string
     {
-        return $this->getBasePath() . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'views';
+        return $this->getBasePath().DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'views';
     }
 }

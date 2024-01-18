@@ -12,7 +12,6 @@ use SplFileObject;
 /**
  * Class     Filesystem
  *
- * @package  Arcanedev\LogViewer\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class Filesystem implements FilesystemContract
@@ -79,8 +78,7 @@ class Filesystem implements FilesystemContract
     /**
      * Filesystem constructor.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string                             $storagePath
+     * @param  string  $storagePath
      */
     public function __construct(IlluminateFilesystem $files, $storagePath)
     {
@@ -88,7 +86,7 @@ class Filesystem implements FilesystemContract
         $this->setPath($storagePath);
         $this->setPattern();
 
-        $this->regex = '/' . '([\w-]+)-(' . REGEX_DATE_PATTERN . ')' . '/';
+        $this->regex = '/'.'([\w-]+)-('.REGEX_DATE_PATTERN.')'.'/';
     }
 
     /* -----------------------------------------------------------------
@@ -98,8 +96,6 @@ class Filesystem implements FilesystemContract
 
     /**
      * Get the files instance.
-     *
-     * @return \Illuminate\Filesystem\Filesystem
      */
     public function getInstance(): IlluminateFilesystem
     {
@@ -110,7 +106,6 @@ class Filesystem implements FilesystemContract
      * Set the log storage path.
      *
      * @param  string  $storagePath
-     *
      * @return self
      */
     public function setPath($storagePath)
@@ -122,12 +117,10 @@ class Filesystem implements FilesystemContract
 
     /**
      * Get the log pattern.
-     *
-     * @return string
      */
     public function getPattern(): string
     {
-        return $this->prefixPattern . $this->datePattern . $this->extension;
+        return $this->prefixPattern.$this->datePattern.$this->extension;
     }
 
     /**
@@ -136,12 +129,11 @@ class Filesystem implements FilesystemContract
      * @param  string  $date
      * @param  string  $prefix
      * @param  string  $extension
-     *
      * @return self
      */
     public function setPattern(
-        $prefix    = self::PATTERN_PREFIX,
-        $date      = self::PATTERN_DATE,
+        $prefix = self::PATTERN_PREFIX,
+        $date = self::PATTERN_DATE,
         $extension = self::PATTERN_EXTENSION
     ) {
         $this->setPrefixPattern($prefix);
@@ -155,7 +147,6 @@ class Filesystem implements FilesystemContract
      * Set the log date pattern.
      *
      * @param  string  $datePattern
-     *
      * @return self
      */
     public function setDatePattern($datePattern)
@@ -169,7 +160,6 @@ class Filesystem implements FilesystemContract
      * Set the log prefix pattern.
      *
      * @param  string  $prefixPattern
-     *
      * @return self
      */
     public function setPrefixPattern($prefixPattern)
@@ -183,7 +173,6 @@ class Filesystem implements FilesystemContract
      * Set the log extension.
      *
      * @param  string  $extension
-     *
      * @return self
      */
     public function setExtension($extension)
@@ -200,24 +189,21 @@ class Filesystem implements FilesystemContract
 
     /**
      * Get all log files.
-     *
-     * @return array
      */
     public function all(): array
     {
-        return $this->getFiles('*' . $this->extension);
+        return $this->getFiles('*'.$this->extension);
     }
 
     /**
      * Get all valid log files.
-     *
-     * @return array
      */
     public function logs(): array
     {
-        if (!$this->logsCache) {
+        if (! $this->logsCache) {
             $this->logsCache = $this->getFiles($this->getPattern());
         }
+
         return $this->logsCache;
     }
 
@@ -225,8 +211,6 @@ class Filesystem implements FilesystemContract
      * List the log files (Only dates).
      *
      * @param  bool  $extract
-     *
-     * @return array
      */
     public function paths($extract = false): array
     {
@@ -251,8 +235,6 @@ class Filesystem implements FilesystemContract
     /**
      * Read the log.
      *
-     * @param  string  $prefix
-     * @param  string  $date
      *
      * @return string|LazyCollection
      *
@@ -267,6 +249,7 @@ class Filesystem implements FilesystemContract
             if ($size && $size > $maxSize) {
                 return $this->chunks($path);
             }
+
             return $this->filesystem->get($path);
         } catch (\Exception $e) {
             throw new FilesystemException($e->getMessage());
@@ -276,7 +259,6 @@ class Filesystem implements FilesystemContract
     /**
      * Read the log.
      *
-     * @param  string  $path
      *
      * @return string|LazyCollection
      *
@@ -290,6 +272,7 @@ class Filesystem implements FilesystemContract
             if ($size && $size > $maxSize) {
                 return $this->chunks($path);
             }
+
             return $this->filesystem->get($path);
         } catch (\Exception $e) {
             throw new FilesystemException($e->getMessage(), $e->getCode(), $e);
@@ -299,8 +282,6 @@ class Filesystem implements FilesystemContract
     /**
      * Delete the log.
      *
-     * @param  string  $prefix
-     * @param  string  $date
      *
      * @return bool
      *
@@ -311,7 +292,7 @@ class Filesystem implements FilesystemContract
         $path = $this->path($prefix, $date);
 
         // @codeCoverageIgnoreStart
-        if (!$this->filesystem->delete($path)) {
+        if (! $this->filesystem->delete($path)) {
             throw new FilesystemException('There was an error deleting the log.');
         }
         // @codeCoverageIgnoreEnd
@@ -334,8 +315,6 @@ class Filesystem implements FilesystemContract
     /**
      * Get the log file path.
      *
-     * @param  string  $prefix
-     * @param  string  $date
      *
      * @return string
      */
@@ -343,7 +322,7 @@ class Filesystem implements FilesystemContract
     {
         $dict = $this->paths(true);
 
-        if (!($path = ($dict[$prefix][$date] ?? null)) || !$this->filesystem->exists($path)) {
+        if (! ($path = ($dict[$prefix][$date] ?? null)) || ! $this->filesystem->exists($path)) {
             throw new FilesystemException("The log(s) could not be located at: [$path] via [$prefix][$date]");
         }
 
@@ -352,35 +331,31 @@ class Filesystem implements FilesystemContract
 
     /**
      * Get files matching pattern.
-     *
-     * @param  string  $pattern
-     *
-     * @return array
      */
     public function getFiles(string $pattern): array
     {
         $files = $this->filesystem->glob(
-            $this->storagePath . DIRECTORY_SEPARATOR . $pattern,
+            $this->storagePath.DIRECTORY_SEPARATOR.$pattern,
             GLOB_BRACE
         );
 
         $maxSize = config('log-viewer.max_log_size');
+
         return array_filter(array_map('realpath', $files), function ($file) use ($maxSize) {
-            if (!$file) {
+            if (! $file) {
                 return false;
             }
             $size = $this->filesystem->size($file);
             if ($size && $size > $maxSize) {
                 return false;
             }
+
             return true;
         });
     }
 
     /**
      * Clears path caches
-     *
-     * @return void
      */
     public function clearCache(): void
     {

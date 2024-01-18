@@ -8,7 +8,6 @@ use Illuminate\Contracts\Config\Repository as ConfigContract;
 /**
  * Interface  LogMenu
  *
- * @package   Arcanedev\LogViewer\Contracts\Utilities
  * @author    ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 interface LogMenu
@@ -21,7 +20,6 @@ interface LogMenu
     /**
      * Set the config instance.
      *
-     * @param  \Illuminate\Contracts\Config\Repository  $config
      *
      * @return self
      */
@@ -30,7 +28,6 @@ interface LogMenu
     /**
      * Set the log styler instance.
      *
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\LogStyler  $styler
      *
      * @return self
      */
@@ -44,8 +41,6 @@ interface LogMenu
     /**
      * Make log menu.
      *
-     * @param  \Arcanedev\LogViewer\Entities\Log  $log
-     * @param  bool                               $trans
      *
      * @return array
      */

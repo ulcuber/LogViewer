@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests\Utilities;
+<?php
+
+namespace Arcanedev\LogViewer\Tests\Utilities;
 
 use Arcanedev\LogViewer\Tests\TestCase;
 use Arcanedev\LogViewer\Utilities\LogChecker;
@@ -6,7 +8,6 @@ use Arcanedev\LogViewer\Utilities\LogChecker;
 /**
  * Class     LogCheckerTest
  *
- * @package  Arcanedev\LogViewer\Tests\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogCheckerTest extends TestCase
@@ -16,7 +17,7 @@ class LogCheckerTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\Utilities\LogChecker */
+    /** @var \Arcanedev\LogViewer\Utilities\LogChecker */
     private $checker;
 
     /* -----------------------------------------------------------------

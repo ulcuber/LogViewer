@@ -8,7 +8,6 @@ use Arcanedev\LogViewer\Tests\TestCase;
 /**
  * Class     LogTest
  *
- * @package  Arcanedev\LogViewer\Tests\Entities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogTest extends TestCase
@@ -18,7 +17,7 @@ class LogTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\Entities\Log */
+    /** @var \Arcanedev\LogViewer\Entities\Log */
     private $log;
 
     /* -----------------------------------------------------------------
@@ -215,7 +214,7 @@ class LogTest extends TestCase
     {
         return [
             ['2015-01-01'],
-            ['2015-01-02']
+            ['2015-01-02'],
         ];
     }
 }

@@ -8,7 +8,6 @@ use Arcanedev\Support\Providers\RouteServiceProvider as ServiceProvider;
 /**
  * Class     RouteServiceProvider
  *
- * @package  Arcanedev\LogViewer\Providers
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class RouteServiceProvider extends ServiceProvider
@@ -53,9 +52,8 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Get config value by key
      *
-     * @param  string      $key
+     * @param  string  $key
      * @param  mixed|null  $default
-     *
      * @return mixed
      */
     private function config($key, $default = null)

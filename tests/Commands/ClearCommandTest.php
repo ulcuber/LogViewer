@@ -7,7 +7,6 @@ use Arcanedev\LogViewer\Tests\TestCase;
 /**
  * Class     ClearCommandTest
  *
- * @package  Arcanedev\LogViewer\Tests\Commands
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class ClearCommandTest extends TestCase
@@ -17,10 +16,10 @@ class ClearCommandTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\LogViewer */
+    /** @var \Arcanedev\LogViewer\LogViewer */
     private $logViewer;
 
-    /** @var  string */
+    /** @var string */
     private $path;
 
     /* -----------------------------------------------------------------
@@ -33,7 +32,7 @@ class ClearCommandTest extends TestCase
         parent::setUp();
 
         $this->logViewer = $this->app->make(\Arcanedev\LogViewer\Contracts\LogViewer::class);
-        $this->path      = storage_path('logs-to-clear');
+        $this->path = storage_path('logs-to-clear');
 
         $this->setupForTests();
     }
@@ -93,10 +92,11 @@ class ClearCommandTest extends TestCase
 
     public static function rmDirRecursive(string $dir)
     {
-        $files = array_diff(scandir($dir), array('.', '..'));
+        $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
             (is_dir("$dir/$file")) ? static::rmDirRecursive("$dir/$file") : unlink("$dir/$file");
         }
+
         return rmdir($dir);
     }
 }

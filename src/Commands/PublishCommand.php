@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Commands;
+<?php
+
+namespace Arcanedev\LogViewer\Commands;
 
 use Arcanedev\LogViewer\LogViewerServiceProvider;
 use Symfony\Component\Console\Input\InputOption;
@@ -6,7 +8,6 @@ use Symfony\Component\Console\Input\InputOption;
 /**
  * Class     PublishCommand
  *
- * @package  Arcanedev\LogViewer\Commands
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class PublishCommand extends Command
@@ -21,7 +22,7 @@ class PublishCommand extends Command
      *
      * @var string
      */
-    protected $name      = 'log-viewer:publish';
+    protected $name = 'log-viewer:publish';
 
     /**
      * The console command description.

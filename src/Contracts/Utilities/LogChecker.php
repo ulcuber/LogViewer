@@ -7,7 +7,6 @@ use Illuminate\Contracts\Config\Repository as ConfigContract;
 /**
  * Interface  LogChecker
  *
- * @package   Arcanedev\LogViewer\Contracts\Utilities
  * @author    ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 interface LogChecker
@@ -21,9 +20,12 @@ interface LogChecker
      * @link http://laravel.com/docs/5.4/errors#configuration
      * @link https://github.com/Seldaek/monolog/blob/master/doc/02-handlers-formatters-processors.md#log-to-files-and-syslog
      */
-    public const HANDLER_DAILY    = 'daily';
-    public const HANDLER_SINGLE   = 'single';
-    public const HANDLER_SYSLOG   = 'syslog';
+    public const HANDLER_DAILY = 'daily';
+
+    public const HANDLER_SINGLE = 'single';
+
+    public const HANDLER_SYSLOG = 'syslog';
+
     public const HANDLER_ERRORLOG = 'errorlog';
 
     /* -----------------------------------------------------------------
@@ -34,7 +36,6 @@ interface LogChecker
     /**
      * Set the config instance.
      *
-     * @param  \Illuminate\Contracts\Config\Repository  $config
      *
      * @return self
      */
@@ -43,7 +44,6 @@ interface LogChecker
     /**
      * Set the Filesystem instance.
      *
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\Filesystem  $filesystem
      *
      * @return self
      */

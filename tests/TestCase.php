@@ -14,7 +14,6 @@ use ReflectionClass;
 /**
  * Class     TestCase
  *
- * @package  Arcanedev\LogViewer\Tests
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 abstract class TestCase extends BaseTestCase
@@ -28,9 +27,9 @@ abstract class TestCase extends BaseTestCase
     protected static $logLevels = [];
 
     /** @var array */
-    protected static $locales   = [
+    protected static $locales = [
         'ar', 'bg', 'de', 'en', 'es', 'et', 'fa', 'fr', 'hu', 'hy', 'id', 'it', 'ja', 'ko', 'ms', 'nl', 'pl',
-        'pt-BR', 'ro', 'ru', 'sv', 'th', 'tr', 'uk', 'zh-TW', 'zh'
+        'pt-BR', 'ro', 'ru', 'sv', 'th', 'tr', 'uk', 'zh-TW', 'zh',
     ];
 
     /* -----------------------------------------------------------------
@@ -55,15 +54,14 @@ abstract class TestCase extends BaseTestCase
     protected static function fixturePath(?string $path = null): string
     {
         return is_null($path)
-            ? __DIR__ . '/fixtures'
-            : __DIR__ . '/fixtures/' . $path;
+            ? __DIR__.'/fixtures'
+            : __DIR__.'/fixtures/'.$path;
     }
 
     /**
      * Get package providers.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     *
      * @return array
      */
     protected function getPackageProviders($app)
@@ -81,12 +79,12 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        $app['path.storage'] = realpath(__DIR__ . '/fixtures');
+        $app['path.storage'] = realpath(__DIR__.'/fixtures');
 
         /** @var \Illuminate\Config\Repository $config */
         $config = $app['config'];
 
-        $config->set('log-viewer.storage-path', $app['path.storage'] . DIRECTORY_SEPARATOR . 'logs');
+        $config->set('log-viewer.storage-path', $app['path.storage'].DIRECTORY_SEPARATOR.'logs');
     }
 
     /* -----------------------------------------------------------------
@@ -98,7 +96,7 @@ abstract class TestCase extends BaseTestCase
      * Asserts that a string is a valid JSON string.
      *
      * @param  \Illuminate\Contracts\Support\Jsonable|mixed  $object
-     * @param  string                                        $message
+     * @param  string  $message
      */
     public static function assertJsonObject($object, $message = '')
     {
@@ -111,8 +109,6 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Assert Log object.
-     *
-     * @param  \Arcanedev\LogViewer\Entities\Log  $log
      */
     protected static function assertLog(Log $log)
     {
@@ -122,8 +118,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Assert Log entries object.
      *
-     * @param  string                                            $date
-     * @param  \Arcanedev\LogViewer\Entities\LogEntryCollection  $entries
+     * @param  string  $date
      */
     protected static function assertLogEntries($date, LogEntryCollection $entries)
     {
@@ -135,8 +130,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Assert log entry object.
      *
-     * @param  string                                  $date
-     * @param  \Arcanedev\LogViewer\Entities\LogEntry  $entry
+     * @param  string  $date
      */
     protected static function assertLogEntry($date, LogEntry $entry)
     {
@@ -164,8 +158,6 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Assert levels.
-     *
-     * @param  array  $levels
      */
     protected static function assertLevels(array $levels)
     {
@@ -181,7 +173,7 @@ abstract class TestCase extends BaseTestCase
      * Assert translated level.
      *
      * @param  string  $locale
-     * @param  array   $levels
+     * @param  array  $levels
      */
     protected function assertTranslatedLevels($locale, $levels)
     {
@@ -207,7 +199,6 @@ abstract class TestCase extends BaseTestCase
     /**
      * Assert dates.
      *
-     * @param  array   $dates
      * @param  string  $message
      */
     public static function assertDates(array $dates, $message = '')
@@ -225,16 +216,16 @@ abstract class TestCase extends BaseTestCase
      */
     public static function assertDate($date, $message = '')
     {
-        self::assertMatchesRegularExpression('/' . REGEX_DATE_PATTERN . '/', $date, $message);
+        self::assertMatchesRegularExpression('/'.REGEX_DATE_PATTERN.'/', $date, $message);
     }
 
     /**
      * Assert Menu item.
      *
-     * @param  array   $item
+     * @param  array  $item
      * @param  string  $name
-     * @param  int     $count
-     * @param  bool    $withIcons
+     * @param  int  $count
+     * @param  bool  $withIcons
      */
     protected static function assertMenuItem($item, $name, $count, $withIcons = true)
     {
@@ -312,8 +303,6 @@ abstract class TestCase extends BaseTestCase
     /**
      * Get log path.
      *
-     * @param  string  $prefix
-     * @param  string  $date
      *
      * @return string
      */
@@ -326,7 +315,6 @@ abstract class TestCase extends BaseTestCase
      * Get log content.
      *
      * @param  string  $path
-     *
      * @return string
      */
     public function getLogContent($path)
@@ -347,15 +335,13 @@ abstract class TestCase extends BaseTestCase
     /**
      * Get log object from fixture.
      *
-     * @param  string  $prefix
-     * @param  string  $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
     protected function getLog(string $prefix, string $date)
     {
         $path = $this->getLogPath($prefix, $date);
-        $raw  = $this->getLogContent($path);
+        $raw = $this->getLogContent($path);
 
         return Log::make($prefix, $date, $path, $raw);
     }
@@ -364,7 +350,6 @@ abstract class TestCase extends BaseTestCase
      * Get random entry from a log file.
      *
      * @param  string  $date
-     *
      * @return mixed
      */
     protected function getRandomLogEntry($date)
@@ -388,11 +373,6 @@ abstract class TestCase extends BaseTestCase
 
     /**
      * Create dummy log.
-     *
-     * @param  string  $date
-     * @param  string  $path
-     *
-     * @return bool
      */
     protected static function createDummyLog(string $date, string $path = 'logs'): bool
     {
@@ -407,7 +387,6 @@ abstract class TestCase extends BaseTestCase
      *
      * @param  string  $locale
      * @param  string  $key
-     *
      * @return mixed
      */
     private static function getTranslatedLevel($locale, $key)

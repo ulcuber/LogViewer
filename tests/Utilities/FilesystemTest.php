@@ -8,7 +8,6 @@ use Arcanedev\LogViewer\Utilities\Filesystem;
 /**
  * Class     FilesystemTest
  *
- * @package  Arcanedev\LogViewer\Tests\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class FilesystemTest extends TestCase
@@ -18,7 +17,7 @@ class FilesystemTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\Utilities\Filesystem */
+    /** @var \Arcanedev\LogViewer\Utilities\Filesystem */
     private $filesystem;
 
     /* -----------------------------------------------------------------
@@ -97,7 +96,7 @@ class FilesystemTest extends TestCase
         $file = $this->filesystem->read($prefix, $date);
 
         static::assertNotEmpty($file);
-        static::assertStringStartsWith('[' . $date, $file);
+        static::assertStringStartsWith('['.$date, $file);
     }
 
     /** @test */
@@ -154,7 +153,6 @@ class FilesystemTest extends TestCase
             static::assertFileExists($file);
         }
     }
-
 
     /** @test */
     public function it_can_get_file_path_by_prefix_and_date()

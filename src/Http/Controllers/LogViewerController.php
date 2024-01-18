@@ -19,7 +19,6 @@ use Illuminate\Support\Str;
 /**
  * Class     LogViewerController
  *
- * @package  LogViewer\Http\Controllers
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogViewerController extends Controller
@@ -49,8 +48,6 @@ class LogViewerController extends Controller
 
     /**
      * LogViewerController constructor.
-     *
-     * @param  \Arcanedev\LogViewer\Contracts\LogViewer  $logViewer
      */
     public function __construct(LogViewerContract $logViewer)
     {
@@ -70,9 +67,9 @@ class LogViewerController extends Controller
      */
     public function index(Request $request)
     {
-        $stats     = $this->logViewer->statsTable();
+        $stats = $this->logViewer->statsTable();
         $chartData = $this->prepareChartData($stats);
-        $percents  = $this->calcPercentages($stats->footer(), $stats->header());
+        $percents = $this->calcPercentages($stats->footer(), $stats->header());
 
         return $this->view($request, 'dashboard', compact('chartData', 'percents'));
     }
@@ -86,9 +83,9 @@ class LogViewerController extends Controller
     {
         $date = date('Y-m-d');
 
-        $stats     = $this->logViewer->statsTableForDate($date);
+        $stats = $this->logViewer->statsTableForDate($date);
         $chartData = $this->prepareChartData($stats);
-        $percents  = $this->calcPercentages($stats->footer(), $stats->header());
+        $percents = $this->calcPercentages($stats->footer(), $stats->header());
 
         return $this->view($request, 'dashboard', compact('chartData', 'percents', 'date'));
     }
@@ -96,7 +93,6 @@ class LogViewerController extends Controller
     /**
      * List all logs.
      *
-     * @param  \Illuminate\Http\Request  $request
      *
      * @return \Illuminate\View\View
      */
@@ -105,21 +101,22 @@ class LogViewerController extends Controller
         $filters = $request->only(['prefix', 'date']);
 
         $stats = $this->logViewer->logs()
-            ->when(!empty($filters), function (LogCollection $files) use ($filters) {
+            ->when(! empty($filters), function (LogCollection $files) use ($filters) {
                 return $files->filter(function (Log $log) use ($filters) {
                     foreach ($filters as $key => $value) {
                         if ($log->{$key} !== $value) {
                             return false;
                         }
                     }
+
                     return true;
                 });
             })
-        ->stats();
+            ->stats();
 
-        $stats   = $this->logViewer->statsTableFor($stats);
+        $stats = $this->logViewer->statsTableFor($stats);
         $headers = $stats->header();
-        $rows    = $this->paginate($stats->rows(), $request);
+        $rows = $this->paginate($stats->rows(), $request);
 
         return $this->view($request, 'logs', compact('headers', 'rows'));
     }
@@ -127,9 +124,6 @@ class LogViewerController extends Controller
     /**
      * Show the log.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string                    $prefix
-     * @param  string                    $date
      *
      * @return \Illuminate\View\View
      */
@@ -139,10 +133,10 @@ class LogViewerController extends Controller
             config(['log-viewer.reversed_order' => $order === 'desc']);
         }
 
-        $level   = 'all';
-        $log     = $this->getLogOrFail($prefix, $date);
-        $query   = $request->get('query');
-        $levels  = $this->logViewer->levelsNames();
+        $level = 'all';
+        $log = $this->getLogOrFail($prefix, $date);
+        $query = $request->get('query');
+        $levels = $this->logViewer->levelsNames();
 
         $entries = $this->filter($log->entries($level), $request)->paginate($this->perPage);
 
@@ -152,10 +146,6 @@ class LogViewerController extends Controller
     /**
      * Show similar entries.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string                    $prefix
-     * @param  string                    $date
-     * @param  string                    $level
      *
      * @return \Illuminate\View\View
      */
@@ -168,9 +158,9 @@ class LogViewerController extends Controller
         $text = $request->get('text', '');
         $similarity = (float) $request->get('similarity', config('log-viewer.similarity', 76));
 
-        $log     = $this->getLogOrFail($prefix, $date);
-        $query   = $request->get('query');
-        $levels  = $this->logViewer->levelsNames();
+        $log = $this->getLogOrFail($prefix, $date);
+        $query = $request->get('query');
+        $levels = $this->logViewer->levelsNames();
         $entries = $log->getSimilar($text, $similarity)->paginate($this->perPage);
 
         return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
@@ -179,10 +169,6 @@ class LogViewerController extends Controller
     /**
      * Filter the log entries by level.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string                    $prefix
-     * @param  string                    $date
-     * @param  string                    $level
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
@@ -196,9 +182,9 @@ class LogViewerController extends Controller
             return redirect()->route($this->showRoute, [$prefix, $date]);
         }
 
-        $log     = $this->getLogOrFail($prefix, $date);
-        $query   = $request->get('query');
-        $levels  = $this->logViewer->levelsNames();
+        $log = $this->getLogOrFail($prefix, $date);
+        $query = $request->get('query');
+        $levels = $this->logViewer->levelsNames();
         $entries = $this->filter($log->entries($level), $request)->paginate($this->perPage);
 
         return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
@@ -207,10 +193,6 @@ class LogViewerController extends Controller
     /**
      * Show the log with the search query.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string                    $prefix
-     * @param  string                    $date
-     * @param  string                    $level
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
@@ -226,8 +208,8 @@ class LogViewerController extends Controller
             return redirect()->route($this->showRoute, [$prefix, $date]);
         }
 
-        $log     = $this->getLogOrFail($prefix, $date);
-        $levels  = $this->logViewer->levelsNames();
+        $log = $this->getLogOrFail($prefix, $date);
+        $levels = $this->logViewer->levelsNames();
         $needles = array_map(function ($needle) {
             return Str::lower($needle);
         }, array_filter(explode(' ', $query)));
@@ -245,8 +227,6 @@ class LogViewerController extends Controller
     /**
      * Download the log
      *
-     * @param  string  $prefix
-     * @param  string  $date
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
@@ -258,7 +238,6 @@ class LogViewerController extends Controller
     /**
      * Delete a log.
      *
-     * @param  \Illuminate\Http\Request  $request
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -277,7 +256,7 @@ class LogViewerController extends Controller
         $date = $validated['date'];
 
         return response()->json([
-            'result' => $this->logViewer->delete($prefix, $date) ? 'success' : 'error'
+            'result' => $this->logViewer->delete($prefix, $date) ? 'success' : 'error',
         ]);
     }
 
@@ -290,9 +269,8 @@ class LogViewerController extends Controller
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $view
-     * @param  array   $data
-     * @param  array   $mergeData
-     *
+     * @param  array  $data
+     * @param  array  $mergeData
      * @return \Illuminate\View\View
      */
     protected function view(Request $request, $view, $data = [], $mergeData = [])
@@ -315,8 +293,6 @@ class LogViewerController extends Controller
     /**
      * Paginate logs.
      *
-     * @param  array                     $data
-     * @param  \Illuminate\Http\Request  $request
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
@@ -338,8 +314,6 @@ class LogViewerController extends Controller
     /**
      * Get a log or fail
      *
-     * @param  string  $prefix
-     * @param  string  $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log|null
      */
@@ -372,6 +346,7 @@ class LogViewerController extends Controller
                         }
                     }
                 }
+
                 return false;
             });
         })
@@ -382,23 +357,27 @@ class LogViewerController extends Controller
                             return true;
                         }
                     }
+
                     return false;
                 });
             })
             ->when($request->exclude_similar, function (LogEntryCollection $entries, $similar) use ($request) {
                 $similarity = (float) $request->get('similarity', config('log-viewer.similarity', 76));
+
                 return $entries->filter(function (LogEntry $entry) use ($similar, $similarity) {
                     foreach ((array) $similar as $text) {
                         if ($entry->isSimilar($text, $similarity)) {
                             return false;
                         }
                     }
+
                     return true;
                 });
             })
             ->when($request->unique, function (LogEntryCollection $entries) use ($request) {
                 $was = [];
                 $similarity = (float) $request->get('similarity', config('log-viewer.similarity', 76));
+
                 return $entries->filter(function (LogEntry $entry) use (&$was, $similarity) {
                     $header = $entry->header;
                     if (isset($was[$header])) {
@@ -421,7 +400,6 @@ class LogViewerController extends Controller
     /**
      * Prepare chart data.
      *
-     * @param  \Arcanedev\LogViewer\Tables\StatsTable  $stats
      *
      * @return string
      */
@@ -430,11 +408,11 @@ class LogViewerController extends Controller
         $totals = $stats->totals()->all();
 
         return json_encode([
-            'labels'   => Arr::pluck($totals, 'label'),
+            'labels' => Arr::pluck($totals, 'label'),
             'datasets' => [
                 [
-                    'data'                 => Arr::pluck($totals, 'value'),
-                    'backgroundColor'      => Arr::pluck($totals, 'color'),
+                    'data' => Arr::pluck($totals, 'value'),
+                    'backgroundColor' => Arr::pluck($totals, 'color'),
                     'hoverBackgroundColor' => Arr::pluck($totals, 'highlight'),
                 ],
             ],
@@ -444,20 +422,18 @@ class LogViewerController extends Controller
     /**
      * Calculate the percentage.
      *
-     * @param  array  $total
-     * @param  array  $names
      *
      * @return array
      */
     protected function calcPercentages(array $total, array $names)
     {
         $percents = [];
-        $all      = Arr::get($total, 'all');
+        $all = Arr::get($total, 'all');
 
         foreach ($total as $level => $count) {
             $percents[$level] = [
-                'name'    => $names[$level],
-                'count'   => $count,
+                'name' => $names[$level],
+                'count' => $count,
                 'percent' => $all ? round(($count / $all) * 100, 2) : 0,
             ];
         }

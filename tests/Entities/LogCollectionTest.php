@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests\Entities;
+<?php
+
+namespace Arcanedev\LogViewer\Tests\Entities;
 
 use Arcanedev\LogViewer\Entities\LogCollection;
 use Arcanedev\LogViewer\Exceptions\FilesystemException;
@@ -8,7 +10,6 @@ use Arcanedev\LogViewer\Tests\TestCase;
 /**
  * Class     LogCollectionTest
  *
- * @package  Arcanedev\LogViewer\Tests\Entities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogCollectionTest extends TestCase
@@ -18,7 +19,7 @@ class LogCollectionTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\Entities\LogCollection */
+    /** @var \Arcanedev\LogViewer\Entities\LogCollection */
     private $logs;
 
     /* -----------------------------------------------------------------
@@ -54,14 +55,14 @@ class LogCollectionTest extends TestCase
     /** @test */
     public function it_can_get_all_logs()
     {
-        static::assertCount(3,   $this->logs);
-        static::assertSame(3,  $this->logs->count());
+        static::assertCount(3, $this->logs);
+        static::assertSame(3, $this->logs->count());
         static::assertSame(24, $this->logs->total());
 
         foreach ($this->logs as $log) {
-            /** @var  \Arcanedev\LogViewer\Entities\Log  $log */
+            /** @var \Arcanedev\LogViewer\Entities\Log $log */
             static::assertLog($log);
-            static::assertCount(8,  $log->entries());
+            static::assertCount(8, $log->entries());
             static::assertSame(8, $log->entries()->count());
         }
     }
@@ -159,7 +160,7 @@ class LogCollectionTest extends TestCase
     /** @test */
     public function it_can_get_log_menu()
     {
-        foreach(self::$locales as $locale) {
+        foreach (self::$locales as $locale) {
             $this->app->setLocale($locale);
             $menu = $this->logs->menu();
 
@@ -188,7 +189,7 @@ class LogCollectionTest extends TestCase
     public function it_must_throw_a_log_not_found_on_log_method()
     {
         $this->expectException(FilesystemException::class);
-        $this->expectExceptionMessage("The log(s) could not be located at: [] via [laravel][2222-01-01]");
+        $this->expectExceptionMessage('The log(s) could not be located at: [] via [laravel][2222-01-01]');
 
         $this->logs->log('laravel', '2222-01-01');
     }

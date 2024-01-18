@@ -2,7 +2,7 @@
 
 use Arcanedev\LogViewer\Contracts;
 
-if (!function_exists('log_viewer')) {
+if (! function_exists('log_viewer')) {
     /**
      * Get the LogViewer instance.
      *
@@ -14,7 +14,7 @@ if (!function_exists('log_viewer')) {
     }
 }
 
-if (!function_exists('log_levels')) {
+if (! function_exists('log_levels')) {
     /**
      * Get the LogLevels instance.
      *
@@ -26,7 +26,7 @@ if (!function_exists('log_levels')) {
     }
 }
 
-if (!function_exists('log_menu')) {
+if (! function_exists('log_menu')) {
     /**
      * Get the LogMenu instance.
      *
@@ -38,7 +38,7 @@ if (!function_exists('log_menu')) {
     }
 }
 
-if (!function_exists('log_styler')) {
+if (! function_exists('log_styler')) {
     /**
      * Get the LogStyler instance.
      *

@@ -10,7 +10,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginator
 /**
  * Interface  LogViewer
  *
- * @package   Arcanedev\LogViewer\Contracts
  * @author    ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 interface LogViewer extends Patternable
@@ -24,7 +23,6 @@ interface LogViewer extends Patternable
      * Get the log levels.
      *
      * @param  bool|false  $flip
-     *
      * @return array
      */
     public function levels(bool $flip = false);
@@ -32,7 +30,6 @@ interface LogViewer extends Patternable
     /**
      * Get the translated log levels.
      *
-     * @param  string|null  $locale
      *
      * @return array
      */
@@ -41,7 +38,6 @@ interface LogViewer extends Patternable
     /**
      * Set the log storage path.
      *
-     * @param  string  $path
      *
      * @return self
      */
@@ -54,15 +50,12 @@ interface LogViewer extends Patternable
 
     /**
      * Get all logs.
-     *
-     * @return \Arcanedev\LogViewer\Entities\LogCollection
      */
     public function all(): LogCollection;
 
     /**
      * Paginate all logs.
      *
-     * @param  int  $perPage
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
@@ -71,8 +64,6 @@ interface LogViewer extends Patternable
     /**
      * Get a log.
      *
-     * @param  string  $prefix
-     * @param  string  $date
      *
      * @return \Arcanedev\LogViewer\Entities\Log
      */
@@ -80,22 +71,12 @@ interface LogViewer extends Patternable
 
     /**
      * Get the log entries.
-     *
-     * @param  string  $prefix
-     * @param  string  $date
-     * @param  string  $level
-     *
-     * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
      */
     public function entries(string $prefix, string $date, string $level = 'all'): LogEntryCollection;
 
     /**
      * Download a log file.
      *
-     * @param  string       $prefix
-     * @param  string       $date
-     * @param  string|null  $filename
-     * @param  array        $headers
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
@@ -103,46 +84,28 @@ interface LogViewer extends Patternable
 
     /**
      * Get logs statistics.
-     *
-     * @return array
      */
     public function stats(): array;
 
     /**
      * Get logs statistics table.
-     *
-     * @param  string|null  $locale
-     *
-     * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
     public function statsTable(?string $locale = null): StatsTable;
 
     /**
      * Get logs statistics table for stats.
-     *
-     * @param array $stats
-     * @param string|null $locale
-     *
-     * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
     public function statsTableFor(array $stats, ?string $locale = null): StatsTable;
 
     /**
      * Get logs statistics table for date.
-     *
-     * @param  string  $date
-     * @param  string|null  $locale
-     *
-     * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
     public function statsTableForDate(string $date, ?string $locale = null): StatsTable;
 
     /**
      * Delete the log.
      *
-     * @param  string  $date
      *
-     * @return bool
      *
      * @throws \Arcanedev\LogViewer\Exceptions\FilesystemException
      */
@@ -150,45 +113,31 @@ interface LogViewer extends Patternable
 
     /**
      * Clear the log files.
-     *
-     * @return bool
      */
     public function clear(): bool;
 
     /**
      * List the log files.
-     *
-     * @return array
      */
     public function files(): array;
 
     /**
      * Get all logs.
-     *
-     * @return LogCollection
      */
     public function logs(): LogCollection;
 
     /**
      * List the log files (only paths).
-     *
-     * @return array
      */
     public function paths(): array;
 
     /**
      * Get logs count.
-     *
-     * @return int
      */
     public function count(): int;
 
     /**
      * Get entries total from all logs.
-     *
-     * @param  string  $level
-     *
-     * @return int
      */
     public function total(string $level = 'all'): int;
 
@@ -196,8 +145,6 @@ interface LogViewer extends Patternable
      * Get logs tree.
      *
      * @param  bool|false  $trans
-     *
-     * @return array
      */
     public function tree(bool $trans = false): array;
 
@@ -205,8 +152,6 @@ interface LogViewer extends Patternable
      * Get logs menu.
      *
      * @param  bool|true  $trans
-     *
-     * @return array
      */
     public function menu(bool $trans = true): array;
 
@@ -217,8 +162,6 @@ interface LogViewer extends Patternable
 
     /**
      * Determine if the log folder is empty or not.
-     *
-     * @return bool
      */
     public function isEmpty(): bool;
 
@@ -229,16 +172,12 @@ interface LogViewer extends Patternable
 
     /**
      * Get the LogViewer version.
-     *
-     * @return string
      */
     public function version(): string;
 
     /**
      * Get used memory values in human readable format
      * memory_limit, memory_get_usage, memory_get_peak_usage
-     *
-     * @return array
      */
     public function memory(): array;
 
@@ -247,8 +186,6 @@ interface LogViewer extends Patternable
      * memory_get_peak_usage / memory_limit
      *
      * example: `7M / 128M`
-     *
-     * @return string
      */
     public function memoryString(): string;
 }

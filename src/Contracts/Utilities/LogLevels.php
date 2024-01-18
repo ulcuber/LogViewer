@@ -7,7 +7,6 @@ use Illuminate\Translation\Translator;
 /**
  * Interface  LogLevels
  *
- * @package   Arcanedev\LogViewer\Contracts\Utilities
  * @author    ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 interface LogLevels
@@ -20,7 +19,6 @@ interface LogLevels
     /**
      * Set the Translator instance.
      *
-     * @param  \Illuminate\Translation\Translator  $translator
      *
      * @return self
      */
@@ -37,7 +35,6 @@ interface LogLevels
      * Set the selected locale.
      *
      * @param  string  $locale
-     *
      * @return self
      */
     public function setLocale($locale);
@@ -51,7 +48,6 @@ interface LogLevels
      * Get the log levels.
      *
      * @param  bool  $flip
-     *
      * @return array
      */
     public function lists($flip = false);
@@ -60,7 +56,6 @@ interface LogLevels
      * Get translated levels.
      *
      * @param  string|null  $locale
-     *
      * @return array
      */
     public function names($locale = null);
@@ -69,7 +64,6 @@ interface LogLevels
      * Get PSR log levels.
      *
      * @param  bool  $flip
-     *
      * @return array
      */
     public static function all($flip = false);
@@ -77,9 +71,8 @@ interface LogLevels
     /**
      * Get the translated level.
      *
-     * @param  string       $key
+     * @param  string  $key
      * @param  string|null  $locale
-     *
      * @return string
      */
     public function get($key, $locale = null);

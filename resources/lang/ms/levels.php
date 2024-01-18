@@ -1,13 +1,13 @@
 <?php
 
 return [
-    'all'       => 'Semua',
+    'all' => 'Semua',
     'emergency' => 'Kecemasan',
-    'alert'     => 'Waspada',
-    'critical'  => 'Kritikal',
-    'error'     => 'Ralat',
-    'warning'   => 'Amaran',
-    'notice'    => 'Notis',
-    'info'      => 'Info',
-    'debug'     => 'Debug',
+    'alert' => 'Waspada',
+    'critical' => 'Kritikal',
+    'error' => 'Ralat',
+    'warning' => 'Amaran',
+    'notice' => 'Notis',
+    'info' => 'Info',
+    'debug' => 'Debug',
 ];

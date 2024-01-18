@@ -1,4 +1,6 @@
-<?php namespace Arcanedev\LogViewer\Tests\Tables;
+<?php
+
+namespace Arcanedev\LogViewer\Tests\Tables;
 
 use Arcanedev\LogViewer\Contracts\Table as TableContract;
 use Arcanedev\LogViewer\Tables\StatsTable;
@@ -7,7 +9,6 @@ use Arcanedev\LogViewer\Tests\TestCase;
 /**
  * Class     StatsTableTest
  *
- * @package  Arcanedev\LogViewer\Tests\Tables
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class StatsTableTest extends TestCase
@@ -17,7 +18,7 @@ class StatsTableTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\Tables\StatsTable */
+    /** @var \Arcanedev\LogViewer\Tables\StatsTable */
     private $table;
 
     /** @var array */
@@ -113,7 +114,7 @@ class StatsTableTest extends TestCase
     /** @test */
     public function it_can_get_stats_table_via_log_viewer()
     {
-        /** @var  \Arcanedev\LogViewer\Contracts\LogViewer  $logViewer */
+        /** @var \Arcanedev\LogViewer\Contracts\LogViewer $logViewer */
         $logViewer = $this->app->make(\Arcanedev\LogViewer\Contracts\LogViewer::class);
 
         static::assertTable($logViewer->statsTable());
@@ -122,7 +123,7 @@ class StatsTableTest extends TestCase
     /** @test */
     public function it_can_get_stats_table_via_log_factory()
     {
-        /** @var  \Arcanedev\LogViewer\Contracts\Utilities\Factory  $logFactory */
+        /** @var \Arcanedev\LogViewer\Contracts\Utilities\Factory $logFactory */
         $logFactory = $this->app->make(\Arcanedev\LogViewer\Contracts\Utilities\Factory::class);
 
         static::assertTable($logFactory->statsTable());
@@ -135,8 +136,6 @@ class StatsTableTest extends TestCase
 
     /**
      * Assert table instance.
-     *
-     * @param  \Arcanedev\LogViewer\Contracts\Table  $table
      */
     protected static function assertTable(TableContract $table)
     {
@@ -147,8 +146,6 @@ class StatsTableTest extends TestCase
 
     /**
      * Assert table header.
-     *
-     * @param  \Arcanedev\LogViewer\Contracts\Table  $table
      */
     protected static function assertTableHeader(TableContract $table)
     {
@@ -160,8 +157,6 @@ class StatsTableTest extends TestCase
 
     /**
      * Assert table rows.
-     *
-     * @param  \Arcanedev\LogViewer\Contracts\Table  $table
      */
     protected static function assertTableRows(TableContract $table)
     {
@@ -196,8 +191,6 @@ class StatsTableTest extends TestCase
 
     /**
      * Assert table footer.
-     *
-     * @param  \Arcanedev\LogViewer\Contracts\Table  $table
      */
     protected static function assertTableFooter(TableContract $table)
     {

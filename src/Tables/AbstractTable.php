@@ -8,7 +8,6 @@ use Arcanedev\LogViewer\Contracts\Utilities\LogLevels as LogLevelsContract;
 /**
  * Class     AbstractTable
  *
- * @package  Arcanedev\LogViewer\Bases
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 abstract class AbstractTable implements TableContract
@@ -18,14 +17,14 @@ abstract class AbstractTable implements TableContract
      | -----------------------------------------------------------------
      */
 
-    /** @var array  */
-    private $header  = [];
+    /** @var array */
+    private $header = [];
 
-    /** @var array  */
-    private $rows    = [];
+    /** @var array */
+    private $rows = [];
 
-    /** @var array  */
-    private $footer  = [];
+    /** @var array */
+    private $footer = [];
 
     /** @var \Arcanedev\LogViewer\Contracts\Utilities\LogLevels */
     protected $levels;
@@ -44,9 +43,7 @@ abstract class AbstractTable implements TableContract
     /**
      * Create a table instance.
      *
-     * @param  array                                               $data
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\LogLevels  $levels
-     * @param  string|null                                         $locale
+     * @param  string|null  $locale
      */
     public function __construct(array $data, LogLevelsContract $levels, $locale = null)
     {
@@ -64,7 +61,6 @@ abstract class AbstractTable implements TableContract
     /**
      * Set LogLevels instance.
      *
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\LogLevels  $levels
      *
      * @return self
      */
@@ -78,7 +74,6 @@ abstract class AbstractTable implements TableContract
     /**
      * Set table locale.
      *
-     * @param  string|null  $locale
      *
      * @return self
      */
@@ -95,8 +90,6 @@ abstract class AbstractTable implements TableContract
 
     /**
      * Get table header.
-     *
-     * @return array
      */
     public function header(): array
     {
@@ -105,8 +98,6 @@ abstract class AbstractTable implements TableContract
 
     /**
      * Get table rows.
-     *
-     * @return array
      */
     public function rows(): array
     {
@@ -115,8 +106,6 @@ abstract class AbstractTable implements TableContract
 
     /**
      * Get table footer.
-     *
-     * @return array
      */
     public function footer(): array
     {
@@ -125,8 +114,6 @@ abstract class AbstractTable implements TableContract
 
     /**
      * Get raw data.
-     *
-     * @return array
      */
     public function data(): array
     {
@@ -136,7 +123,6 @@ abstract class AbstractTable implements TableContract
     /**
      * Set table data.
      *
-     * @param  array  $data
      *
      * @return self
      */
@@ -158,34 +144,22 @@ abstract class AbstractTable implements TableContract
     protected function init()
     {
         $this->header = $this->prepareHeader($this->data);
-        $this->rows   = $this->prepareRows($this->data);
+        $this->rows = $this->prepareRows($this->data);
         $this->footer = $this->prepareFooter($this->data);
     }
 
     /**
      * Prepare table header.
-     *
-     * @param  array  $data
-     *
-     * @return array
      */
     abstract protected function prepareHeader(array $data): array;
 
     /**
      * Prepare table rows.
-     *
-     * @param  array  $data
-     *
-     * @return array
      */
     abstract protected function prepareRows(array $data): array;
 
     /**
      * Prepare table footer.
-     *
-     * @param  array  $data
-     *
-     * @return array
      */
     abstract protected function prepareFooter(array $data): array;
 
@@ -196,25 +170,17 @@ abstract class AbstractTable implements TableContract
 
     /**
      * Translate.
-     *
-     * @param  string  $key
-     *
-     * @return string
      */
     protected function translate(string $key): string
     {
         /** @var \Illuminate\Translation\Translator $translator */
         $translator = trans();
 
-        return $translator->get('log-viewer::' . $key, [], $this->locale);
+        return $translator->get('log-viewer::'.$key, [], $this->locale);
     }
 
     /**
      * Get log level color.
-     *
-     * @param  string  $level
-     *
-     * @return string
      */
     protected function color(string $level): string
     {

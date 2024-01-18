@@ -8,7 +8,6 @@ use Arcanedev\LogViewer\Utilities\Factory;
 /**
  * Class     FactoryTest
  *
- * @package  Arcanedev\LogViewer\Tests\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class FactoryTest extends TestCase
@@ -18,7 +17,7 @@ class FactoryTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\Contracts\Utilities\Factory */
+    /** @var \Arcanedev\LogViewer\Contracts\Utilities\Factory */
     private $logFactory;
 
     /* -----------------------------------------------------------------
@@ -117,9 +116,9 @@ class FactoryTest extends TestCase
 
         static::assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $logs);
         static::assertSame(30, $logs->perPage());
-        static::assertSame(3,  $logs->total());
-        static::assertSame(1,  $logs->lastPage());
-        static::assertSame(1,  $logs->currentPage());
+        static::assertSame(3, $logs->total());
+        static::assertSame(1, $logs->lastPage());
+        static::assertSame(1, $logs->currentPage());
     }
 
     /** @test */
@@ -182,37 +181,37 @@ class FactoryTest extends TestCase
         $expected = [
             'laravel' => [
                 '2015-01-03' => [
-                    'all'       => ['name' => 'Tous', 'count' => 8],
+                    'all' => ['name' => 'Tous', 'count' => 8],
                     'emergency' => ['name' => 'Urgence', 'count' => 1],
-                    'alert'     => ['name' => 'Alerte', 'count' => 1],
-                    'critical'  => ['name' => 'Critique', 'count' => 1],
-                    'error'     => ['name' => 'Erreur', 'count' => 1],
-                    'warning'   => ['name' => 'Avertissement', 'count' => 1],
-                    'notice'    => ['name' => 'Notice', 'count' => 1],
-                    'info'      => ['name' => 'Info', 'count' => 1],
-                    'debug'     => ['name' => 'Debug', 'count' => 1],
+                    'alert' => ['name' => 'Alerte', 'count' => 1],
+                    'critical' => ['name' => 'Critique', 'count' => 1],
+                    'error' => ['name' => 'Erreur', 'count' => 1],
+                    'warning' => ['name' => 'Avertissement', 'count' => 1],
+                    'notice' => ['name' => 'Notice', 'count' => 1],
+                    'info' => ['name' => 'Info', 'count' => 1],
+                    'debug' => ['name' => 'Debug', 'count' => 1],
                 ],
                 '2015-01-02' => [
-                    'all'       => ['name' => 'Tous', 'count' => 8],
+                    'all' => ['name' => 'Tous', 'count' => 8],
                     'emergency' => ['name' => 'Urgence', 'count' => 1],
-                    'alert'     => ['name' => 'Alerte', 'count' => 1],
-                    'critical'  => ['name' => 'Critique', 'count' => 1],
-                    'error'     => ['name' => 'Erreur', 'count' => 1],
-                    'warning'   => ['name' => 'Avertissement', 'count' => 1],
-                    'notice'    => ['name' => 'Notice', 'count' => 1],
-                    'info'      => ['name' => 'Info', 'count' => 1],
-                    'debug'     => ['name' => 'Debug', 'count' => 1],
+                    'alert' => ['name' => 'Alerte', 'count' => 1],
+                    'critical' => ['name' => 'Critique', 'count' => 1],
+                    'error' => ['name' => 'Erreur', 'count' => 1],
+                    'warning' => ['name' => 'Avertissement', 'count' => 1],
+                    'notice' => ['name' => 'Notice', 'count' => 1],
+                    'info' => ['name' => 'Info', 'count' => 1],
+                    'debug' => ['name' => 'Debug', 'count' => 1],
                 ],
                 '2015-01-01' => [
-                    'all'       => ['name' => 'Tous', 'count' => 8],
+                    'all' => ['name' => 'Tous', 'count' => 8],
                     'emergency' => ['name' => 'Urgence', 'count' => 1],
-                    'alert'     => ['name' => 'Alerte', 'count' => 1],
-                    'critical'  => ['name' => 'Critique', 'count' => 1],
-                    'error'     => ['name' => 'Erreur', 'count' => 1],
-                    'warning'   => ['name' => 'Avertissement', 'count' => 1],
-                    'notice'    => ['name' => 'Notice', 'count' => 1],
-                    'info'      => ['name' => 'Info', 'count' => 1],
-                    'debug'     => ['name' => 'Debug', 'count' => 1],
+                    'alert' => ['name' => 'Alerte', 'count' => 1],
+                    'critical' => ['name' => 'Critique', 'count' => 1],
+                    'error' => ['name' => 'Erreur', 'count' => 1],
+                    'warning' => ['name' => 'Avertissement', 'count' => 1],
+                    'notice' => ['name' => 'Notice', 'count' => 1],
+                    'info' => ['name' => 'Info', 'count' => 1],
+                    'debug' => ['name' => 'Debug', 'count' => 1],
                 ],
             ],
         ];
@@ -261,33 +260,33 @@ class FactoryTest extends TestCase
     /** @test */
     public function it_can_set_and_get_pattern()
     {
-        $prefix    = 'laravel-';
-        $date      = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]';
+        $prefix = 'laravel-';
+        $date = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]';
         $extension = '.log';
 
         static::assertSame(
-            $prefix . $date . $extension,
+            $prefix.$date.$extension,
             $this->logFactory->getPattern()
         );
 
         $this->logFactory->setPattern($prefix, $date, $extension = '');
 
         static::assertSame(
-            $prefix . $date . $extension,
+            $prefix.$date.$extension,
             $this->logFactory->getPattern()
         );
 
         $this->logFactory->setPattern($prefix = 'laravel-cli-', $date, $extension);
 
         static::assertSame(
-            $prefix . $date . $extension,
+            $prefix.$date.$extension,
             $this->logFactory->getPattern()
         );
 
         $this->logFactory->setPattern($prefix, $date = '[0-9][0-9][0-9][0-9]', $extension);
 
         static::assertSame(
-            $prefix . $date . $extension,
+            $prefix.$date.$extension,
             $this->logFactory->getPattern()
         );
 

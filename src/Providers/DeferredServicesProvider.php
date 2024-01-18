@@ -1,13 +1,16 @@
-<?php namespace Arcanedev\LogViewer\Providers;
+<?php
 
-use Arcanedev\LogViewer\{Contracts, LogViewer, Utilities};
+namespace Arcanedev\LogViewer\Providers;
+
+use Arcanedev\LogViewer\Contracts;
+use Arcanedev\LogViewer\LogViewer;
+use Arcanedev\LogViewer\Utilities;
 use Arcanedev\Support\Providers\ServiceProvider;
 use Illuminate\Contracts\Support\DeferrableProvider;
 
 /**
  * Class     DeferredServicesProvider
  *
- * @package  Arcanedev\LogViewer\Providers
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class DeferredServicesProvider extends ServiceProvider implements DeferrableProvider
@@ -33,8 +36,6 @@ class DeferredServicesProvider extends ServiceProvider implements DeferrableProv
 
     /**
      * Get the services provided by the provider.
-     *
-     * @return array
      */
     public function provides(): array
     {
@@ -97,8 +98,8 @@ class DeferredServicesProvider extends ServiceProvider implements DeferrableProv
     private function registerFilesystem(): void
     {
         $this->singleton(Contracts\Utilities\Filesystem::class, function ($app) {
-            /** @var  \Illuminate\Config\Repository  $config */
-            $config     = $app['config'];
+            /** @var \Illuminate\Config\Repository $config */
+            $config = $app['config'];
             $filesystem = new Utilities\Filesystem($app['files'], $config->get('log-viewer.storage-path'));
 
             return $filesystem->setPattern(

@@ -5,7 +5,6 @@ namespace Arcanedev\LogViewer\Commands;
 /**
  * Class     StatsCommand
  *
- * @package  Arcanedev\LogViewer\Commands
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class StatsCommand extends Command
@@ -20,7 +19,7 @@ class StatsCommand extends Command
      *
      * @var string
      */
-    protected $name        = 'log-viewer:stats';
+    protected $name = 'log-viewer:stats';
 
     /**
      * The console command description.
@@ -34,7 +33,7 @@ class StatsCommand extends Command
      *
      * @var string
      */
-    protected $signature   = 'log-viewer:stats';
+    protected $signature = 'log-viewer:stats';
 
     /* -----------------------------------------------------------------
      |  Main Methods

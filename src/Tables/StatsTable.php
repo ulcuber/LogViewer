@@ -9,7 +9,6 @@ use Illuminate\Support\Collection;
 /**
  * Class     StatsTable
  *
- * @package  Arcanedev\LogViewer\Tables
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class StatsTable extends AbstractTable
@@ -22,10 +21,7 @@ class StatsTable extends AbstractTable
     /**
      * Make a stats table instance.
      *
-     * @param  array                                               $data
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\LogLevels  $levels
-     * @param  string|null                                         $locale
-     *
+     * @param  string|null  $locale
      * @return self
      */
     public static function make(array $data, LogLevelsContract $levels, $locale = null)
@@ -40,10 +36,6 @@ class StatsTable extends AbstractTable
 
     /**
      * Prepare table header.
-     *
-     * @param  array  $data
-     *
-     * @return array
      */
     protected function prepareHeader(array $data): array
     {
@@ -51,7 +43,7 @@ class StatsTable extends AbstractTable
             [
                 'prefix' => $this->translate('general.prefix'),
                 'date' => $this->translate('general.date'),
-                'all'  => $this->translate('general.all'),
+                'all' => $this->translate('general.all'),
             ],
             $this->levels->names($this->locale)
         );
@@ -59,10 +51,6 @@ class StatsTable extends AbstractTable
 
     /**
      * Prepare table rows.
-     *
-     * @param  array  $data
-     *
-     * @return array
      */
     protected function prepareRows(array $data): array
     {
@@ -79,10 +67,6 @@ class StatsTable extends AbstractTable
 
     /**
      * Prepare table footer.
-     *
-     * @param  array  $data
-     *
-     * @return array
      */
     protected function prepareFooter(array $data): array
     {
@@ -107,8 +91,6 @@ class StatsTable extends AbstractTable
      * Get totals.
      *
      * @param  string|null  $locale
-     *
-     * @return \Illuminate\Support\Collection
      */
     public function totals(): Collection
     {
@@ -116,9 +98,9 @@ class StatsTable extends AbstractTable
 
         foreach (Arr::except($this->footer(), 'all') as $level => $count) {
             $totals->put($level, [
-                'label'     => $this->translate("levels.$level"),
-                'value'     => $count,
-                'color'     => $this->color($level),
+                'label' => $this->translate("levels.$level"),
+                'value' => $count,
+                'color' => $this->color($level),
                 'highlight' => $this->color($level),
             ]);
         }
@@ -128,10 +110,6 @@ class StatsTable extends AbstractTable
 
     /**
      * Get json totals data.
-     *
-     * @param  string|null  $locale
-     *
-     * @return string
      */
     public function totalsJson(?string $locale = null): string
     {

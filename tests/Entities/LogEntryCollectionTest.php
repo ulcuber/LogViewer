@@ -8,7 +8,6 @@ use Arcanedev\LogViewer\Tests\TestCase;
 /**
  * Class     LogEntryCollectionTest
  *
- * @package  Arcanedev\LogViewer\Tests\Entities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogEntryCollectionTest extends TestCase
@@ -18,7 +17,7 @@ class LogEntryCollectionTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\Entities\LogEntryCollection */
+    /** @var \Arcanedev\LogViewer\Entities\LogEntryCollection */
     private $entries;
 
     /* -----------------------------------------------------------------
@@ -127,7 +126,6 @@ class LogEntryCollectionTest extends TestCase
     /**
      * Get log entries
      *
-     * @param  string  $path
      *
      * @return LogEntryCollection
      */

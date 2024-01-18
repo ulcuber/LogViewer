@@ -1,11 +1,12 @@
-<?php namespace Arcanedev\LogViewer\Contracts;
+<?php
+
+namespace Arcanedev\LogViewer\Contracts;
 
 use Arcanedev\LogViewer\Contracts\Utilities\Filesystem;
 
 /**
  * Interface  Patternable
  *
- * @package   Arcanedev\LogViewer\Contracts
  * @author    ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 interface Patternable
@@ -28,12 +29,11 @@ interface Patternable
      * @param  string  $date
      * @param  string  $prefix
      * @param  string  $extension
-     *
      * @return self
      */
     public function setPattern(
-        $prefix    = Filesystem::PATTERN_PREFIX,
-        $date      = Filesystem::PATTERN_DATE,
+        $prefix = Filesystem::PATTERN_PREFIX,
+        $date = Filesystem::PATTERN_DATE,
         $extension = Filesystem::PATTERN_EXTENSION
     );
 }

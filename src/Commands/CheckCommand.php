@@ -7,7 +7,6 @@ use Arcanedev\LogViewer\Contracts\Utilities\LogChecker as LogCheckerContract;
 /**
  * Class     PublishCommand
  *
- * @package  Arcanedev\LogViewer\Commands
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class CheckCommand extends Command
@@ -22,7 +21,7 @@ class CheckCommand extends Command
      *
      * @var string
      */
-    protected $name      = 'log-viewer:check';
+    protected $name = 'log-viewer:check';
 
     /**
      * The console command description.
@@ -83,9 +82,9 @@ class CheckCommand extends Command
         $this->frame('Application requirements');
 
         $this->table([
-            'Status', 'Message'
+            'Status', 'Message',
         ], [
-            [$requirements['status'], $requirements['message']]
+            [$requirements['status'], $requirements['message']],
         ]);
     }
 
@@ -108,7 +107,7 @@ class CheckCommand extends Command
             $this->table(['File', 'Message'], $rows);
             $this->info('The format must match glob pattern');
             $this->output->writeln("<info>Glob pattern</info>: <comment>{$pattern}</comment>");
-            $this->output->writeln("<info>Configured in</info>: <comment>config/log-viewer.php</comment> pattern");
+            $this->output->writeln('<info>Configured in</info>: <comment>config/log-viewer.php</comment> pattern');
         }
     }
 }

@@ -16,7 +16,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 /**
  * Class     Factory
  *
- * @package  Arcanedev\LogViewer\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class Factory implements FactoryContract
@@ -47,9 +46,6 @@ class Factory implements FactoryContract
 
     /**
      * Create a new instance.
-     *
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\Filesystem  $filesystem
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\LogLevels   $levels
      */
     public function __construct(FilesystemContract $filesystem, LogLevelsContract $levels)
     {
@@ -64,8 +60,6 @@ class Factory implements FactoryContract
 
     /**
      * Get the filesystem instance.
-     *
-     * @return \Arcanedev\LogViewer\Contracts\Utilities\Filesystem
      */
     public function getFilesystem(): FilesystemContract
     {
@@ -75,7 +69,6 @@ class Factory implements FactoryContract
     /**
      * Set the filesystem instance.
      *
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\Filesystem  $filesystem
      *
      * @return self
      */
@@ -88,8 +81,6 @@ class Factory implements FactoryContract
 
     /**
      * Get the log levels instance.
-     *
-     * @return \Arcanedev\LogViewer\Contracts\Utilities\LogLevels
      */
     public function getLevels(): LogLevelsContract
     {
@@ -99,7 +90,6 @@ class Factory implements FactoryContract
     /**
      * Set the log levels instance.
      *
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\LogLevels  $levels
      *
      * @return self
      */
@@ -113,7 +103,6 @@ class Factory implements FactoryContract
     /**
      * Set the log storage path.
      *
-     * @param  string  $storagePath
      *
      * @return self
      */
@@ -126,8 +115,6 @@ class Factory implements FactoryContract
 
     /**
      * Get the log pattern.
-     *
-     * @return string
      */
     public function getPattern(): string
     {
@@ -140,12 +127,11 @@ class Factory implements FactoryContract
      * @param  string  $date
      * @param  string  $prefix
      * @param  string  $extension
-     *
      * @return self
      */
     public function setPattern(
-        $prefix    = FilesystemContract::PATTERN_PREFIX,
-        $date      = FilesystemContract::PATTERN_DATE,
+        $prefix = FilesystemContract::PATTERN_PREFIX,
+        $date = FilesystemContract::PATTERN_DATE,
         $extension = FilesystemContract::PATTERN_EXTENSION
     ) {
         $this->filesystem->setPattern($prefix, $date, $extension);
@@ -155,8 +141,6 @@ class Factory implements FactoryContract
 
     /**
      * Get all logs.
-     *
-     * @return \Arcanedev\LogViewer\Entities\LogCollection
      */
     public function logs(): LogCollection
     {
@@ -172,8 +156,6 @@ class Factory implements FactoryContract
      * Get all logs (alias).
      *
      * @see logs
-     *
-     * @return \Arcanedev\LogViewer\Entities\LogCollection
      */
     public function all(): LogCollection
     {
@@ -182,10 +164,6 @@ class Factory implements FactoryContract
 
     /**
      * Paginate all logs.
-     *
-     * @param  int  $perPage
-     *
-     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     public function paginate(int $perPage = 30): LengthAwarePaginator
     {
@@ -194,17 +172,13 @@ class Factory implements FactoryContract
 
     /**
      * Get a log by date.
-     *
-     * @param  string  $prefix
-     * @param  string  $date
-     *
-     * @return \Arcanedev\LogViewer\Entities\Log
      */
     public function log(string $prefix, string $date): Log
     {
         // NOTE: iterator reads file by file so not using this->logs()->log()
         try {
             $path = $this->filesystem->path($prefix, $date);
+
             return Log::make($prefix, $date, $path, $this->filesystem->readPath($path));
         } catch (FilesystemException $th) {
             throw new LogNotFoundException("Log not found for [$prefix][$date]", 1, $th);
@@ -213,11 +187,6 @@ class Factory implements FactoryContract
 
     /**
      * Get a log by date (alias).
-     *
-     * @param  string  $prefix
-     * @param  string  $date
-     *
-     * @return \Arcanedev\LogViewer\Entities\Log
      */
     public function get(string $prefix, string $date): Log
     {
@@ -226,12 +195,6 @@ class Factory implements FactoryContract
 
     /**
      * Get log entries.
-     *
-     * @param  string  $prefix
-     * @param  string  $date
-     * @param  string  $level
-     *
-     * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
      */
     public function entries(string $prefix, string $date, string $level = 'all'): LogEntryCollection
     {
@@ -240,8 +203,6 @@ class Factory implements FactoryContract
 
     /**
      * Get logs statistics.
-     *
-     * @return array
      */
     public function stats(): array
     {
@@ -250,10 +211,6 @@ class Factory implements FactoryContract
 
     /**
      * Get logs statistics for date.
-     *
-     * @param string $date
-     *
-     * @return array
      */
     public function statsForDate(string $date): array
     {
@@ -262,10 +219,6 @@ class Factory implements FactoryContract
 
     /**
      * Get logs statistics table.
-     *
-     * @param  string|null  $locale
-     *
-     * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
     public function statsTable(?string $locale = null): StatsTable
     {
@@ -274,11 +227,6 @@ class Factory implements FactoryContract
 
     /**
      * Get logs statistics table for stats.
-     *
-     * @param  array  $stats
-     * @param  string|null  $locale
-     *
-     * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
     public function statsTableFor(array $stats, ?string $locale = null): StatsTable
     {
@@ -287,11 +235,6 @@ class Factory implements FactoryContract
 
     /**
      * Get logs statistics table for log.
-     *
-     * @param  string  $date
-     * @param  string|null  $locale
-     *
-     * @return \Arcanedev\LogViewer\Tables\StatsTable
      */
     public function statsTableForDate(string $date, ?string $locale = null): StatsTable
     {
@@ -300,8 +243,6 @@ class Factory implements FactoryContract
 
     /**
      * List the log files (paths).
-     *
-     * @return array
      */
     public function paths(): array
     {
@@ -310,8 +251,6 @@ class Factory implements FactoryContract
 
     /**
      * Get logs count.
-     *
-     * @return int
      */
     public function count(): int
     {
@@ -320,10 +259,6 @@ class Factory implements FactoryContract
 
     /**
      * Get total log entries.
-     *
-     * @param  string  $level
-     *
-     * @return int
      */
     public function total(string $level = 'all'): int
     {
@@ -332,10 +267,6 @@ class Factory implements FactoryContract
 
     /**
      * Get tree menu.
-     *
-     * @param  bool  $trans
-     *
-     * @return array
      */
     public function tree(bool $trans = false): array
     {
@@ -344,10 +275,6 @@ class Factory implements FactoryContract
 
     /**
      * Get tree menu.
-     *
-     * @param  bool  $trans
-     *
-     * @return array
      */
     public function menu(bool $trans = true): array
     {
@@ -361,8 +288,6 @@ class Factory implements FactoryContract
 
     /**
      * Determine if the log folder is empty or not.
-     *
-     * @return bool
      */
     public function isEmpty(): bool
     {

@@ -8,7 +8,6 @@ use Arcanedev\LogViewer\Entities\Log;
 /**
  * Class     LatestCommand
  *
- * @package  Arcanedev\LogViewer\Commands
  * @author   ulcuber
  */
 class LatestCommand extends Command
@@ -18,7 +17,7 @@ class LatestCommand extends Command
      *
      * @var string
      */
-    protected $name        = 'log-viewer:latest';
+    protected $name = 'log-viewer:latest';
 
     /**
      * The console command description.
@@ -32,7 +31,7 @@ class LatestCommand extends Command
      *
      * @var string
      */
-    protected $signature   = 'log-viewer:latest';
+    protected $signature = 'log-viewer:latest';
 
     /**
      * Execute the console command.
@@ -47,6 +46,7 @@ class LatestCommand extends Command
 
         if (empty($paths)) {
             $this->warn("No file for [{$date}]");
+
             return 1;
         }
 

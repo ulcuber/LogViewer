@@ -7,7 +7,6 @@ use Arcanedev\LogViewer\Tests\TestCase;
 /**
  * Class     PublishCommandTest
  *
- * @package  Arcanedev\LogViewer\Tests\Commands
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class PublishCommandTest extends TestCase
@@ -44,7 +43,7 @@ class PublishCommandTest extends TestCase
     /** @test */
     public function it_can_publish_all_with_force()
     {
-        $this->artisan('log-viewer:publish', ['--force'   => true])
+        $this->artisan('log-viewer:publish', ['--force' => true])
             ->assertExitCode(0);
 
         static::assertHasConfigFile();
@@ -102,18 +101,18 @@ class PublishCommandTest extends TestCase
      */
     protected function assertHasLocalizationFiles()
     {
-        $path        = $this->getLocalizationFolder();
+        $path = $this->getLocalizationFolder();
         $directories = $this->illuminateFile()->directories($path);
-        $locales     = array_map('basename', $directories);
+        $locales = array_map('basename', $directories);
 
         static::assertEmpty(
             $missing = array_diff($locales, self::$locales),
-            'The locales [' . implode(', ', $missing)
-                . '] are missing in the Arcanedev\\LogViewer\\Tests\\TestCase::$locales (line 29) for tests purposes.'
+            'The locales ['.implode(', ', $missing)
+                .'] are missing in the Arcanedev\\LogViewer\\Tests\\TestCase::$locales (line 29) for tests purposes.'
         );
 
         foreach ($directories as $directory) {
-            static::assertFileExists($directory . '/levels.php');
+            static::assertFileExists($directory.'/levels.php');
         }
     }
 
@@ -158,7 +157,7 @@ class PublishCommandTest extends TestCase
      */
     private function getConfigFilePath()
     {
-        return $this->getConfigPath() . '/log-viewer.php';
+        return $this->getConfigPath().'/log-viewer.php';
     }
 
     /**

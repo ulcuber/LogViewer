@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\File;
 /**
  * Class     LogViewerTest
  *
- * @package  Arcanedev\LogViewer\Tests
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogViewerTest extends TestCase
@@ -19,7 +18,7 @@ class LogViewerTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\LogViewer */
+    /** @var \Arcanedev\LogViewer\LogViewer */
     private $logViewer;
 
     /* -----------------------------------------------------------------
@@ -294,10 +293,10 @@ class LogViewerTest extends TestCase
     {
         $prefix = 'laravel';
         $date = '2015-01-01';
-        $ext      = 'log';
+        $ext = 'log';
 
         $download = $this->logViewer->download($prefix, $date);
-        $file     = $download->getFile();
+        $file = $download->getFile();
 
         static::assertInstanceOf(
             \Symfony\Component\HttpFoundation\BinaryFileResponse::class,
@@ -338,33 +337,33 @@ class LogViewerTest extends TestCase
     /** @test */
     public function it_can_set_and_get_pattern()
     {
-        $prefix    = 'laravel-';
-        $date      = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]';
+        $prefix = 'laravel-';
+        $date = '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]';
         $extension = '.log';
 
         static::assertSame(
-            $prefix . $date . $extension,
+            $prefix.$date.$extension,
             $this->logViewer->getPattern()
         );
 
         $this->logViewer->setPattern($prefix, $date, $extension = '');
 
         static::assertSame(
-            $prefix . $date . $extension,
+            $prefix.$date.$extension,
             $this->logViewer->getPattern()
         );
 
         $this->logViewer->setPattern($prefix = 'laravel-cli-', $date, $extension);
 
         static::assertSame(
-            $prefix . $date . $extension,
+            $prefix.$date.$extension,
             $this->logViewer->getPattern()
         );
 
         $this->logViewer->setPattern($prefix, $date = '[0-9][0-9][0-9][0-9]', $extension);
 
         static::assertSame(
-            $prefix . $date . $extension,
+            $prefix.$date.$extension,
             $this->logViewer->getPattern()
         );
 

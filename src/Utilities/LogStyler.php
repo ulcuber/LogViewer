@@ -9,7 +9,6 @@ use Illuminate\Support\HtmlString;
 /**
  * Class     LogStyler
  *
- * @package  Arcanedev\LogViewer\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogStyler implements LogStylerContract
@@ -33,8 +32,6 @@ class LogStyler implements LogStylerContract
 
     /**
      * Create a new instance.
-     *
-     * @param  \Illuminate\Contracts\Config\Repository  $config
      */
     public function __construct(ConfigContract $config)
     {
@@ -50,8 +47,7 @@ class LogStyler implements LogStylerContract
      * Get config.
      *
      * @param  string  $key
-     * @param  mixed   $default
-     *
+     * @param  mixed  $default
      * @return mixed
      */
     private function get($key, $default = null)
@@ -67,24 +63,22 @@ class LogStyler implements LogStylerContract
     /**
      * Make level icon.
      *
-     * @param  string       $level
+     * @param  string  $level
      * @param  string|null  $default
-     *
      * @return \Illuminate\Support\HtmlString
      */
     public function icon($level, $default = null)
     {
         return new HtmlString(
-            '<i class="' . $this->get("icons.$level", $default) . '"></i>'
+            '<i class="'.$this->get("icons.$level", $default).'"></i>'
         );
     }
 
     /**
      * Get level color.
      *
-     * @param  string       $level
+     * @param  string  $level
      * @param  string|null  $default
-     *
      * @return string
      */
     public function color($level, $default = null)
@@ -94,18 +88,15 @@ class LogStyler implements LogStylerContract
 
     /**
      * Get extra color.
-     *
-     * @return array
      */
     public function extraColors(): array
     {
-        return $this->get("colors.extras");
+        return $this->get('colors.extras');
     }
 
     /**
      * Get strings to highlight.
      *
-     * @param  array  $default
      *
      * @return array
      */

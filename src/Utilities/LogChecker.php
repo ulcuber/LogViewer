@@ -9,7 +9,6 @@ use Illuminate\Contracts\Config\Repository as ConfigContract;
 /**
  * Class     LogChecker
  *
- * @package  Arcanedev\LogViewer\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogChecker implements LogCheckerContract
@@ -82,9 +81,6 @@ class LogChecker implements LogCheckerContract
 
     /**
      * LogChecker constructor.
-     *
-     * @param  \Illuminate\Contracts\Config\Repository              $config
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\Filesystem  $filesystem
      */
     public function __construct(ConfigContract $config, FilesystemContract $filesystem)
     {
@@ -101,7 +97,6 @@ class LogChecker implements LogCheckerContract
     /**
      * Set the config instance.
      *
-     * @param  \Illuminate\Contracts\Config\Repository  $config
      *
      * @return self
      */
@@ -115,7 +110,6 @@ class LogChecker implements LogCheckerContract
     /**
      * Set the Filesystem instance.
      *
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\Filesystem  $filesystem
      *
      * @return self
      */
@@ -130,7 +124,6 @@ class LogChecker implements LogCheckerContract
      * Set the log handler mode.
      *
      * @param  string  $handler
-     *
      * @return self
      */
     protected function setHandler($handler)
@@ -189,13 +182,13 @@ class LogChecker implements LogCheckerContract
         $this->refresh();
 
         return $this->isDaily() ? [
-            'status'  => 'success',
-            'header'  => 'Application requirements fulfilled.',
+            'status' => 'success',
+            'header' => 'Application requirements fulfilled.',
             'message' => 'Are you ready to rock ?',
         ] : [
-            'status'  => 'failed',
-            'header'  => 'Application requirements failed.',
-            'message' => $this->messages['handler']
+            'status' => 'failed',
+            'header' => 'Application requirements failed.',
+            'message' => $this->messages['handler'],
         ];
     }
 
@@ -218,7 +211,6 @@ class LogChecker implements LogCheckerContract
      * Is the handler is the same as the application log handler.
      *
      * @param  string  $handler
-     *
      * @return bool
      */
     protected function isSameHandler($handler)
@@ -242,9 +234,9 @@ class LogChecker implements LogCheckerContract
 
         $this->messages = [
             'handler' => '',
-            'files'   => [],
+            'files' => [],
         ];
-        $this->files    = [];
+        $this->files = [];
 
         $this->pattern = $this->filesystem->getPattern();
         $this->logs = array_flip($this->filesystem->getFiles($this->pattern));
@@ -279,14 +271,12 @@ class LogChecker implements LogCheckerContract
 
     /**
      * Check a log file.
-     *
-     * @param  string  $path
      */
     protected function checkLogFile(string $path)
     {
-        $status   = true;
+        $status = true;
         $filename = basename($path);
-        $message  = "The log file [$filename] is valid.";
+        $message = "The log file [$filename] is valid.";
 
         if ($this->isSingleLogFile($filename)) {
             $this->status = $status = false;
@@ -295,7 +285,7 @@ class LogChecker implements LogCheckerContract
         } elseif ($this->isInvalidLogPattern($path)) {
             $this->status = $status = false;
             $this->messages['files'][$filename] = $message =
-                "The log filename has an invalid format";
+                'The log filename has an invalid format';
         }
 
         $this->files[$filename] = compact('filename', 'status', 'message', 'path');
@@ -304,7 +294,6 @@ class LogChecker implements LogCheckerContract
     /**
      * Check if it's not a single log file.
      *
-     * @param  string  $file
      *
      * @return bool
      */
@@ -316,12 +305,11 @@ class LogChecker implements LogCheckerContract
     /**
      * Check the log file matches glob pattern.
      *
-     * @param  string  $path
      *
      * @return bool
      */
     protected function isInvalidLogPattern(string $path)
     {
-        return !isset($this->logs[$path]);
+        return ! isset($this->logs[$path]);
     }
 }

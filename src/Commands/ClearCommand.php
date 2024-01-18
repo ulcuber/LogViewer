@@ -5,7 +5,6 @@ namespace Arcanedev\LogViewer\Commands;
 /**
  * Class     ClearCommand
  *
- * @package  Arcanedev\LogViewer\Commands
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class ClearCommand extends Command

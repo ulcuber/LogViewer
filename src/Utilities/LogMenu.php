@@ -10,7 +10,6 @@ use Illuminate\Contracts\Config\Repository as ConfigContract;
 /**
  * Class     LogMenu
  *
- * @package  Arcanedev\LogViewer\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogMenu implements LogMenuContract
@@ -41,9 +40,6 @@ class LogMenu implements LogMenuContract
 
     /**
      * LogMenu constructor.
-     *
-     * @param  \Illuminate\Contracts\Config\Repository             $config
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\LogStyler  $styler
      */
     public function __construct(ConfigContract $config, LogStylerContract $styler)
     {
@@ -59,7 +55,6 @@ class LogMenu implements LogMenuContract
     /**
      * Set the config instance.
      *
-     * @param  \Illuminate\Contracts\Config\Repository  $config
      *
      * @return self
      */
@@ -73,7 +68,6 @@ class LogMenu implements LogMenuContract
     /**
      * Set the log styler instance.
      *
-     * @param  \Arcanedev\LogViewer\Contracts\Utilities\LogStyler  $styler
      *
      * @return self
      */
@@ -92,8 +86,6 @@ class LogMenu implements LogMenuContract
     /**
      * Make log menu.
      *
-     * @param  \Arcanedev\LogViewer\Entities\Log  $log
-     * @param  bool                               $trans
      *
      * @return array
      */
@@ -104,7 +96,7 @@ class LogMenu implements LogMenuContract
 
         foreach ($log->tree($trans) as $level => $item) {
             $items[$level] = array_merge($item, [
-                'url'  => route($route, [$log->prefix, $log->date, $level]),
+                'url' => route($route, [$log->prefix, $log->date, $level]),
                 'icon' => $this->isIconsEnabled() ? $this->styler->icon($level)->toHtml() : '',
             ]);
         }
@@ -119,8 +111,6 @@ class LogMenu implements LogMenuContract
 
     /**
      * Check if the icons are enabled.
-     *
-     * @return bool
      */
     protected function isIconsEnabled(): bool
     {
@@ -135,9 +125,7 @@ class LogMenu implements LogMenuContract
     /**
      * Get config.
      *
-     * @param  string  $key
-     * @param  mixed   $default
-     *
+     * @param  mixed  $default
      * @return mixed
      */
     protected function config(string $key, $default = null)

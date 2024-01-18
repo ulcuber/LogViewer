@@ -10,7 +10,6 @@ use Illuminate\Support\LazyCollection;
 /**
  * Class     LogEntryCollection
  *
- * @package  Arcanedev\LogViewer\Entities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogEntryCollection extends LazyCollection
@@ -26,14 +25,13 @@ class LogEntryCollection extends LazyCollection
      * Load raw log entries.
      *
      * @param  string  $raw
-     *
      * @return self
      */
     public static function load($raw)
     {
         return new static(function () use (&$raw) {
             foreach (LogParser::parse($raw) as $entry) {
-                list($header, $stack) = $entry;
+                [$header, $stack] = $entry;
 
                 yield new LogEntry($header, $stack);
             }
@@ -44,7 +42,6 @@ class LogEntryCollection extends LazyCollection
      * Paginate log entries.
      *
      * @param  int  $perPage
-     *
      * @return Paginator|LengthAwarePaginator
      */
     public function paginate($perPage = 20)
@@ -84,7 +81,6 @@ class LogEntryCollection extends LazyCollection
      * Get filtered log entries by level.
      *
      * @param  string  $level
-     *
      * @return self
      */
     public function filterByLevel($level)
@@ -97,8 +93,6 @@ class LogEntryCollection extends LazyCollection
     /**
      * Get filtered log entries by level.
      *
-     * @param  string  $text
-     * @param  float  $similarity
      *
      * @return self
      */
@@ -111,8 +105,6 @@ class LogEntryCollection extends LazyCollection
 
     /**
      * Get log entries stats.
-     *
-     * @return array
      */
     public function stats(): array
     {
@@ -131,7 +123,6 @@ class LogEntryCollection extends LazyCollection
      * Get the log entries navigation tree.
      *
      * @param  bool|false  $trans
-     *
      * @return array
      */
     public function tree($trans = false)
@@ -140,7 +131,7 @@ class LogEntryCollection extends LazyCollection
 
         array_walk($tree, function (&$count, $level) use ($trans) {
             $count = [
-                'name'  => $trans ? log_levels()->get($level) : $level,
+                'name' => $trans ? log_levels()->get($level) : $level,
                 'count' => $count,
             ];
         });
@@ -148,9 +139,10 @@ class LogEntryCollection extends LazyCollection
         return $tree;
     }
 
-    public function filter(callable $callback = null)
+    public function filter(?callable $callback = null)
     {
         static::$lastCount = null;
+
         return parent::filter($callback);
     }
 }

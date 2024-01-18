@@ -1,12 +1,13 @@
-<?php namespace Arcanedev\LogViewer\Tests\Utilities;
+<?php
 
-use Arcanedev\LogViewer\Utilities\LogLevels;
+namespace Arcanedev\LogViewer\Tests\Utilities;
+
 use Arcanedev\LogViewer\Tests\TestCase;
+use Arcanedev\LogViewer\Utilities\LogLevels;
 
 /**
  * Class     LogLevelsTest
  *
- * @package  Arcanedev\LogViewer\Tests\Utilities
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 class LogLevelsTest extends TestCase
@@ -16,7 +17,7 @@ class LogLevelsTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var  \Arcanedev\LogViewer\Utilities\LogLevels  */
+    /** @var \Arcanedev\LogViewer\Utilities\LogLevels */
     private $levels;
 
     /* -----------------------------------------------------------------
