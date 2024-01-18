@@ -29,7 +29,7 @@
     },
     "require-dev": {
         "laravel/framework": "^9.1",
-        "laravel/pint": "^1.13",
+        "laravel/pint": "^1.5",
         "mockery/mockery": "^1.5",
         "orchestra/testbench-core": "^7.15",
         "phpunit/phpunit": "^9.5"
