@@ -141,7 +141,7 @@
                                 <tr>
                                     <td>
                                         @foreach ($entry->extra as $propName => $extra)
-                                            <a class="badge badge-env badge-extra-{{ $propName }}" href="{{ route('log-viewer::logs.show', array_merge(request()->input(), ['prefix' => $log->prefix, 'date' => $log->date, $key => $extra])) }}">
+                                            <a class="badge badge-env badge-extra-{{ $propName }}" href="{{ route('log-viewer::logs.show', array_merge(request()->input(), ['prefix' => $log->prefix, 'date' => $log->date, $propName => $extra])) }}">
                                                 {{ $extra }}
                                             </a>
                                         @endforeach
