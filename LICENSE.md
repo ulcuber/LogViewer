@@ -1,7 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2015-2019 ARCANEDEV <arcanedev.maroc@gmail.com> - LogViewer
-Copyright (c) 2022 ulcuber <victor17011998@yandex.ru> - LogViewer
+Copyright (c) ARCANEDEV <arcanedev.maroc@gmail.com>, ulcuber <victor17011998@yandex.ru>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
