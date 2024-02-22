@@ -214,7 +214,7 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
         $reminder = array_pop($matches);
 
-        $regex = '/{(?:[^{}]|(?R))*}/xm';
+        $regex = '/(?:\[(?:[^\[\]]|(?R))*\]|{(?:[^{}]|(?R))*})/xm';
         $reminder = preg_replace_callback($regex, function ($replaceable) {
             if (! is_null($context = json_decode($replaceable[0], true))) {
                 $this->setContext($context);
@@ -224,6 +224,7 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
             return $replaceable[0];
         }, $reminder);
+        $regex = '/{(?:[^{}]|(?R))*}/xm';
         if (! $this->context && ! strpos($this->stack, '>>>>>>>>')) {
             $this->stack = preg_replace_callback($regex, function ($replaceable) {
                 if (! is_null($context = json_decode($replaceable[0], true))) {
