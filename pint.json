@@ -1,0 +1,45 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "trailing_comma_in_multiline": true,
+        "align_multiline_comment": true,
+        "combine_consecutive_issets": true,
+        "combine_consecutive_unsets": true,
+        "concat_space": {
+            "spacing": "one"
+        },
+        "declare_strict_types": true,
+        "explicit_string_variable": true,
+        "assign_null_coalescing_to_coalesce_equal": true,
+        "fully_qualified_strict_types": true,
+        "function_typehint_space": true,
+        "ordered_class_elements": {
+            "order": [
+                "use_trait",
+                "case",
+                "constant",
+                "constant_public",
+                "constant_protected",
+                "constant_private",
+                "property_public",
+                "property_protected",
+                "property_private",
+                "construct",
+                "destruct",
+                "phpunit",
+                "method:__invoke",
+                "method_abstract",
+                "method_public_static",
+                "method_protected_static",
+                "method_private_static",
+                "method_public",
+                "method_protected",
+                "method_private",
+                "method:__call",
+                "magic"
+            ]
+        },
+        "ordered_interfaces": true,
+        "ordered_traits": true
+    }
+}
