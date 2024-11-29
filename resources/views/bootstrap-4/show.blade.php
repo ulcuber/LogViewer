@@ -2,7 +2,7 @@
 /**
  * @var  Arcanedev\LogViewer\Entities\Log                                                                     $log
  * @var  Illuminate\Pagination\LengthAwarePaginator|array<string|int, Arcanedev\LogViewer\Entities\LogEntry>  $entries
- * @var  string|null                                                                                          $query
+ * @var  string|null                                                                                          $search
  */
 ?>
 
@@ -78,43 +78,79 @@
                     </table>
                 </div>
                 <div class="card-footer">
-                    {{-- Search --}}
-                    <form action="{{ route('log-viewer::logs.search', [$log->prefix, $log->date, $level]) }}" method="GET">
-                        <div class="form-group">
+                    <form action="{{ route('log-viewer::logs.show', ['prefix' => $log->prefix, 'date' => $log->date, 'level' => $level]) }}" method="GET">
+                        <input type="hidden" name="level" value="{{ $level }}">
+                        <div class="form-row justify-content-between align-items-center">
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <input
+                                        id="fuzzy"
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        name="fuzzy"
+                                        @checked(request('fuzzy'))
+                                    >
+                                    <label class="form-check-label" for="fuzzy">{{
+                                        trans('log-viewer::general.fuzzy-search')
+                                    }}</label>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="form-check">
+                                    <input
+                                        id="unique"
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        name="unique"
+                                        @checked(request('unique'))
+                                    >
+                                    <label class="form-check-label" for="unique">{{
+                                        trans('log-viewer::general.unique')
+                                    }}</label>
+                                </div>
+                            </div>
+                            <div class="col-auto row justify-content-between align-items-center">
+                                <label class="col-form-label" for="similarity">{{ trans('log-viewer::general.similarity') }}</label>
+                                <div class="col-auto">
+                                    <input
+                                        id="similarity"
+                                        type="range"
+                                        class="form-control-range"
+                                        name="similarity"
+                                        min="0"
+                                        max="100"
+                                        value="{{ request('similarity', config('log-viewer.similarity', 76)) }}"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row justify-content-between align-items-center">
+                            <div class="col-auto">
+                                <select class="custom-select" id="order-select" name="order">
+                                    @foreach (['asc', 'desc'] as $o)
+                                        <option value="{{ $o }}" @selected($order == $o)>
+                                            {{ trans("log-viewer::general.order-{$o}") }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group mt-3">
                             <div class="input-group">
-                                <input id="query" name="query" class="form-control" value="{{ $query }}" placeholder="{{ trans('log-viewer::general.search-placeholder') }}">
+                                <input id="search" name="search" class="form-control" value="{{ $search }}" placeholder="{{ trans('log-viewer::general.search-placeholder') }}">
                                 <div class="input-group-append">
-                                    @unless (is_null($query))
+                                    @unless (is_null($search))
                                         <a href="{{ route('log-viewer::logs.show', [$log->prefix, $log->date]) }}" class="btn btn-secondary">
-                                            ({{ $entries->count() }} {{ trans('log-viewer::general.of-results') }}) <i class="bi bi-x-circle"></i>
+                                            <span class="sr-only">{{ trans('log-viewer::general.search-reset') }}</span> <i class="bi bi-x-circle"></i>
                                         </a>
                                     @endunless
                                     <button id="search-btn" class="btn btn-primary">
-                                        <span class="bi bi-search"></span>
+                                        <span class="sr-only">{{ trans('log-viewer::general.search-submit') }}</span> <span class="bi bi-search"></span>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </form>
-                    <div class="row justify-content-between align-items-center">
-                        <div>
-                            @if (config('log-viewer.reversed_order'))
-                                <a class="btn btn-sm btn-info mb-1 mb-md-0" href="{{ route($route, array_merge($filters, ['order' => 'asc'])) }}">{{ trans('log-viewer::general.order-asc') }}</a>
-                            @else
-                                <a class="btn btn-sm btn-info mb-1 mb-md-0" href="{{ route($route, array_merge($filters, ['order' => 'desc'])) }}">{{ trans('log-viewer::general.order-desc') }}</a>
-                            @endif
-                            @if (request('unique'))
-                                <a class="btn btn-sm btn-info mb-1 mb-md-0 active" aria-pressed="true" href="{{ route($route, array_merge($filters, ['unique' => null])) }}">{{ trans('log-viewer::general.unique') }}</a>
-                            @else
-                                <a class="btn btn-sm btn-info mb-1 mb-md-0" href="{{ route($route, array_merge($filters, ['unique' => true])) }}">{{ trans('log-viewer::general.unique') }}</a>
-                            @endif
-                        </div>
-                        <div class="btn-group">
-                            <span class="badge badge-info">{{ trans('log-viewer::general.similarity') }} {{ $similarity }}</span>
-                            <a class="btn badge badge-info" href="{{ route($route, array_merge($filters, ['similarity' => $similarity - 1])) }}">-</a>
-                            <a class="btn badge badge-info" href="{{ route($route, array_merge($filters, ['similarity' => $similarity + 1])) }}">+</a>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -156,8 +192,8 @@
                                         <br/>
 
                                         <div class="btn-group">
-                                            <a class="btn btn-sm btn-light" href="{{ route('log-viewer::logs.similar', [$log->prefix, $log->date, $entry->level, 'text' => $entry->header]) }}">{{ trans('log-viewer::general.similar') }}</a>
-                                            @if (!request('text'))
+                                            <a class="btn btn-sm btn-light" href="{{ route('log-viewer::logs.show', ['prefix' => $log->prefix, 'date' => $log->date, 'level' => $entry->level, 'search' => $entry->header, 'fuzzy' => true]) }}">{{ trans('log-viewer::general.similar') }}</a>
+                                            @if (!request('search'))
                                                 <a class="btn btn-sm btn-light" href="{{ route($route, array_merge($filters, ['exclude_similar' => array_merge($filters['exclude_similar'] ?? [], [$entry->header])])) }}">{{ trans('log-viewer::general.exclude-similar') }}</a>
                                             @endif
                                         </div>
@@ -209,7 +245,7 @@
                 </div>
             </div>
 
-            {!! $entries->appends(compact('query'))->render(method_exists($entries, 'total') ? 'pagination::bootstrap-4' : 'pagination::simple-bootstrap-4') !!}
+            {!! $entries->appends(compact('search'))->render(method_exists($entries, 'total') ? 'pagination::bootstrap-4' : 'pagination::simple-bootstrap-4') !!}
         </section>
     </div>
 @endsection

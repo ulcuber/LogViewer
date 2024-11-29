@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Arcanedev\LogViewer\Contracts\Utilities\Filesystem;
 
 return [
@@ -105,8 +107,6 @@ return [
      */
 
     'menu' => [
-        'filter-route' => 'log-viewer::logs.filter',
-
         'icons-enabled' => true,
     ],
 

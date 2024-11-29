@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Http\Routes;
 
 use Arcanedev\LogViewer\Http\Controllers\LogViewerController;
@@ -58,15 +60,6 @@ class LogViewerRoute extends RouteRegistrar
 
                     $this->get('download', [LogViewerController::class, 'download'])
                         ->name('download'); // log-viewer::logs.download
-
-                    $this->get('{level}', [LogViewerController::class, 'showByLevel'])
-                        ->name('filter'); // log-viewer::logs.filter
-
-                    $this->get('{level}/search', [LogViewerController::class, 'search'])
-                        ->name('search'); // log-viewer::logs.search
-
-                    $this->get('{level}/similar', [LogViewerController::class, 'showSimilar'])
-                        ->name('similar'); // log-viewer::logs.similar
                 });
             });
         });

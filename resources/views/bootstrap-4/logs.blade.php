@@ -38,7 +38,7 @@
                                     @elseif ($value == 0)
                                         <span class="badge empty">{{ $value }}</span>
                                     @else
-                                        <a href="{{ route('log-viewer::logs.filter', [$prefix, $date, $key]) }}">
+                                        <a href="{{ route('log-viewer::logs.show', ['prefix' => $prefix, 'date' => $date, 'level' => $key]) }}">
                                             <span class="badge badge-level-{{ $key }}">{{ $value }}</span>
                                         </a>
                                     @endif

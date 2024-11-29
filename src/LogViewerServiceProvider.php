@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer;
 
 use Arcanedev\Support\Providers\PackageServiceProvider;
@@ -82,7 +84,7 @@ class LogViewerServiceProvider extends PackageServiceProvider
      */
     protected function getTranslationsPath(): string
     {
-        return $this->getBasePath().DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'lang';
+        return $this->getBasePath() . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'lang';
     }
 
     /**
@@ -91,6 +93,6 @@ class LogViewerServiceProvider extends PackageServiceProvider
      */
     protected function getViewsPath(): string
     {
-        return $this->getBasePath().DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR.'views';
+        return $this->getBasePath() . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'views';
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Http\Controllers;
 
 use Arcanedev\LogViewer\Contracts\LogViewer as LogViewerContract;
@@ -31,7 +33,7 @@ class LogViewerController extends Controller
     /**
      * The log viewer instance
      *
-     * @var \Arcanedev\LogViewer\Contracts\LogViewer
+     * @var LogViewerContract
      */
     protected $logViewer;
 
@@ -41,24 +43,11 @@ class LogViewerController extends Controller
     /** @var string */
     protected $showRoute = 'log-viewer::logs.show';
 
-    /* -----------------------------------------------------------------
-     |  Constructor
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * LogViewerController constructor.
-     */
     public function __construct(LogViewerContract $logViewer)
     {
         $this->logViewer = $logViewer;
         $this->perPage = config('log-viewer.per-page', $this->perPage);
     }
-
-    /* -----------------------------------------------------------------
-     |  Main Methods
-     | -----------------------------------------------------------------
-     */
 
     /**
      * Show the dashboard.
@@ -129,99 +118,22 @@ class LogViewerController extends Controller
      */
     public function show(Request $request, string $prefix, string $date)
     {
-        if ($order = $request->order) {
+        $order = $request->get(
+            'order',
+            fn () => config('log-viewer.reversed_order') ? 'desc' : 'asc'
+        );
+        if ($order) {
             config(['log-viewer.reversed_order' => $order === 'desc']);
         }
 
-        $level = 'all';
+        $level = $request->get('level', 'all');
         $log = $this->getLogOrFail($prefix, $date);
-        $query = $request->get('query');
+        $search = $request->get('search');
         $levels = $this->logViewer->levelsNames();
 
         $entries = $this->filter($log->entries($level), $request)->paginate($this->perPage);
 
-        return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
-    }
-
-    /**
-     * Show similar entries.
-     *
-     *
-     * @return \Illuminate\View\View
-     */
-    public function showSimilar(Request $request, string $prefix, string $date, string $level)
-    {
-        if ($order = $request->order) {
-            config(['log-viewer.reversed_order' => $order === 'desc']);
-        }
-
-        $text = $request->get('text', '');
-        $similarity = (float) $request->get('similarity', config('log-viewer.similarity', 76));
-
-        $log = $this->getLogOrFail($prefix, $date);
-        $query = $request->get('query');
-        $levels = $this->logViewer->levelsNames();
-        $entries = $log->getSimilar($text, $similarity)->paginate($this->perPage);
-
-        return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
-    }
-
-    /**
-     * Filter the log entries by level.
-     *
-     *
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
-    public function showByLevel(Request $request, string $prefix, string $date, string $level)
-    {
-        if ($order = $request->order) {
-            config(['log-viewer.reversed_order' => $order === 'desc']);
-        }
-
-        if ($level === 'all') {
-            return redirect()->route($this->showRoute, [$prefix, $date]);
-        }
-
-        $log = $this->getLogOrFail($prefix, $date);
-        $query = $request->get('query');
-        $levels = $this->logViewer->levelsNames();
-        $entries = $this->filter($log->entries($level), $request)->paginate($this->perPage);
-
-        return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
-    }
-
-    /**
-     * Show the log with the search query.
-     *
-     *
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
-    public function search(Request $request, string $prefix, string $date, string $level = 'all')
-    {
-        if ($order = $request->order) {
-            config(['log-viewer.reversed_order' => $order === 'desc']);
-        }
-
-        $query = $request->get('query');
-
-        if (is_null($query)) {
-            return redirect()->route($this->showRoute, [$prefix, $date]);
-        }
-
-        $log = $this->getLogOrFail($prefix, $date);
-        $levels = $this->logViewer->levelsNames();
-        $needles = array_map(function ($needle) {
-            return Str::lower($needle);
-        }, array_filter(explode(' ', $query)));
-        $entries = $this->filter($log->entries($level), $request)
-            ->unless(empty($needles), function (LogEntryCollection $entries) use ($needles) {
-                return $entries->filter(function (LogEntry $entry) use ($needles) {
-                    return Str::containsAll(Str::lower($entry->header), $needles);
-                });
-            })
-            ->paginate($this->perPage);
-
-        return $this->view($request, 'show', compact('level', 'log', 'query', 'levels', 'entries'));
+        return $this->view($request, 'show', compact('level', 'log', 'search', 'levels', 'entries', 'order'));
     }
 
     /**
@@ -260,11 +172,6 @@ class LogViewerController extends Controller
         ]);
     }
 
-    /* -----------------------------------------------------------------
-     |  Other Methods
-     | -----------------------------------------------------------------
-     */
-
     /**
      * Get the evaluated view contents for the given view.
      *
@@ -285,7 +192,7 @@ class LogViewerController extends Controller
         }
         $data['filters'] = $filters;
 
-        $data['similarity'] = (float) $request->get('similarity', config('log-viewer.similarity', 76));
+        $data['similarity'] = $request->float('similarity', (float) config('log-viewer.similarity', 76));
 
         return view()->make("log-viewer::{$theme}.{$view}", $data, $mergeData);
     }
@@ -294,7 +201,7 @@ class LogViewerController extends Controller
      * Paginate logs.
      *
      *
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return LengthAwarePaginator
      */
     protected function paginate(array $data, Request $request)
     {
@@ -315,7 +222,7 @@ class LogViewerController extends Controller
      * Get a log or fail
      *
      *
-     * @return \Arcanedev\LogViewer\Entities\Log|null
+     * @return Log|null
      */
     protected function getLogOrFail(string $prefix, string $date)
     {
@@ -362,7 +269,7 @@ class LogViewerController extends Controller
                 });
             })
             ->when($request->exclude_similar, function (LogEntryCollection $entries, $similar) use ($request) {
-                $similarity = (float) $request->get('similarity', config('log-viewer.similarity', 76));
+                $similarity = $request->float('similarity', (float) config('log-viewer.similarity', 76));
 
                 return $entries->filter(function (LogEntry $entry) use ($similar, $similarity) {
                     foreach ((array) $similar as $text) {
@@ -374,9 +281,34 @@ class LogViewerController extends Controller
                     return true;
                 });
             })
+            ->when($request->search, function (LogEntryCollection $entries, string|array $search) use ($request) {
+                if ($request->boolean('fuzzy')) {
+                    $similarity = $request->float('similarity', (float) config('log-viewer.similarity', 76));
+
+                    return $entries->filter(function (LogEntry $entry) use (&$search, &$similarity) {
+                        foreach ((array) $search as $text) {
+                            if ($entry->isSimilar($text, $similarity)) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+                }
+
+                $needles = array_map(function ($needle) {
+                    return Str::lower($needle);
+                }, array_filter(explode(' ', $search)));
+
+                return $entries->unless(empty($needles), function (LogEntryCollection $entries) use ($needles) {
+                    return $entries->filter(function (LogEntry $entry) use ($needles) {
+                        return Str::containsAll(Str::lower($entry->header), $needles);
+                    });
+                });
+            })
             ->when($request->unique, function (LogEntryCollection $entries) use ($request) {
                 $was = [];
-                $similarity = (float) $request->get('similarity', config('log-viewer.similarity', 76));
+                $similarity = $request->float('similarity', (float) config('log-viewer.similarity', 76));
 
                 return $entries->filter(function (LogEntry $entry) use (&$was, $similarity) {
                     $header = $entry->header;
