@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Tests\Utilities;
 
 use Arcanedev\LogViewer\Tests\TestCase;
@@ -17,7 +19,7 @@ class LogMenuTest extends TestCase
      | -----------------------------------------------------------------
      */
 
-    /** @var \Arcanedev\LogViewer\Utilities\LogMenu */
+    /** @var LogMenu */
     private $menu;
 
     /* -----------------------------------------------------------------
@@ -59,55 +61,55 @@ class LogMenuTest extends TestCase
             'all' => [
                 'name' => 'All',
                 'count' => 8,
-                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01/all',
+                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01?level=all',
                 'icon' => '<i class="bi bi-list"></i>',
             ],
             'emergency' => [
                 'name' => 'Emergency',
                 'count' => 1,
-                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01/emergency',
+                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01?level=emergency',
                 'icon' => '<i class="bi bi-bug"></i>',
             ],
             'alert' => [
                 'name' => 'Alert',
                 'count' => 1,
-                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01/alert',
+                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01?level=alert',
                 'icon' => '<i class="bi bi-bullhorn"></i>',
             ],
             'critical' => [
                 'name' => 'Critical',
                 'count' => 1,
-                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01/critical',
+                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01?level=critical',
                 'icon' => '<i class="bi bi-heartbeat"></i>',
             ],
             'error' => [
                 'name' => 'Error',
                 'count' => 1,
-                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01/error',
+                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01?level=error',
                 'icon' => '<i class="bi bi-times-circle"></i>',
             ],
             'warning' => [
                 'name' => 'Warning',
                 'count' => 1,
-                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01/warning',
+                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01?level=warning',
                 'icon' => '<i class="bi bi-exclamation-triangle"></i>',
             ],
             'notice' => [
                 'name' => 'Notice',
                 'count' => 1,
-                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01/notice',
+                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01?level=notice',
                 'icon' => '<i class="bi bi-exclamation-circle"></i>',
             ],
             'info' => [
                 'name' => 'Info',
                 'count' => 1,
-                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01/info',
+                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01?level=info',
                 'icon' => '<i class="bi bi-info-circle"></i>',
             ],
             'debug' => [
                 'name' => 'Debug',
                 'count' => 1,
-                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01/debug',
+                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01?level=debug',
                 'icon' => '<i class="bi bi-life-ring"></i>',
             ],
         ];

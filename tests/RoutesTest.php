@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Tests;
 
 /**
@@ -64,7 +66,7 @@ class RoutesTest extends TestCase
         $date = '2015-01-01';
         $level = 'error';
 
-        $response = $this->get(route('log-viewer::logs.filter', [$prefix, $date, $level]));
+        $response = $this->get(route('log-viewer::logs.show', [$prefix, $date, $level]));
         $response->assertSuccessful();
 
         static::assertStringContainsString(
@@ -80,9 +82,9 @@ class RoutesTest extends TestCase
         $prefix = 'laravel';
         $date = '2015-01-01';
         $level = 'all';
-        $query = 'This is an error log.';
+        $search = 'This is an error log.';
 
-        $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
+        $response = $this->get(route('log-viewer::logs.show', compact('prefix', 'date', 'level', 'search')));
         $response->assertSuccessful();
 
         /** @var \Illuminate\View\View $view */
@@ -97,16 +99,16 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_search_using_shuffled_query()
+    public function it_can_search_using_shuffled_search()
     {
         $prefix = 'laravel';
         $date = '2015-01-01';
         $level = 'all';
-        $query = explode(' ', 'This is a error log');
-        shuffle($query);
-        $query = implode(' ', $query);
+        $search = explode(' ', 'This is a error log');
+        shuffle($search);
+        $search = implode(' ', $search);
 
-        $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
+        $response = $this->get(route('log-viewer::logs.show', compact('prefix', 'date', 'level', 'search')));
         $response->assertSuccessful();
 
         /** @var \Illuminate\View\View $view */
@@ -121,16 +123,16 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_search_using_case_insensitive_query()
+    public function it_can_search_using_case_insensitive_search()
     {
         $prefix = 'laravel';
         $date = '2015-01-01';
         $level = 'all';
-        $query = explode(' ', 'ThiS Is A ErROr loG');
-        shuffle($query);
-        $query = implode(' ', $query);
+        $search = explode(' ', 'ThiS Is A ErROr loG');
+        shuffle($search);
+        $search = implode(' ', $search);
 
-        $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
+        $response = $this->get(route('log-viewer::logs.show', compact('prefix', 'date', 'level', 'search')));
         $response->assertSuccessful();
 
         /** @var \Illuminate\View\View $view */
@@ -145,16 +147,16 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    public function it_can_still_search_if_extra_spacing_is_in_query()
+    public function it_can_still_search_if_extra_spacing_is_in_search()
     {
         $prefix = 'laravel';
         $date = '2015-01-01';
         $level = 'all';
-        $query = explode(' ', 'ThiS  Is  A  ErROr  loG');
-        shuffle($query);
-        $query = implode(' ', $query);
+        $search = explode(' ', 'ThiS  Is  A  ErROr  loG');
+        shuffle($search);
+        $search = implode(' ', $search);
 
-        $response = $this->get(route('log-viewer::logs.search', compact('prefix', 'date', 'level', 'query')));
+        $response = $this->get(route('log-viewer::logs.show', compact('prefix', 'date', 'level', 'search')));
         $response->assertSuccessful();
 
         /** @var \Illuminate\View\View $view */
@@ -166,20 +168,6 @@ class RoutesTest extends TestCase
         $entries = $view->getData()['entries'];
 
         static::assertCount(1, $entries);
-    }
-
-    /** @test */
-    public function it_must_redirect_on_all_level()
-    {
-        $prefix = 'laravel';
-        $date = '2015-01-01';
-        $level = 'all';
-
-        $response = $this->get(route('log-viewer::logs.filter', [$prefix, $date, $level]));
-
-        static::assertTrue($response->isRedirection());
-        static::assertEquals(302, $response->getStatusCode());
-        // TODO: Add more assertion to check the redirect url
     }
 
     /** @test */
@@ -198,7 +186,7 @@ class RoutesTest extends TestCase
             \Symfony\Component\HttpFoundation\BinaryFileResponse::class,
             $base
         );
-        static::assertEquals("laravel-$date.log", $base->getFile()->getFilename());
+        static::assertEquals("laravel-{$date}.log", $base->getFile()->getFilename());
     }
 
     /** @test */
@@ -231,7 +219,7 @@ class RoutesTest extends TestCase
         );
 
         static::assertSame(404, $response->getStatusCode());
-        static::assertSame("Log not found for [$prefix][0000-00-00]", $response->exception->getMessage());
+        static::assertSame("Log not found for [{$prefix}][0000-00-00]", $response->exception->getMessage());
     }
 
     /** @test */

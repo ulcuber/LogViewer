@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Commands;
 
 use Arcanedev\LogViewer\Contracts\Utilities\Filesystem as FilesystemContract;
