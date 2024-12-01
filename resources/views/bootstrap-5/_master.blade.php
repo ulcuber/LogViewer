@@ -7,10 +7,10 @@
     <meta name="author" content="ARCANEDEV">
     <title>LogViewer - Created by ARCANEDEV</title>
     {{-- Styles --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700|Source+Sans+Pro:400,600' rel='stylesheet' type='text/css'>
-    @include('log-viewer::bootstrap-4._styles')
+    @include('log-viewer::bootstrap-5._styles')
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-dark sticky-top bg-dark p-0">
@@ -56,7 +56,10 @@
     <footer class="main-footer">
         <div class="container-fluid d-flex flex-wrap justify-content-between">
             <p class="text-muted">
-                LogViewer - <span class="badge badge-info">version {{ log_viewer()->version() }}</span>
+                <a href="https://github.com/ulcuber/LogViewer/tree/v9.x">
+                    <i class="bi bi-github"></i>
+                    LogViewer
+                </a> - <span class="badge text-bg-info">version {{ log_viewer()->version() }}</span>
             </p>
             <p class="text-muted">
                 {{ log_viewer()->memoryString() }}
@@ -69,9 +72,37 @@
 
     {{-- Scripts --}}
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    {{-- with popper --}}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+
+    <script>
+        $(() => {
+          const locale = undefined;
+          const dateTimeFormat = new Intl.DateTimeFormat(locale, {
+            dateStyle: 'short',
+            timeStyle: 'short',
+          });
+          const timeFormat = new Intl.DateTimeFormat(locale, {
+            timeStyle: 'short',
+          });
+
+          function local(selector, formatter) {
+            const elements = document.querySelectorAll(selector);
+            const dates = Array.from(elements);
+            el = dates.pop();
+            while (el) {
+              el.textContent = formatter.format(
+                  new Date(el.getAttribute('datetime'))
+              );
+              el = dates.pop();
+            }
+          }
+
+          local('time.datetime', dateTimeFormat);
+          local('time.time', timeFormat);
+        });
+    </script>
 
     @yield('modals')
     @yield('scripts')

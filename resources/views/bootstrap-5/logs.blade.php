@@ -1,6 +1,4 @@
-@extends('log-viewer::bootstrap-4._master')
-
-<?php /** @var  Illuminate\Pagination\LengthAwarePaginator  $rows */ ?>
+@extends('log-viewer::bootstrap-5._master')
 
 @section('content')
     <div class="page-header mb-4">
@@ -14,9 +12,9 @@
                     @foreach($headers as $key => $header)
                     <th scope="col" class="text-center">
                         @if ($key == 'date' || $key == 'prefix')
-                            <span class="badge badge-info">{{ $header }}</span>
+                            <span class="badge text-bg-info">{{ $header }}</span>
                         @else
-                            <span class="badge badge-level-{{ $key }}">
+                            <span class="badge text-bg-level-{{ $key }}">
                                 {{ log_styler()->icon($key) }}
                             </span>
                         @endif
@@ -32,21 +30,21 @@
                             @foreach($row as $key => $value)
                                 <td class="text-center">
                                     @if ($key == 'date')
-                                        <a href="{{ route('log-viewer::logs.list', compact('date')) }}"><span class="badge badge-primary">{{ $value }}</span></a>
+                                        <a href="{{ route('log-viewer::logs.list', compact('date')) }}"><span class="badge text-bg-primary">{{ $value }}</span></a>
                                     @elseif ($key == 'prefix')
-                                        <a href="{{ route('log-viewer::logs.list', ['prefix' => $value]) }}"><span class="badge badge-primary">{{ $value }}</span></a>
+                                        <a href="{{ route('log-viewer::logs.list', ['prefix' => $value]) }}"><span class="badge text-bg-primary">{{ $value }}</span></a>
                                     @elseif ($value == 0)
                                         <span class="badge empty">{{ $value }}</span>
                                     @else
-                                        <a href="{{ route('log-viewer::logs.show', ['prefix' => $prefix, 'date' => $date, 'level' => $key]) }}">
-                                            <span class="badge badge-level-{{ $key }}">{{ $value }}</span>
+                                        <a href="{{ route('log-viewer::logs.show', ['prefix' => $prefix, 'date' => $date, 'level' => $key === 'all' ? null : $key]) }}">
+                                            <span class="badge text-bg-level-{{ $key }}">{{ $value }}</span>
                                         </a>
                                     @endif
                                 </td>
                             @endforeach
                             <td class="text-right">
                                 <a href="{{ route('log-viewer::logs.show', [$prefix, $date]) }}" class="btn btn-sm btn-info">
-                                    <i class="bi bi-search"></i>
+                                    <i class="bi bi-eye"></i>
                                 </a>
                                 <a href="{{ route('log-viewer::logs.download', [$prefix, $date]) }}" class="btn btn-sm btn-success">
                                     <i class="bi bi-download"></i>
@@ -60,7 +58,7 @@
                 @empty
                     <tr>
                         <td colspan="11" class="text-center">
-                            <span class="badge badge-secondary">{{ trans('log-viewer::general.empty-logs') }}</span>
+                            <span class="badge text-bg-secondary">{{ trans('log-viewer::general.empty-logs') }}</span>
                         </td>
                     </tr>
                 @endforelse
@@ -114,7 +112,7 @@
                 deleteLogForm.find('input[name=prefix]').val(prefix);
                 deleteLogForm.find('input[name=date]').val(date);
                 deleteLogModal.find('.modal-body p').html(
-                    'Are you sure you want to <span class="badge badge-danger">DELETE</span> this log file <span class="badge badge-secondary">' + prefix + '</span> <span class="badge badge-primary">' + date + '</span> ?'
+                    'Are you sure you want to <span class="badge text-bg-danger">DELETE</span> this log file <span class="badge text-bg-secondary">' + prefix + '</span> <span class="badge text-bg-primary">' + date + '</span> ?'
                 );
 
                 deleteLogModal.modal('show');

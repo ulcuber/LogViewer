@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Helpers;
 
 use Arcanedev\LogViewer\Entities\LogEntry;
@@ -12,22 +14,7 @@ use Illuminate\Support\LazyCollection;
  */
 class LogParser
 {
-    /* -----------------------------------------------------------------
-     |  Properties
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Parsed data.
-     *
-     * @var array
-     */
-    protected static $parsed = [];
-
-    /* -----------------------------------------------------------------
-     |  Main Methods
-     | -----------------------------------------------------------------
-     */
+    protected static array $parsed = [];
 
     /**
      * Parse file content.
@@ -40,15 +27,15 @@ class LogParser
         static::$parsed = [];
 
         if ($raw instanceof LazyCollection) {
-            $pattern = '/^'.REGEX_DATE_PATTERN.REGEX_DATETIME_SEPARATOR
-                .REGEX_TIME_PATTERN.REGEX_MS_PATTERN.REGEX_TIMEZONE_PATTERN.'/';
+            $pattern = '/^' . REGEX_DATE_PATTERN . REGEX_DATETIME_SEPARATOR
+                . REGEX_TIME_PATTERN . REGEX_MS_PATTERN . REGEX_TIMEZONE_PATTERN . '/';
 
             return LazyCollection::make(function () use (&$pattern, &$raw) {
                 $stack = '';
                 $prevHeader = null;
                 $reminder = '';
                 foreach ($raw as $chunk) {
-                    $lines = explode("\n", $reminder.$chunk);
+                    $lines = explode("\n", $reminder . $chunk);
                     $reminder = array_pop($lines);
                     foreach ($lines as $line) {
                         /**
@@ -70,7 +57,7 @@ class LogParser
                             $prevHeader = $header;
                             $stack = '';
                         } else {
-                            $stack .= $line.PHP_EOL;
+                            $stack .= $line . PHP_EOL;
                         }
                         unset($headings);
                     }
@@ -80,7 +67,7 @@ class LogParser
                 }
             });
         } else {
-            $pattern = '/(?:\r?\n|^)'.REGEX_DATETIME_PATTERN.'/';
+            $pattern = '/(?:\r?\n|^)' . REGEX_DATETIME_PATTERN . '/';
 
             preg_match_all($pattern, $raw, $headings);
             // shift whole match
@@ -109,12 +96,12 @@ class LogParser
     public static function count($raw): int
     {
         if ($raw instanceof LazyCollection) {
-            $pattern = '/^'.REGEX_DATE_PATTERN.REGEX_DATETIME_SEPARATOR
-                .REGEX_TIME_PATTERN.REGEX_MS_PATTERN.REGEX_TIMEZONE_PATTERN.'/';
+            $pattern = '/^' . REGEX_DATE_PATTERN . REGEX_DATETIME_SEPARATOR
+                . REGEX_TIME_PATTERN . REGEX_MS_PATTERN . REGEX_TIMEZONE_PATTERN . '/';
             $count = 0;
             $reminder = '';
             foreach ($raw as $chunk) {
-                $lines = explode("\n", $reminder.$chunk);
+                $lines = explode("\n", $reminder . $chunk);
                 $reminder = array_pop($lines);
                 foreach ($lines as $line) {
                     if (
@@ -128,7 +115,7 @@ class LogParser
 
             return $count;
         } else {
-            $pattern = '/(?:\r?\n|^)'.REGEX_DATETIME_PATTERN.'/';
+            $pattern = '/(?:\r?\n|^)' . REGEX_DATETIME_PATTERN . '/';
 
             return preg_match_all($pattern, $raw, $headings) ?: 0;
         }
@@ -142,11 +129,11 @@ class LogParser
         $levelGroup = LogEntry::levelGroup();
 
         if ($raw instanceof LazyCollection) {
-            $pattern = '/^'.REGEX_DATE_PATTERN.REGEX_DATETIME_SEPARATOR
-                .REGEX_TIME_PATTERN.REGEX_MS_PATTERN.REGEX_TIMEZONE_PATTERN.'/';
+            $pattern = '/^' . REGEX_DATE_PATTERN . REGEX_DATETIME_SEPARATOR
+                . REGEX_TIME_PATTERN . REGEX_MS_PATTERN . REGEX_TIMEZONE_PATTERN . '/';
             $reminder = '';
             foreach ($raw as $chunk) {
-                $lines = explode("\n", $reminder.$chunk);
+                $lines = explode("\n", $reminder . $chunk);
                 $reminder = array_pop($lines);
                 foreach ($lines as $line) {
                     $headings = explode(']', $line, 2);
@@ -162,7 +149,7 @@ class LogParser
                 }
             }
         } else {
-            $pattern = '/(?:\r?\n|^)'.REGEX_DATETIME_PATTERN.'/';
+            $pattern = '/(?:\r?\n|^)' . REGEX_DATETIME_PATTERN . '/';
             preg_match_all($pattern, $raw, $headings);
             // shift whole match
             array_shift($headings);
@@ -178,9 +165,6 @@ class LogParser
         return $counters;
     }
 
-    /**
-     * Init stats counters.
-     */
     public static function initStats(): array
     {
         $levels = array_merge_recursive(

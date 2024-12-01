@@ -58,6 +58,9 @@ class LogViewerRoute extends RouteRegistrar
                     $this->get('/', [LogViewerController::class, 'show'])
                         ->name('show'); // log-viewer::logs.show
 
+                    $this->get('stats', [LogViewerController::class, 'stats'])
+                        ->name('stats'); // log-viewer::logs.stats
+
                     $this->get('download', [LogViewerController::class, 'download'])
                         ->name('download'); // log-viewer::logs.download
                 });

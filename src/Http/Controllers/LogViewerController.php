@@ -11,12 +11,15 @@ use Arcanedev\LogViewer\Entities\LogEntry;
 use Arcanedev\LogViewer\Entities\LogEntryCollection;
 use Arcanedev\LogViewer\Exceptions\LogNotFoundException;
 use Arcanedev\LogViewer\Tables\StatsTable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
  * Class     LogViewerController
@@ -40,21 +43,13 @@ class LogViewerController extends Controller
     /** @var int */
     protected $perPage = 30;
 
-    /** @var string */
-    protected $showRoute = 'log-viewer::logs.show';
-
     public function __construct(LogViewerContract $logViewer)
     {
         $this->logViewer = $logViewer;
         $this->perPage = config('log-viewer.per-page', $this->perPage);
     }
 
-    /**
-     * Show the dashboard.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $stats = $this->logViewer->statsTable();
         $chartData = $this->prepareChartData($stats);
@@ -66,7 +61,7 @@ class LogViewerController extends Controller
     /**
      * Show the dashboard for today.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function today(Request $request)
     {
@@ -83,7 +78,7 @@ class LogViewerController extends Controller
      * List all logs.
      *
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
     public function listLogs(Request $request)
     {
@@ -110,13 +105,7 @@ class LogViewerController extends Controller
         return $this->view($request, 'logs', compact('headers', 'rows'));
     }
 
-    /**
-     * Show the log.
-     *
-     *
-     * @return \Illuminate\View\View
-     */
-    public function show(Request $request, string $prefix, string $date)
+    public function show(Request $request, string $prefix, string $date): View
     {
         $order = $request->get(
             'order',
@@ -136,24 +125,59 @@ class LogViewerController extends Controller
         return $this->view($request, 'show', compact('level', 'log', 'search', 'levels', 'entries', 'order'));
     }
 
-    /**
-     * Download the log
-     *
-     *
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
-     */
-    public function download(string $prefix, string $date)
+    public function stats(Request $request, string $prefix, string $date): View
+    {
+        $level = $request->get('level', 'all');
+        $routeLevel = $level === 'all' ? null : $level;
+
+        $log = $this->getLogOrFail($prefix, $date);
+        $search = $request->get('search');
+        $levels = $this->logViewer->levelsNames();
+
+        $entries = $this->filter($log->entries($level), $request);
+
+        $stats = [
+            'has_context' => 0,
+        ];
+        $context = [];
+        foreach ($entries as $entry) {
+            /** @var LogEntry $entry */
+            if ($entry->hasContext()) {
+                $stats['has_context']++;
+                $flat = Arr::dot($entry->context);
+                foreach ($flat as $dottedKey => $value) {
+                    if (! isset($context[$dottedKey])) {
+                        $context[$dottedKey] = [];
+                    }
+
+                    if (isset($context[$dottedKey][$value])) {
+                        $context[$dottedKey][$value]['count']++;
+                    } else {
+                        $context[$dottedKey][$value] = [
+                            'url' => route('log-viewer::logs.show', [
+                                'prefix' => $log->prefix,
+                                'date' => $log->date,
+                                'level' => $routeLevel,
+                                'context' => [
+                                    $dottedKey => $value,
+                                ],
+                            ]),
+                            'count' => 1,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $this->view($request, 'stats', compact('level', 'log', 'search', 'levels', 'stats', 'context'));
+    }
+
+    public function download(string $prefix, string $date): BinaryFileResponse
     {
         return $this->logViewer->download($prefix, $date);
     }
 
-    /**
-     * Delete a log.
-     *
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function delete(Request $request)
+    public function delete(Request $request): JsonResponse
     {
         abort_unless($request->ajax(), 405, 'Method Not Allowed');
 
@@ -172,15 +196,7 @@ class LogViewerController extends Controller
         ]);
     }
 
-    /**
-     * Get the evaluated view contents for the given view.
-     *
-     * @param  string  $view
-     * @param  array  $data
-     * @param  array  $mergeData
-     * @return \Illuminate\View\View
-     */
-    protected function view(Request $request, $view, $data = [], $mergeData = [])
+    protected function view(Request $request, string $view, array $data = [], array $mergeData = []): View
     {
         $theme = config('log-viewer.theme');
 
@@ -197,13 +213,7 @@ class LogViewerController extends Controller
         return view()->make("log-viewer::{$theme}.{$view}", $data, $mergeData);
     }
 
-    /**
-     * Paginate logs.
-     *
-     *
-     * @return LengthAwarePaginator
-     */
-    protected function paginate(array $data, Request $request)
+    protected function paginate(array $data, Request $request): LengthAwarePaginator
     {
         $data = new Collection($data);
         $page = $request->get('page', 1);
@@ -218,13 +228,7 @@ class LogViewerController extends Controller
         );
     }
 
-    /**
-     * Get a log or fail
-     *
-     *
-     * @return Log|null
-     */
-    protected function getLogOrFail(string $prefix, string $date)
+    protected function getLogOrFail(string $prefix, string $date): Log
     {
         $log = null;
 
@@ -243,6 +247,7 @@ class LogViewerController extends Controller
         $uuidKeys = ['uuid', 'parentUuid'];
         $uuids = Arr::only($extras, $uuidKeys);
         $extras = Arr::except($extras, $uuidKeys);
+        $context = $request->context;
 
         return $entries->unless(empty($uuids), function (LogEntryCollection $entries) use ($uuids, $uuidKeys) {
             return $entries->filter(function (LogEntry $entry) use ($uuids, $uuidKeys) {
@@ -306,6 +311,21 @@ class LogViewerController extends Controller
                     });
                 });
             })
+            ->unless(empty($context), function (LogEntryCollection $entries) use (&$context) {
+                return $entries->filter(function (LogEntry $entry) use (&$context) {
+                    if ($entry->hasNotContext()) {
+                        return false;
+                    }
+
+                    foreach ((array) $context as $key => $value) {
+                        if (Arr::get($entry->context, $key) === $value) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                });
+            })
             ->when($request->unique, function (LogEntryCollection $entries) use ($request) {
                 $was = [];
                 $similarity = $request->float('similarity', (float) config('log-viewer.similarity', 76));
@@ -329,13 +349,7 @@ class LogViewerController extends Controller
             });
     }
 
-    /**
-     * Prepare chart data.
-     *
-     *
-     * @return string
-     */
-    protected function prepareChartData(StatsTable $stats)
+    protected function prepareChartData(StatsTable $stats): string
     {
         $totals = $stats->totals()->all();
 
@@ -351,13 +365,7 @@ class LogViewerController extends Controller
         ]);
     }
 
-    /**
-     * Calculate the percentage.
-     *
-     *
-     * @return array
-     */
-    protected function calcPercentages(array $total, array $names)
+    protected function calcPercentages(array $total, array $names): array
     {
         $percents = [];
         $all = Arr::get($total, 'all');

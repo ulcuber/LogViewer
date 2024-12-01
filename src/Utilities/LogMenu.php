@@ -16,62 +16,31 @@ use Illuminate\Contracts\Config\Repository as ConfigContract;
  */
 class LogMenu implements LogMenuContract
 {
-    /**
-     * The config repository instance.
-     *
-     * @var ConfigContract
-     */
-    protected $config;
+    protected ConfigContract $config;
 
-    /**
-     * The log styler instance.
-     *
-     * @var LogStylerContract
-     */
-    protected $styler;
+    protected LogStylerContract $styler;
 
-    /**
-     * LogMenu constructor.
-     */
     public function __construct(ConfigContract $config, LogStylerContract $styler)
     {
         $this->setConfig($config);
         $this->setLogStyler($styler);
     }
 
-    /**
-     * Set the config instance.
-     *
-     *
-     * @return self
-     */
-    public function setConfig(ConfigContract $config)
+    public function setConfig(ConfigContract $config): static
     {
         $this->config = $config;
 
         return $this;
     }
 
-    /**
-     * Set the log styler instance.
-     *
-     *
-     * @return self
-     */
-    public function setLogStyler(LogStylerContract $styler)
+    public function setLogStyler(LogStylerContract $styler): static
     {
         $this->styler = $styler;
 
         return $this;
     }
 
-    /**
-     * Make log menu.
-     *
-     *
-     * @return array
-     */
-    public function make(Log $log, bool $trans = true)
+    public function make(Log $log, bool $trans = true): array
     {
         $items = [];
 
@@ -80,7 +49,7 @@ class LogMenu implements LogMenuContract
                 'url' => route('log-viewer::logs.show', [
                     'prefix' => $log->prefix,
                     'date' => $log->date,
-                    'level' => $level,
+                    'level' => $level === 'all' ? null : $level,
                 ]),
                 'icon' => $this->isIconsEnabled() ? $this->styler->icon($level)->toHtml() : '',
             ]);
@@ -89,30 +58,11 @@ class LogMenu implements LogMenuContract
         return $items;
     }
 
-    /* -----------------------------------------------------------------
-     |  Check Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Check if the icons are enabled.
-     */
     protected function isIconsEnabled(): bool
     {
         return (bool) $this->config('menu.icons-enabled', false);
     }
 
-    /* -----------------------------------------------------------------
-     |  Other Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Get config.
-     *
-     * @param  mixed  $default
-     * @return mixed
-     */
     protected function config(string $key, $default = null)
     {
         return $this->config->get("log-viewer.{$key}", $default);

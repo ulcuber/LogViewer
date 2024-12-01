@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Entities;
 
-use Carbon\Carbon;
+use Closure;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 use JsonSerializable;
 
@@ -23,65 +26,53 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
 
     /**
      * Regex to search groups after date
-     *
-     * @var string
      */
-    public static $regex = '/(?:\[([^\[\]]*?)\])?(?:\[([^\[\]]*?)\])? ([a-z]+)\.([A-Z]+): (.*)/';
+    public static string $regex = '/(?:\[([^\[\]]*?)\])?(?:\[([^\[\]]*?)\])? ([a-z]+)\.([A-Z]+): (.*)/';
+
+    public string $env;
+
+    public string $level;
+
+    public string $header;
+
+    public ?string $stack;
+
+    public array $context = [];
+
+    public array $extra = [];
 
     /**
      * Group numbers matched to its setter methods
-     *
-     * @var array
      */
-    protected static $propertyGroups = [
+    protected static array $propertyGroups = [
         3 => 'setEnv',
         4 => 'setLevel',
     ];
 
     /**
      * Group numbers matched to keys on array of extra properties
-     *
-     * @var array
      */
-    protected static $extraGroups = [
+    protected static array $extraGroups = [
         1 => 'uuid',
         2 => 'parentUuid',
     ];
 
-    /* -----------------------------------------------------------------
-     |  Properties
-     | -----------------------------------------------------------------
-     */
+    protected Carbon|Closure $datetime;
 
-    /** @var string */
-    public $env;
-
-    /** @var string */
-    public $level;
-
-    /** @var \Carbon\Carbon|callable */
-    protected $datetime;
-
-    /** @var string */
-    public $header;
-
-    /** @var string */
-    public $stack;
-
-    /** @var array */
-    public $context = [];
-
-    /** @var array */
-    public $extra = [];
+    public function __construct(array $header, ?string $stack = null)
+    {
+        $this->setStack($stack);
+        $this->setHeader($header);
+    }
 
     /**
      * Configures cached config from `log-viewer` config
      */
     public static function configure(): void
     {
-        static::$regex = '/'.config('log-viewer.parser.regex').'/';
+        static::$regex = '/' . config('log-viewer.parser.regex') . '/';
         foreach (config('log-viewer.parser.property_groups') as $group => $property) {
-            static::$propertyGroups[$group] = 'set'.ucfirst($property);
+            static::$propertyGroups[$group] = 'set' . ucfirst($property);
         }
         static::$extraGroups = config('log-viewer.parser.extra_groups');
     }
@@ -91,75 +82,6 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
         return array_flip(static::$propertyGroups)['setLevel'];
     }
 
-    /* -----------------------------------------------------------------
-     |  Constructor
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Construct the log entry instance.
-     *
-     * @param  string|null  $stack
-     */
-    public function __construct(array $header, $stack = null)
-    {
-        $this->setStack($stack);
-        $this->setHeader($header);
-    }
-
-    /* -----------------------------------------------------------------
-     |  Getters & Setters
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Magic isset for extra parameters, configured via `parser.extra_groups`
-     */
-    public function __isset(string $name): bool
-    {
-        return isset($this->extra[$name]);
-    }
-
-    /**
-     * Magic getter for extra parameters, configured via `parser.extra_groups`
-     */
-    public function __get(string $name): ?string
-    {
-        return $this->extra[$name] ?? null;
-    }
-
-    /**
-     * Set entry environment.
-     *
-     * @param  string  $env
-     * @return self
-     */
-    protected function setEnv($env)
-    {
-        $this->env = $env;
-
-        return $this;
-    }
-
-    /**
-     * Set the entry level.
-     *
-     * @param  string  $level
-     * @return self
-     */
-    protected function setLevel($level)
-    {
-        $this->level = strtolower($level);
-
-        return $this;
-    }
-
-    /**
-     * Get the entry date time.
-     *
-     * @param  string  $format
-     * @param  string  $datetime
-     */
     public function getDatetime(): Carbon
     {
         if (is_callable($this->datetime)) {
@@ -170,33 +92,127 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Set the entry date time.
-     *
-     * @param  string  $format
-     * @param  string  $datetime
-     * @return \Arcanedev\LogViewer\Entities\LogEntry
+     * Get translated level name with icon.
      */
-    protected function setDatetime($format, $datetime)
+    public function level(): string
+    {
+        return $this->icon()->toHtml() . ' ' . $this->name();
+    }
+
+    /**
+     * Get translated level name.
+     */
+    public function name(): string
+    {
+        return log_levels()->get($this->level);
+    }
+
+    /**
+     * Get level icon.
+     */
+    public function icon(): HtmlString
+    {
+        return log_styler()->icon($this->level);
+    }
+
+    /**
+     * Get the entry stack.
+     */
+    public function stack(): string
+    {
+        return trim(htmlentities($this->stack));
+    }
+
+    /**
+     * Get the entry context as json pretty print.
+     */
+    public function context(): string
+    {
+        return json_encode($this->context, static::JSON_FLAGS);
+    }
+
+    public function toArray(): array
+    {
+        return [
+            'uuid' => $this->uuid,
+            'level' => $this->level,
+            'datetime' => $this->getDatetime()->format('Y-m-d H:i:s'),
+            'header' => $this->header,
+            'stack' => $this->stack,
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toJson($options = 0): string
+    {
+        return json_encode($this->toArray(), $options);
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
+    }
+
+    public function hasStack(): bool
+    {
+        return ! is_null($this->stack) && $this->stack !== "\n";
+    }
+
+    public function hasContext(): bool
+    {
+        return ! empty($this->context);
+    }
+
+    public function hasNotContext(): bool
+    {
+        return empty($this->context);
+    }
+
+    public function isSameLevel(string $level): bool
+    {
+        return $this->level === $level;
+    }
+
+    public function isSimilar(string $text, float $similarity): bool
+    {
+        $percent = 0;
+
+        similar_text($text, $this->header, $percent);
+
+        return $percent >= $similarity;
+    }
+
+    protected function setEnv(string $env): static
+    {
+        $this->env = $env;
+
+        return $this;
+    }
+
+    protected function setLevel(string $level): static
+    {
+        $this->level = strtolower($level);
+
+        return $this;
+    }
+
+    protected function setDatetime(string $format, string $datetime): static
     {
         // defer Carbon instances as they are too heavy
         $this->datetime = function () use ($format, $datetime) {
             try {
                 return Carbon::createFromFormat($format, $datetime);
             } catch (\Throwable $th) {
-                throw new Exception($th->getMessage().": ([$datetime] -> [$format]) ", $th->getCode(), $th);
+                throw new Exception($th->getMessage() . ": ([{$datetime}] -> [{$format}]) ", $th->getCode(), $th);
             }
         };
 
         return $this;
     }
 
-    /**
-     * Set the entry header.
-     *
-     *
-     * @return self
-     */
-    protected function setHeader(array $header)
+    protected function setHeader(array $header): static
     {
         $reminder = array_pop($header);
 
@@ -242,156 +258,19 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
         return $this;
     }
 
-    /**
-     * Set the entry stack.
-     *
-     * @param  string  $stack
-     * @return self
-     */
-    protected function setStack($stack)
+    protected function setStack(?string $stack): static
     {
         $this->stack = $stack;
 
         return $this;
     }
 
-    /**
-     * Set the context.
-     *
-     *
-     * @return $this
-     */
-    protected function setContext(array $context)
+    protected function setContext(array $context): static
     {
         $this->context = $context;
 
         return $this;
     }
-
-    /**
-     * Get translated level name with icon.
-     */
-    public function level(): string
-    {
-        return $this->icon()->toHtml().' '.$this->name();
-    }
-
-    /**
-     * Get translated level name.
-     */
-    public function name(): string
-    {
-        return log_levels()->get($this->level);
-    }
-
-    /**
-     * Get level icon.
-     */
-    public function icon(): HtmlString
-    {
-        return log_styler()->icon($this->level);
-    }
-
-    /**
-     * Get the entry stack.
-     */
-    public function stack(): string
-    {
-        return trim(htmlentities($this->stack));
-    }
-
-    /**
-     * Get the entry context as json pretty print.
-     */
-    public function context(): string
-    {
-        return json_encode($this->context, static::JSON_FLAGS);
-    }
-
-    /* -----------------------------------------------------------------
-     |  Convert Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Get the log entry as an array.
-     */
-    public function toArray(): array
-    {
-        return [
-            'uuid' => $this->uuid,
-            'level' => $this->level,
-            'datetime' => $this->getDatetime()->format('Y-m-d H:i:s'),
-            'header' => $this->header,
-            'stack' => $this->stack,
-        ];
-    }
-
-    /**
-     * Convert the log entry to its JSON representation.
-     *
-     * @param  int  $options
-     */
-    public function toJson($options = 0): string
-    {
-        return json_encode($this->toArray(), $options);
-    }
-
-    /**
-     * Serialize the log entry object to json data.
-     */
-    public function jsonSerialize(): array
-    {
-        return $this->toArray();
-    }
-
-    /* -----------------------------------------------------------------
-     |  Check Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Check if the entry has a stack.
-     */
-    public function hasStack(): bool
-    {
-        return ! is_null($this->stack) && $this->stack !== "\n";
-    }
-
-    /**
-     * Check if the entry has a context.
-     */
-    public function hasContext(): bool
-    {
-        return ! empty($this->context);
-    }
-
-    /**
-     * Check if same log level.
-     *
-     * @param  string  $level
-     */
-    public function isSameLevel($level): bool
-    {
-        return $this->level === $level;
-    }
-
-    /**
-     * Check if similar to.
-     */
-    public function isSimilar(string $text, float $similarity): bool
-    {
-        $percent = 0;
-
-        similar_text($text, $this->header, $percent);
-
-        return $percent >= $similarity;
-    }
-
-    /* -----------------------------------------------------------------
-     |  Other Methods
-     | -----------------------------------------------------------------
-     */
 
     /**
      * Extract datetime from the header.
@@ -401,10 +280,26 @@ class LogEntry implements Arrayable, Jsonable, JsonSerializable
         $ms = ($header[3] ?? null) ? '.u' : '';
         $tz = ($header[4] ?? null) ? 'P' : '';
         $format = "Y-m-d\TH:i:s{$ms}{$tz}";
-        $datetime = $header[0].'T'.$header[2]
-            .(($header[3] ?? null) ? '.'.mb_strcut($header[3], 1, 6) : '')
-            .($header[4] ?? '');
+        $datetime = $header[0] . 'T' . $header[2]
+            . (($header[3] ?? null) ? '.' . mb_strcut($header[3], 1, 6) : '')
+            . ($header[4] ?? '');
 
         return [$format, $datetime];
+    }
+
+    /**
+     * Magic isset for extra parameters, configured via `parser.extra_groups`
+     */
+    public function __isset(string $name): bool
+    {
+        return isset($this->extra[$name]);
+    }
+
+    /**
+     * Magic getter for extra parameters, configured via `parser.extra_groups`
+     */
+    public function __get(string $name): ?string
+    {
+        return $this->extra[$name] ?? null;
     }
 }

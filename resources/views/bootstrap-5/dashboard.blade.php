@@ -1,4 +1,4 @@
-@extends('log-viewer::bootstrap-4._master')
+@extends('log-viewer::bootstrap-5._master')
 
 @section('content')
     <div class="page-header mb-4">

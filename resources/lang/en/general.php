@@ -14,6 +14,7 @@ return [
     'header' => 'Header',
     'download' => 'Download',
     'delete' => 'Delete',
+    'stats' => 'Stats',
     'info-actions' => 'Info/Actions',
     'levels' => 'Levels',
     'log-info' => 'Log info:',

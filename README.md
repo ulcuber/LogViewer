@@ -24,15 +24,17 @@ Feel free to check out the [releases](https://github.com/ulcuber/LogViewer/relea
 -   Logs menu/tree generator.
 -   Grouped logs by dates and levels.
 -   Customized log levels icons (bootstrap icons by default).
--   Works great with big logs
+-   Works great with big logs.
 -   Well documented package (IDE Friendly).
--   Well tested
--   Any date format
--   Custom regex to parse extra params
--   Well optimized
--   Could be balanced between Memory/CPU consumption
--   Filters for any parsed params
--   Search for similar log entries
+-   Well tested.
+-   Any date format.
+-   Local dates displayed (in browser timezone).
+-   Custom regex to parse extra params.
+-   Well optimized.
+-   Could be balanced between Memory/CPU consumption.
+-   Filters for any parsed params.
+-   Search for [similar](https://www.php.net/manual/en/function.similar-text.php) log entries.
+-   Logs context stats.
 
 ## Table of contents
 

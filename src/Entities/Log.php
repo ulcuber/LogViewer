@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Entities;
 
 use Arcanedev\LogViewer\Helpers\LogParser;
+use Closure;
+use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Carbon;
@@ -15,43 +19,25 @@ use SplFileInfo;
  *
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
-class Log implements Arrayable, Jsonable, JsonSerializable
+class Log implements Arrayable, Countable, Jsonable, JsonSerializable
 {
-    /* -----------------------------------------------------------------
-     |  Properties
-     | -----------------------------------------------------------------
-     */
+    public string $prefix;
 
-    /** @var string */
-    public $prefix;
+    public string $date;
 
-    /** @var string */
-    public $date;
+    protected string $path;
 
-    /** @var string */
-    protected $path;
+    protected int $count = 0;
 
-    /** @var array|null */
-    protected $stats;
+    protected array|Closure|null $stats = null;
 
-    /** @var \Arcanedev\LogViewer\Entities\LogEntryCollection */
-    protected $entries;
+    protected LogEntryCollection $entries;
 
-    /** @var \SplFileInfo */
-    protected $file;
+    protected SplFileInfo $file;
 
-    /* -----------------------------------------------------------------
-     |  Constructor
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Log constructor.
-     *
-     * @param  string|LazyCollection  $raw
-     */
-    public function __construct(string $prefix, string $date, string $path, $raw, bool $stats = false)
-    {
+    public function __construct(
+        string $prefix, string $date, string $path, string|LazyCollection $raw, bool $stats = false
+    ) {
         $this->prefix = $prefix;
         $this->date = $date;
         $this->path = $path;
@@ -60,123 +46,71 @@ class Log implements Arrayable, Jsonable, JsonSerializable
         $this->entries = LogEntryCollection::load($raw);
 
         if ($stats) {
-            $this->stats = function () use ($raw) {
-                return LogParser::stats($raw);
+            $this->stats = function () use (&$raw) {
+                $stats = LogParser::stats($raw);
+                $this->count = $stats['all'];
+
+                return $stats;
             };
         } else {
-            LogEntryCollection::$lastCount = LogParser::count($raw);
+            $this->count = LogParser::count($raw);
+            LogEntryCollection::$lastCount = $this->count;
         }
     }
 
-    /* -----------------------------------------------------------------
-     |  Getters & Setters
-     | -----------------------------------------------------------------
-     */
+    public static function make(
+        string $prefix, string $date, string $path, string|LazyCollection $raw, bool $stats = false
+    ): static {
+        return new static($prefix, $date, $path, $raw, $stats);
+    }
 
-    /**
-     * Get log path.
-     *
-     * @return string
-     */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
-    /**
-     * Get file info.
-     *
-     * @return \SplFileInfo
-     */
-    public function file()
+    public function count(): int
+    {
+        return $this->count;
+    }
+
+    public function file(): SplFileInfo
     {
         return $this->file;
     }
 
-    /**
-     * Get file size.
-     *
-     * @return string
-     */
-    public function size()
+    public function size(): string
     {
         return $this->formatSize($this->file->getSize());
     }
 
-    /**
-     * Get file creation date.
-     *
-     * @return \Carbon\Carbon
-     */
-    public function createdAt()
+    public function createdAt(): Carbon
     {
         return Carbon::createFromTimestamp($this->file()->getATime());
     }
 
-    /**
-     * Get file modification date.
-     *
-     * @return \Carbon\Carbon
-     */
-    public function updatedAt()
+    public function updatedAt(): Carbon
     {
         return Carbon::createFromTimestamp($this->file()->getMTime());
     }
 
-    /* -----------------------------------------------------------------
-     |  Main Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Make a log object.
-     *
-     * @param  string|LazyCollection  $raw
-     * @return self
-     */
-    public static function make(string $prefix, string $date, string $path, $raw, bool $stats = false)
-    {
-        return new self($prefix, $date, $path, $raw, $stats);
-    }
-
-    /**
-     * Get log entries.
-     *
-     *
-     * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
-     */
-    public function entries(string $level = 'all')
+    public function entries(string $level = 'all'): LogEntryCollection
     {
         return $level === 'all'
             ? $this->entries
             : $this->getByLevel($level);
     }
 
-    /**
-     * Get filtered log entries by level.
-     *
-     * @param  string  $level
-     * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
-     */
-    public function getByLevel($level)
+    public function getByLevel(string $level): LogEntryCollection
     {
         return $this->entries->filterByLevel($level);
     }
 
-    /**
-     * Get filtered log entries by similarity.
-     *
-     *
-     * @return \Arcanedev\LogViewer\Entities\LogEntryCollection
-     */
-    public function getSimilar(string $text, float $similarity)
+    public function getSimilar(string $text, float $similarity): LogEntryCollection
     {
         return $this->entries->filterBySimilarity($text, $similarity);
     }
 
-    /**
-     * Get log stats.
-     */
     public function stats(): array
     {
         if (is_callable($this->stats)) {
@@ -190,39 +124,17 @@ class Log implements Arrayable, Jsonable, JsonSerializable
         return $this->entries->stats();
     }
 
-    /**
-     * Get the log navigation tree.
-     *
-     * @param  bool  $trans
-     * @return array
-     */
-    public function tree($trans = false)
+    public function tree(bool $trans = false): array
     {
         return $this->entries->tree($trans);
     }
 
-    /**
-     * Get log entries menu.
-     *
-     * @param  bool  $trans
-     * @return array
-     */
-    public function menu($trans = true)
+    public function menu(bool $trans = true): array
     {
         return log_menu()->make($this, $trans);
     }
 
-    /* -----------------------------------------------------------------
-     |  Convert Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Get the log as a plain array.
-     *
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'prefix' => $this->prefix,
@@ -233,39 +145,19 @@ class Log implements Arrayable, Jsonable, JsonSerializable
     }
 
     /**
-     * Convert the object to its JSON representation.
-     *
-     * @param  int  $options
-     * @return string
+     * {@inheritdoc}
      */
     public function toJson($options = 0)
     {
         return json_encode($this->toArray(), $options);
     }
 
-    /**
-     * Serialize the log object to json data.
-     *
-     * @return array
-     */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }
 
-    /* -----------------------------------------------------------------
-     |  Other Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Format the file size.
-     *
-     * @param  int  $bytes
-     * @param  int  $precision
-     * @return string
-     */
-    private function formatSize($bytes, $precision = 2)
+    protected function formatSize(int $bytes, int $precision = 2): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
@@ -273,6 +165,6 @@ class Log implements Arrayable, Jsonable, JsonSerializable
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
 
-        return round($bytes / pow(1024, $pow), $precision).' '.$units[$pow];
+        return round($bytes / pow(1024, $pow), $precision) . ' ' . $units[$pow];
     }
 }

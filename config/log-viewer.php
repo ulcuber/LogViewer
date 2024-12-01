@@ -63,11 +63,11 @@ return [
      |  Theme
      | -----------------------------------------------------------------
      |  Supported themes :
-     |    'bootstrap-4'
+     |    'bootstrap-5'
      |  Make your own theme by adding a folder to the views directory and specifying it here.
      */
 
-    'theme' => 'bootstrap-4',
+    'theme' => 'bootstrap-5',
 
     /* -----------------------------------------------------------------
      |  Route settings

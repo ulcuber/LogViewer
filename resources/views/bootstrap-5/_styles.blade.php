@@ -134,62 +134,62 @@
      * Colors: Badge & Infobox
      */
 
-    .badge.badge-env,
-    .badge.badge-level-all,
-    .badge.badge-level-emergency,
-    .badge.badge-level-alert,
-    .badge.badge-level-critical,
-    .badge.badge-level-error,
-    .badge.badge-level-warning,
-    .badge.badge-level-notice,
-    .badge.badge-level-info,
-    .badge.badge-level-debug,
+    .badge.text-bg-env,
+    .badge.text-bg-level-all,
+    .badge.text-bg-level-emergency,
+    .badge.text-bg-level-alert,
+    .badge.text-bg-level-critical,
+    .badge.text-bg-level-error,
+    .badge.text-bg-level-warning,
+    .badge.text-bg-level-notice,
+    .badge.text-bg-level-info,
+    .badge.text-bg-level-debug,
     .badge.empty {
         color: #FFF;
         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
     }
 
-    .badge.badge-level-all,
+    .badge.text-bg-level-all,
     .box.level-all {
         background-color: {{ log_styler()->color('all') }};
     }
 
-    .badge.badge-level-emergency,
+    .badge.text-bg-level-emergency,
     .box.level-emergency {
         background-color: {{ log_styler()->color('emergency') }};
     }
 
-    .badge.badge-level-alert,
+    .badge.text-bg-level-alert,
     .box.level-alert {
         background-color: {{ log_styler()->color('alert') }};
     }
 
-    .badge.badge-level-critical,
+    .badge.text-bg-level-critical,
     .box.level-critical {
         background-color: {{ log_styler()->color('critical') }};
     }
 
-    .badge.badge-level-error,
+    .badge.text-bg-level-error,
     .box.level-error {
         background-color: {{ log_styler()->color('error') }};
     }
 
-    .badge.badge-level-warning,
+    .badge.text-bg-level-warning,
     .box.level-warning {
         background-color: {{ log_styler()->color('warning') }};
     }
 
-    .badge.badge-level-notice,
+    .badge.text-bg-level-notice,
     .box.level-notice {
         background-color: {{ log_styler()->color('notice') }};
     }
 
-    .badge.badge-level-info,
+    .badge.text-bg-level-info,
     .box.level-info {
         background-color: {{ log_styler()->color('info') }};
     }
 
-    .badge.badge-level-debug,
+    .badge.text-bg-level-debug,
     .box.level-debug {
         background-color: {{ log_styler()->color('debug') }};
     }
@@ -203,11 +203,11 @@
         background-color: {{ log_styler()->color('empty') }};
     }
 
-    .badge.badge-env {
+    .badge.text-bg-env {
         background-color: #6A1B9A;
     }
     @foreach (log_styler()->extraColors() as $key => $color)
-        .badge.badge-extra-{{ $key }} {
+        .badge.text-bg-extra-{{ $key }} {
             background-color: {{ $color }};
         }
     @endforeach

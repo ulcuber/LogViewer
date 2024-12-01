@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Entities;
 
 use Arcanedev\LogViewer\Helpers\LogParser;
@@ -16,18 +18,7 @@ class LogEntryCollection extends LazyCollection
 {
     public static $lastCount = null;
 
-    /* -----------------------------------------------------------------
-     |  Main Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Load raw log entries.
-     *
-     * @param  string  $raw
-     * @return self
-     */
-    public static function load($raw)
+    public static function load(string $raw): static
     {
         return new static(function () use (&$raw) {
             foreach (LogParser::parse($raw) as $entry) {
@@ -38,13 +29,7 @@ class LogEntryCollection extends LazyCollection
         });
     }
 
-    /**
-     * Paginate log entries.
-     *
-     * @param  int  $perPage
-     * @return Paginator|LengthAwarePaginator
-     */
-    public function paginate($perPage = 20)
+    public function paginate(int $perPage = 20): Paginator|LengthAwarePaginator
     {
         $request = request();
         $page = $request->get('page', 1);
@@ -77,35 +62,20 @@ class LogEntryCollection extends LazyCollection
         return $paginator;
     }
 
-    /**
-     * Get filtered log entries by level.
-     *
-     * @param  string  $level
-     * @return self
-     */
-    public function filterByLevel($level)
+    public function filterByLevel(string $level): static
     {
         return $this->filter(function (LogEntry $entry) use ($level) {
             return $entry->isSameLevel($level);
         });
     }
 
-    /**
-     * Get filtered log entries by level.
-     *
-     *
-     * @return self
-     */
-    public function filterBySimilarity(string $text, float $similarity)
+    public function filterBySimilarity(string $text, float $similarity): static
     {
         return $this->filter(function (LogEntry $entry) use ($text, $similarity) {
             return $entry->isSimilar($text, $similarity);
         });
     }
 
-    /**
-     * Get log entries stats.
-     */
     public function stats(): array
     {
         $counters = LogParser::initStats();
@@ -119,13 +89,7 @@ class LogEntryCollection extends LazyCollection
         return $counters;
     }
 
-    /**
-     * Get the log entries navigation tree.
-     *
-     * @param  bool|false  $trans
-     * @return array
-     */
-    public function tree($trans = false)
+    public function tree(bool $trans = false): array
     {
         $tree = $this->stats();
 

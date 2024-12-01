@@ -1,12 +1,4 @@
-<?php
-/**
- * @var  Arcanedev\LogViewer\Entities\Log                                                                     $log
- * @var  Illuminate\Pagination\LengthAwarePaginator|array<string|int, Arcanedev\LogViewer\Entities\LogEntry>  $entries
- * @var  string|null                                                                                          $search
- */
-?>
-
-@extends('log-viewer::bootstrap-4._master')
+@extends('log-viewer::bootstrap-5._master')
 
 @section('content')
     <div class="page-header mb-4">
@@ -17,7 +9,11 @@
         <aside class="col-lg-2">
             {{-- Log Menu --}}
             <div class="card mb-4">
-                <div class="card-header"><i class="bi bi-flag"></i> {{ trans('log-viewer::general.levels') }}<span class="btn btn-light ml-3 aside-hide">&lt;&lt;</span></div>
+                <div class="card-header">
+                    <i class="bi bi-flag"></i>
+                    {{ trans('log-viewer::general.levels') }}
+                    <button type="button" class="btn btn-light ml-3 aside-hide">&lt;&lt;</button>
+                </div>
                 <div class="list-group list-group-flush log-menu">
                     @foreach($log->menu() as $levelKey => $item)
                         @if ($item['count'] === 0)
@@ -28,7 +24,7 @@
                         @else
                             <a href="{{ $item['url'] }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center level-{{ $levelKey }}{{ $level === $levelKey ? ' active' : ''}}">
                                 <span class="level-name">{!! $item['icon'] !!} {{ $item['name'] }}</span>
-                                <span class="badge badge-level-{{ $levelKey }}">{{ $item['count'] }}</span>
+                                <span class="badge text-bg-level-{{ $levelKey }}">{{ $item['count'] }}</span>
                             </a>
                         @endif
                     @endforeach
@@ -47,31 +43,57 @@
                         <a href="#delete-log-modal" class="btn btn-sm btn-danger mb-1 mb-sm-0" data-toggle="modal">
                             <i class="bi bi-trash"></i> {{ trans('log-viewer::general.delete') }}
                         </a>
+                        @unless ((app('router')->getCurrentRoute()?->getName() ?? false) === 'log-viewer::logs.stats')
+                            <a href="{{ route('log-viewer::logs.stats', [$log->prefix, $log->date]) }}" class="btn btn-sm btn-warning mb-1 mb-sm-0">
+                                <i class="bi bi-calculator"></i> {{ trans('log-viewer::general.stats') }}
+                            </a>
+                        @endunless
                     </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-condensed mb-0">
                         <tbody>
                             <tr>
-                                <td>{{ trans('log-viewer::general.file-path') }}</td>
+                                <td>
+                                    <i class="bi bi-file-earmark"></i>
+                                    {{ trans('log-viewer::general.file-path') }}
+                                </td>
                                 <td colspan="7">{{ $log->getPath() }}</td>
                             </tr>
                             <tr>
-                                <td>{{ trans('log-viewer::general.log-entries') }}</td>
                                 <td>
-                                    <span class="badge badge-primary">{{ method_exists($entries, 'total') ? $entries->total() : 'N' }}</span>
+                                    <i class="bi bi-card-checklist"></i>
+                                    {{ trans('log-viewer::general.log-entries') }}
                                 </td>
-                                <td>{{ trans('log-viewer::general.size') }}</td>
                                 <td>
-                                    <span class="badge badge-primary">{{ $log->size() }}</span>
+                                    <span class="badge text-bg-primary">{{ count($log) }}</span>
                                 </td>
-                                <td>{{ trans('log-viewer::general.created-at') }}</td>
                                 <td>
-                                    <span class="badge badge-primary">{{ $log->createdAt() }}</span>
+                                    <i class="bi bi-file-earmark-diff"></i>
+                                    {{ trans('log-viewer::general.size') }}
                                 </td>
-                                <td>{{ trans('log-viewer::general.updated-at') }}</td>
                                 <td>
-                                    <span class="badge badge-primary">{{ $log->updatedAt() }}</span>
+                                    <span class="badge text-bg-primary">{{ $log->size() }}</span>
+                                </td>
+                                <td>
+                                    <i class="bi bi-calendar-plus"></i>
+                                    {{ trans('log-viewer::general.created-at') }}
+                                </td>
+                                <td>
+                                    <span class="badge text-bg-primary"><time
+                                        class="datetime"
+                                        datetime="{{ $log->createdAt()->format('Y-m-d\TH:i:s') . ".000Z" }}"
+                                    >{{ $log->createdAt() }}</time></span>
+                                </td>
+                                <td>
+                                    <i class="bi bi-calendar-event"></i>
+                                    {{ trans('log-viewer::general.updated-at') }}
+                                </td>
+                                <td>
+                                    <span class="badge text-bg-primary"><time
+                                        class="datetime"
+                                        datetime="{{ $log->updatedAt()->format('Y-m-d\TH:i:s') . ".000Z" }}"
+                                    >{{ $log->updatedAt() }}</time></span>
                                 </td>
                             </tr>
                         </tbody>
@@ -80,7 +102,10 @@
                 <div class="card-footer">
                     <form action="{{ route('log-viewer::logs.show', ['prefix' => $log->prefix, 'date' => $log->date, 'level' => $level]) }}" method="GET">
                         <input type="hidden" name="level" value="{{ $level }}">
-                        <div class="form-row justify-content-between align-items-center">
+                        @foreach (request('context', []) as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endforeach
+                        <div class="row justify-content-between align-items-center">
                             <div class="col-auto">
                                 <div class="form-check">
                                     <input
@@ -124,128 +149,41 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-row justify-content-between align-items-center">
-                            <div class="col-auto">
-                                <select class="custom-select" id="order-select" name="order">
-                                    @foreach (['asc', 'desc'] as $o)
-                                        <option value="{{ $o }}" @selected($order == $o)>
-                                            {{ trans("log-viewer::general.order-{$o}") }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                        @isset($order)
+                            <div class="row justify-content-between align-items-center">
+                                <div class="col-auto">
+                                    <select class="form-select" id="order-select" name="order">
+                                        @foreach (['asc', 'desc'] as $o)
+                                            <option value="{{ $o }}" @selected($order == $o)>
+                                                {{ trans("log-viewer::general.order-{$o}") }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
-                        </div>
+                        @endisset
                         <div class="form-group mt-3">
                             <div class="input-group">
                                 <input id="search" name="search" class="form-control" value="{{ $search }}" placeholder="{{ trans('log-viewer::general.search-placeholder') }}">
-                                <div class="input-group-append">
-                                    @unless (is_null($search))
-                                        <a href="{{ route('log-viewer::logs.show', [$log->prefix, $log->date]) }}" class="btn btn-secondary">
-                                            <span class="sr-only">{{ trans('log-viewer::general.search-reset') }}</span> <i class="bi bi-x-circle"></i>
-                                        </a>
-                                    @endunless
-                                    <button id="search-btn" class="btn btn-primary">
-                                        <span class="sr-only">{{ trans('log-viewer::general.search-submit') }}</span> <span class="bi bi-search"></span>
-                                    </button>
-                                </div>
+                                @unless (is_null($search))
+                                    <a
+                                        href="{{ route('log-viewer::logs.show', [$log->prefix, $log->date]) }}"
+                                        class="btn btn-secondary"
+                                    >
+                                        <span class="sr-only">{{ trans('log-viewer::general.search-reset') }}</span> <i class="bi bi-x-circle"></i>
+                                    </a>
+                                @endunless
+                                <button id="search-btn" class="btn btn-primary">
+                                    <span class="sr-only">{{ trans('log-viewer::general.search-submit') }}</span> <span class="bi bi-search"></span>
+                                </button>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
 
-            {{-- Log Entries --}}
-            <div class="card mb-4">
-                @if ($entries->hasPages())
-                    <div class="card-header">
-                        <span class="badge badge-info float-right">
-                            {{ trans('log-viewer::general.page') }} {{ $entries->currentPage() }} {{ trans('log-viewer::general.of') }} {{ method_exists($entries, 'lastPage') ? $entries->lastPage() : 'N' }}
-                        </span>
-                    </div>
-                @endif
+            @yield('section')
 
-                <div class="table-responsive">
-                    <table id="entries" class="table mb-0">
-                        <thead>
-                            <tr>
-                                <th>{{ trans('log-viewer::general.info-actions') }}</th>
-                                <th>{{ trans('log-viewer::general.header') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($entries as $key => $entry)
-                                <tr>
-                                    <td>
-                                        @foreach ($entry->extra as $propName => $extra)
-                                            <a class="badge badge-env badge-extra-{{ $propName }}" href="{{ route('log-viewer::logs.show', array_merge(request()->input(), ['prefix' => $log->prefix, 'date' => $log->date, $propName => $extra])) }}">
-                                                {{ $extra }}
-                                            </a>
-                                        @endforeach
-                                        <span class="badge badge-env">{{ $entry->env }}</span>
-                                        <span class="badge badge-level-{{ $entry->level }}">
-                                            {!! $entry->level() !!}
-                                        </span>
-                                        <span class="badge badge-secondary">
-                                            {{ $entry->getDatetime()->format('H:i:s') }}
-                                        </span>
-
-                                        <br/>
-
-                                        <div class="btn-group">
-                                            <a class="btn btn-sm btn-light" href="{{ route('log-viewer::logs.show', ['prefix' => $log->prefix, 'date' => $log->date, 'level' => $entry->level, 'search' => $entry->header, 'fuzzy' => true]) }}">{{ trans('log-viewer::general.similar') }}</a>
-                                            @if (!request('search'))
-                                                <a class="btn btn-sm btn-light" href="{{ route($route, array_merge($filters, ['exclude_similar' => array_merge($filters['exclude_similar'] ?? [], [$entry->header])])) }}">{{ trans('log-viewer::general.exclude-similar') }}</a>
-                                            @endif
-                                        </div>
-
-                                        @if ($entry->hasContext())
-                                            <a class="btn btn-sm btn-light" role="button" data-toggle="collapse"
-                                            href="#log-context-{{ $key }}" aria-expanded="false" aria-controls="log-context-{{ $key }}">
-                                                <i class="bi bi-toggle-on"></i> Context
-                                            </a>
-                                        @endif
-
-                                        @if ($entry->hasStack())
-                                            <a class="btn btn-sm btn-light" role="button" data-toggle="collapse"
-                                            href="#log-stack-{{ $key }}" aria-expanded="false" aria-controls="log-stack-{{ $key }}">
-                                                <i class="bi bi-toggle-on"></i> Stack
-                                            </a>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        {{ $entry->header }}
-                                    </td>
-                                </tr>
-                                @if ($entry->hasStack() || $entry->hasContext())
-                                    <tr>
-                                        <td colspan="5" class="stack py-0">
-                                            @if ($entry->hasContext())
-                                                <div class="stack-content collapse" id="log-context-{{ $key }}">
-                                                    <pre>{{ $entry->context() }}</pre>
-                                                </div>
-                                            @endif
-
-                                            @if ($entry->hasStack())
-                                                <div class="stack-content collapse" id="log-stack-{{ $key }}">
-                                                    {!! $entry->stack() !!}
-                                                </div>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endif
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center">
-                                        <span class="badge badge-secondary">{{ trans('log-viewer::general.empty-logs') }}</span>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {!! $entries->appends(compact('search'))->render(method_exists($entries, 'total') ? 'pagination::bootstrap-4' : 'pagination::simple-bootstrap-4') !!}
         </section>
     </div>
 @endsection
@@ -267,7 +205,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to <span class="badge badge-danger">DELETE</span> this log file <span class="badge badge-secondary">{{ $log->prefix }}</span> <span class="badge badge-primary">{{ $log->date }}</span> ?</p>
+                        <p>Are you sure you want to <span class="badge text-bg-danger">DELETE</span> this log file <span class="badge text-bg-secondary">{{ $log->prefix }}</span> <span class="badge text-bg-primary">{{ $log->date }}</span> ?</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-sm btn-secondary mr-auto" data-dismiss="modal">Cancel</button>
@@ -277,7 +215,7 @@
             </form>
         </div>
     </div>
-    <div class="aside-show card btn btn-default" style="display: none;">&gt;&gt;</div>
+    <button type="button"class="aside-show card btn btn-default" style="display: none;">&gt;&gt;</button>
     <style>
         .aside-show {
             z-index: 1;

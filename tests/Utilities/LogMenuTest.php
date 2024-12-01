@@ -61,7 +61,7 @@ class LogMenuTest extends TestCase
             'all' => [
                 'name' => 'All',
                 'count' => 8,
-                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01?level=all',
+                'url' => 'http://localhost/log-viewer/logs/laravel/2015-01-01',
                 'icon' => '<i class="bi bi-list"></i>',
             ],
             'emergency' => [
