@@ -150,6 +150,11 @@ class LogViewerController extends Controller
                         $context[$dottedKey] = [];
                     }
 
+                    if (is_array($value)) {
+                        // empty array could not be flattened
+                        $value = '';
+                    }
+
                     if (isset($context[$dottedKey][$value])) {
                         $context[$dottedKey][$value]['count']++;
                     } else {
@@ -167,6 +172,10 @@ class LogViewerController extends Controller
                     }
                 }
             }
+        }
+
+        foreach ($context as $dottedKey => &$values) {
+            $values = collect($values)->sortByDesc('count')->all();
         }
 
         return $this->view($request, 'stats', compact('level', 'log', 'search', 'levels', 'stats', 'context'));

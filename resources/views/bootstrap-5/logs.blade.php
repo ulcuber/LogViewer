@@ -46,6 +46,9 @@
                                 <a href="{{ route('log-viewer::logs.show', [$prefix, $date]) }}" class="btn btn-sm btn-info">
                                     <i class="bi bi-eye"></i>
                                 </a>
+                                <a href="{{ route('log-viewer::logs.stats', [$prefix, $date]) }}" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-calculator"></i>
+                                </a>
                                 <a href="{{ route('log-viewer::logs.download', [$prefix, $date]) }}" class="btn btn-sm btn-success">
                                     <i class="bi bi-download"></i>
                                 </a>
