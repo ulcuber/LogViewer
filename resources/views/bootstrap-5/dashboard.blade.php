@@ -15,7 +15,7 @@
                 @foreach($percents as $level => $item)
                     <div class="col-sm-6 col-md-12 col-lg-4 mb-3">
                         @isset($date)
-                        <a class="box-link" href="{{ route('log-viewer::logs.filter', [config('log-viewer.default_prefix', 'laravel'), $date, $level]) }}">
+                            <a class="box-link" href="{{ route('log-viewer::logs.show', ['prefix' => config('log-viewer.default_prefix', 'laravel'), 'date' => $date, 'level' => $level === 'all' ? null : $level]) }}">
                         @endisset
                         <div class="box level-{{ $level }} {{ $item['count'] === 0 ? 'empty' : '' }}">
                             <div class="box-icon">
