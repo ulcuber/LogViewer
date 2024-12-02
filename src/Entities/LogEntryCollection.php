@@ -18,7 +18,7 @@ class LogEntryCollection extends LazyCollection
 {
     public static $lastCount = null;
 
-    public static function load(string $raw): static
+    public static function load(string|LazyCollection $raw): static
     {
         return new static(function () use (&$raw) {
             foreach (LogParser::parse($raw) as $entry) {

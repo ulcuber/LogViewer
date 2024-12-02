@@ -22,7 +22,7 @@ class LogParser
      * @param  string|LazyCollection  $raw
      * @return array|LazyCollection
      */
-    public static function parse(&$raw)
+    public static function parse(string|LazyCollection &$raw)
     {
         static::$parsed = [];
 
