@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" backupStaticAttributes="false" beStrictAboutTestsThatDoNotTestAnything="false" bootstrap="vendor/autoload.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="true" verbose="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage>
+<phpunit
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+  backupGlobals="false"
+  beStrictAboutTestsThatDoNotTestAnything="false"
+  bootstrap="vendor/autoload.php"
+  colors="true"
+  processIsolation="false"
+  displayDetailsOnTestsThatTriggerDeprecations="true"
+  displayDetailsOnTestsThatTriggerErrors="true"
+  displayDetailsOnTestsThatTriggerNotices="true"
+  displayDetailsOnTestsThatTriggerWarnings="true"
+  displayDetailsOnPhpunitDeprecations="true"
+>
+  <source>
     <include>
       <directory suffix=".php">./src/</directory>
     </include>
+  </source>
+  <coverage>
     <report>
       <clover outputFile="build/logs/clover.xml"/>
       <html outputDirectory="build/logs/coverage"/>
@@ -12,7 +27,7 @@
   </coverage>
   <testsuites>
     <testsuite name="Package Test Suite">
-      <directory suffix=".php">./tests/</directory>
+      <directory suffix="Test.php">./tests/</directory>
     </testsuite>
   </testsuites>
   <php>

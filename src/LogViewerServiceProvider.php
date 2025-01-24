@@ -13,22 +13,12 @@ use Arcanedev\Support\Providers\PackageServiceProvider;
  */
 class LogViewerServiceProvider extends PackageServiceProvider
 {
-    /* -----------------------------------------------------------------
-     |  Properties
-     | -----------------------------------------------------------------
-     */
-
     /**
      * Package name.
      *
      * @var string
      */
     protected $package = 'log-viewer';
-
-    /* -----------------------------------------------------------------
-     |  Main Methods
-     | -----------------------------------------------------------------
-     */
 
     /**
      * Register the service provider.

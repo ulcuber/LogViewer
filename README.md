@@ -15,7 +15,7 @@ Feel free to check out the [releases](https://github.com/ulcuber/LogViewer/relea
 ## Features
 
 -   A great Log viewer API.
--   Laravel `9.x` is supported. For other versions of laravel see other branches
+-   Laravel `10.x` is supported. For other versions of laravel see other branches
 -   Ready to use (Views, Routes, controllers … Out of the box)
     -   Note: No need to publish assets
 -   View, paginate, filter, download and delete logs.
@@ -68,11 +68,11 @@ If you discover any security related issues, please email ulcuber.victor17011998
 
 ## PREVIEW
 
-![Dashboard](https://raw.githubusercontent.com/ulcuber/LogViewer/v9.x/_screenshots/1-dashboard.jpg)
-![Logs list](https://raw.githubusercontent.com/ulcuber/LogViewer/v9.x/_screenshots/2-logs-list.jpg)
-![Single log](https://raw.githubusercontent.com/ulcuber/LogViewer/v9.x/_screenshots/3-single-log.jpg)
+![Dashboard](https://raw.githubusercontent.com/ulcuber/LogViewer/v10.x/_screenshots/1-dashboard.jpg)
+![Logs list](https://raw.githubusercontent.com/ulcuber/LogViewer/v10.x/_screenshots/2-logs-list.jpg)
+![Single log](https://raw.githubusercontent.com/ulcuber/LogViewer/v10.x/_screenshots/3-single-log.jpg)
 
-[badge_laravel]: https://img.shields.io/badge/Laravel-9.x-orange.svg?style=flat-square
+[badge_laravel]: https://img.shields.io/badge/Laravel-10.x-orange.svg?style=flat-square
 
 [badge_build]: https://img.shields.io/github/workflow/status/ulcuber/LogViewer/run-tests?style=flat-square
 

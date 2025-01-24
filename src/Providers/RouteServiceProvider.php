@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Providers;
 
 use Arcanedev\LogViewer\Http\Routes\LogViewerRoute;
@@ -12,11 +14,6 @@ use Arcanedev\Support\Providers\RouteServiceProvider as ServiceProvider;
  */
 class RouteServiceProvider extends ServiceProvider
 {
-    /* -----------------------------------------------------------------
-     |  Getters & Setters
-     | -----------------------------------------------------------------
-     */
-
     /**
      * Check if routes is enabled
      *
@@ -26,11 +23,6 @@ class RouteServiceProvider extends ServiceProvider
     {
         return $this->config('enabled', false);
     }
-
-    /* -----------------------------------------------------------------
-     |  Main Methods
-     | -----------------------------------------------------------------
-     */
 
     /**
      * Define the routes for the application.
@@ -42,23 +34,6 @@ class RouteServiceProvider extends ServiceProvider
                 static::mapRouteClasses([LogViewerRoute::class]);
             });
         }
-    }
-
-    /* -----------------------------------------------------------------
-     |  Other Methods
-     | -----------------------------------------------------------------
-     */
-
-    /**
-     * Get config value by key
-     *
-     * @param  string  $key
-     * @param  mixed|null  $default
-     * @return mixed
-     */
-    private function config($key, $default = null)
-    {
-        return $this->app['config']->get("log-viewer.route.$key", $default);
     }
 
     /**
@@ -74,5 +49,17 @@ class RouteServiceProvider extends ServiceProvider
             }
             // else routes cache probably already included
         });
+    }
+
+    /**
+     * Get config value by key
+     *
+     * @param  string  $key
+     * @param  mixed|null  $default
+     * @return mixed
+     */
+    private function config($key, $default = null)
+    {
+        return $this->app['config']->get("log-viewer.route.{$key}", $default);
     }
 }

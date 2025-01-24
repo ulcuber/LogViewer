@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Arcanedev\LogViewer\Providers;
 
 use Arcanedev\LogViewer\Contracts;
@@ -15,11 +17,6 @@ use Illuminate\Contracts\Support\DeferrableProvider;
  */
 class DeferredServicesProvider extends ServiceProvider implements DeferrableProvider
 {
-    /* -----------------------------------------------------------------
-     |  Main Methods
-     | -----------------------------------------------------------------
-     */
-
     /**
      * Register the service provider.
      */
@@ -49,11 +46,6 @@ class DeferredServicesProvider extends ServiceProvider implements DeferrableProv
             Contracts\Utilities\LogChecker::class,
         ];
     }
-
-    /* -----------------------------------------------------------------
-     |  LogViewer Utilities
-     | -----------------------------------------------------------------
-     */
 
     /**
      * Register the log viewer service.

@@ -210,7 +210,7 @@ class LogTest extends TestCase
      *
      * @return array
      */
-    public function provideDates()
+    public static function provideDates()
     {
         return [
             ['2015-01-01'],
